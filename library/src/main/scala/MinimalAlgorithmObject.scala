@@ -1,0 +1,4 @@
+class MinimalAlgorithmObject(o: Object, weight: Int) extends Ordered[MinimalAlgorithmObject] {
+  def compare(mao: MinimalAlgorithmObject): Int = this.weight
+
+}
