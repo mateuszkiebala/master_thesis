@@ -3,7 +3,7 @@ package minimal_algorithms
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
-class SlidingAggregation {
+object SlidingAggregation {
   def computeWindowValues(rdd: RDD[(Int, (Int, Int, Int))],
                           itemsCntByPartition: Int, windowLen: Int,
                           partitionsPrefixWeights: List[Int]) = {
@@ -38,17 +38,18 @@ class SlidingAggregation {
     })
   }
 
-  def main(args: List[String]): Unit = {
+  def main(args: Array[String]) = {
     val spark = SparkSession.builder().appName("SlidingAggregation")
       .master("local").getOrCreate()
 
-    val input = spark.sparkContext.textFile("hdfs://192.168.0.221:9000/user/mati/small_sample/input")
+    val inputPath = "hdfs://192.168.0.220:9000/user/mati/test.txt"
+    val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
       new MinimalAlgorithmObject(p(0).toInt, p(1).toInt)})
 
     val minimalAlgorithm = new MinimalAlgorithm(spark, 5)
-    minimalAlgorithm.teraSort //.perfectBalance //.sendDataToRemotelyRelevantPartitions(5)
+    minimalAlgorithm.importObjects(inputMapped).perfectBalance //.sendDataToRemotelyRelevantPartitions(5)
 
     /*
     val inputPath = args(0)

@@ -1,11 +1,11 @@
 package minimal_algorithms
 
+import org.apache.spark.Partitioner
+import org.apache.spark.SparkContext._
 import org.apache.spark.broadcast.Broadcast
-import org.apache.spark.{Partitioner, RangePartitioner, SparkContext}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
 
 case class PerfectPartitioner(numPartitions: Int, itemsCntByPartition: Int) extends Partitioner {
   override def getPartition(key: Any): Int = {
@@ -21,42 +21,34 @@ case class KeyPartitioner(numPartitions: Int) extends Partitioner {
 
 class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
   var sc = spark.sparkContext
-  var objects: RDD[MinimalAlgorithmObject]
-  var prefixSums: Broadcast[List[Int]]
-  var balancedObjects: RDD[(Int, MinimalAlgorithmObject)]
-  var itemsCntByPartition: Int
+  var objects: RDD[(Int, MinimalAlgorithmObject)] = sc.emptyRDD
+  //var prefixSums: Broadcast[List[Int]]
+  //var balancedObjects: RDD[(Int, MinimalAlgorithmObject)]
+  var itemsCntByPartition: Int = 0
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
-  def importObjects(objects: RDD[MinimalAlgorithmObject]): Unit = {
-    this.objects = objects
-    this.itemsCntByPartition = (objects.count().toInt+numOfPartitions-1) / numOfPartitions
-  }
-
-  // import z pliku - dane kolumnowe
-  //def importObjects(objects: List[MinimalAlgorithmObject]): Unit = {
-  //  this.objects = sqlContext.sparkContext.parallelize(Seq(objects))
-  //}
-
-  // import z pliku - dane w json
-  //def importObjects(objects: List[MinimalAlgorithmObject]): Unit = {
-  //  this.objects = sqlContext.sparkContext.parallelize(Seq(objects))
-  //}
-
-  /*def teraSort: this.type = {
-    import spark.implicits
-    this.objects = this.objects.partitionBy(new RangePartitioner(this.numOfPartitions, objects.map(o => (o.getWeight, o)))).persist().sortByKey()
+  def importObjects(rdd: RDD[MinimalAlgorithmObject]): this.type = {
+    rdd.collect().foreach(println)
+    objects = rdd.map{mao => (mao.weight, mao)}
+    itemsCntByPartition = (rdd.count().toInt+numOfPartitions-1) / numOfPartitions
     this
   }
 
-  def perfectBalance: this.type = {
-    val prefixSums = sc.broadcast((0 until this.objects.partitions.size)
-      .zip(getPartitionsSize().collect().scanLeft(0)(_ + _))
-      .toMap)
+  def teraSort: this.type = {
+    import spark.implicits._
+    objects = objects.partitionBy(new RangePartitioner(numOfPartitions, objects)).persist().sortByKey()
+    this
+  }
 
-    this.balancedObjects = this.objects
-      .mapPartitions(iter => Iterator(iter.toList.zipWithIndex))
-      .mapPartitionsWithIndex((i, iter) => {
+
+  def perfectBalance: this.type = {
+    this.objects.collect().foreach(println)
+    //this.prefixSums = sc.broadcast((0 until this.objects.partitions.size)
+    //  .zip(getPartitionsSize.collect().scanLeft(0)(_ + _))
+    //  .toMap)
+
+    /*this.balancedObjects = this.objects.mapPartitionsWithIndex((i, iter) => {
         val offset = this.prefixSums.value(i)
         if (iter.isEmpty) Iterator()
         else iter.next.map {case (o, pos) => (pos+offset, o)}.toIterator
@@ -66,10 +58,10 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
 
     this.prefixSums = sc.broadcast(getParitionsWeights(this.balancedObjects)
       .collect().scanLeft(0)(_ + _).toList)
-
+     */
     this
   }
-
+  /*
   def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, (Int, MinimalAlgorithmObject))] = {
     this.balancedObjects.mapPartitionsWithIndex((i, iter) => {
       if (windowLen <= this.itemsCntByPartition) {
@@ -122,7 +114,7 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
         }.flatten.toIterator
       }
     })
-  }
+  }*/
 
   def getPartitionsSize: RDD[Int] = {
     this.objects.mapPartitions(iter => Iterator(iter.length))
@@ -130,8 +122,8 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
 
   def getParitionsWeights(rdd: RDD[(Int, MinimalAlgorithmObject)]): RDD[Int] = {
     def addWeights(res: Int, x: (Int, MinimalAlgorithmObject)): Int = {
-      res + x._2.getWeight()
+      res + x._2.weight
     }
     rdd.mapPartitions(iter => Iterator(iter.toList.foldLeft(0)(addWeights)))
-  }*/
+  }
 }

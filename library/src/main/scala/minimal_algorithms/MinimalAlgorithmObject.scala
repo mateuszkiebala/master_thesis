@@ -1,6 +1,11 @@
 package minimal_algorithms
 
-class MinimalAlgorithmObject(o: Object, weight: Int) extends Ordered[MinimalAlgorithmObject] {
-  def compare(mao: MinimalAlgorithmObject): Int = this.weight
-  def getWeight: Int = this.weight
+class MinimalAlgorithmObject(val key: Int, val weight: Int) extends Comparable[MinimalAlgorithmObject] with Serializable {
+  override def compareTo(mao: MinimalAlgorithmObject): Int = {
+    this.weight.compareTo(mao.weight)
+  }
+
+  override def toString: String = {
+    "Key: " + this.key + " | Weight: " + this.weight
+  }
 }
