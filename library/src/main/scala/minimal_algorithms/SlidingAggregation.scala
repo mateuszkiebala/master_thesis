@@ -1,68 +1,9 @@
-class SlidingAggregation {
+package minimal_algorithms
 
-}
-
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
-import org.apache.spark.RangePartitioner
-import org.apache.spark.Partitioner
+import org.apache.spark.sql.SparkSession
 
-case class PerfectPartitioner(numPartitions: Int, itemsCntByPartition: Int) extends Partitioner {
-  override def getPartition(key: Any): Int = {
-    return key.asInstanceOf[Int] / itemsCntByPartition
-  }
-}
-object PerfectPartitioner {}
-
-case class KeyPartitioner(numPartitions: Int) extends Partitioner {
-  override def getPartition(key: Any): Int = {
-    return key.asInstanceOf[Int]
-  }
-}
-object KeyPartitioner {}
-
-object WindowAggregationApp {
-  def getPartitionsSize(rdd: RDD[(Int, Int)]) = {
-    rdd.mapPartitions(iter => Iterator(iter.length))
-  }
-
-  def getParitionsWeights(rdd: RDD[(Int, (Int, Int))]) = {
-    def addWeights(res: Int, x: (Int, (Int, Int))) = {
-      res + x._2._2
-    }
-    rdd.mapPartitions(iter => Iterator(iter.toList.foldLeft(0)(addWeights)))
-  }
-
-  def sendDataToRemotelyRelevantPartitions(rdd: RDD[(Int, (Int, Int))],
-                                           windowLen: Int,
-                                           numOfPartitions: Int,
-                                           itemsCntByPartition: Int) = {
-    rdd.mapPartitionsWithIndex((i, iter) => {
-      if (windowLen <= itemsCntByPartition) {
-        iter.map {case (r, (k, w)) =>
-          if (i+1 < numOfPartitions) {
-            List((i, (r, k, w)), (i+1, (r, k, w)))
-          } else {
-            List((i, (r, k, w)))
-          }
-        }.flatten.toIterator
-      } else {
-        val remRelM = (windowLen-1) / itemsCntByPartition
-        iter.map {case (r, (k, w)) =>
-          if (i+remRelM+1 < numOfPartitions) {
-            List((i, (r, k, w)), (i+remRelM, (r, k, w)),
-              (i+remRelM+1, (r, k, w)))
-          } else if (i+remRelM < numOfPartitions) {
-            List((i, (r, k, w)), (i+remRelM, (r, k, w)))
-          } else {
-            List((i, (r, k, w)))
-          }
-        }.flatten.toIterator
-      }
-    })
-  }
-
+class SlidingAggregation {
   def computeWindowValues(rdd: RDD[(Int, (Int, Int, Int))],
                           itemsCntByPartition: Int, windowLen: Int,
                           partitionsPrefixWeights: List[Int]) = {
@@ -97,11 +38,19 @@ object WindowAggregationApp {
     })
   }
 
-  def main(args: Array[String]) {
-    val spark = SparkSession.builder().appName("WindowAggregationApp")
+  def main(args: List[String]): Unit = {
+    val spark = SparkSession.builder().appName("SlidingAggregation")
       .master("local").getOrCreate()
-    import spark.implicits._
 
+    val input = spark.sparkContext.textFile("hdfs://192.168.0.221:9000/user/mati/small_sample/input")
+    val inputMapped = input.map(line => {
+      val p = line.split(' ')
+      new MinimalAlgorithmObject(p(0).toInt, p(1).toInt)})
+
+    val minimalAlgorithm = new MinimalAlgorithm(spark, 5)
+    minimalAlgorithm.teraSort //.perfectBalance //.sendDataToRemotelyRelevantPartitions(5)
+
+    /*
     val inputPath = args(0)
     val windowLen = args(1).toInt
     val numOfPartitions = args(3).toInt
@@ -143,6 +92,7 @@ object WindowAggregationApp {
       windowLen, partitionsPrefixWeights.value)
       .map(res => res._1.toString + " " + res._2.toString)
       .saveAsTextFile(args(2))
+      */
     spark.stop()
   }
 }

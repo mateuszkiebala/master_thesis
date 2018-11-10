@@ -1,7 +1,11 @@
+package minimal_algorithms
+
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.{Partitioner, RangePartitioner, SparkContext}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
 case class PerfectPartitioner(numPartitions: Int, itemsCntByPartition: Int) extends Partitioner {
   override def getPartition(key: Any): Int = {
@@ -16,7 +20,7 @@ case class KeyPartitioner(numPartitions: Int) extends Partitioner {
 }
 
 class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
-  var sc: SparkContext
+  var sc = spark.sparkContext
   var objects: RDD[MinimalAlgorithmObject]
   var prefixSums: Broadcast[List[Int]]
   var balancedObjects: RDD[(Int, MinimalAlgorithmObject)]
@@ -24,10 +28,9 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
-  def MinimalAlgorithm(objects: List[MinimalAlgorithmObject]): Unit = {
-    this.sc = spark.sparkContext
-    this.objects = sc.parallelize(objects)
-    this.itemsCntByPartition = (objects.length+numOfPartitions-1) / numOfPartitions
+  def importObjects(objects: RDD[MinimalAlgorithmObject]): Unit = {
+    this.objects = objects
+    this.itemsCntByPartition = (objects.count().toInt+numOfPartitions-1) / numOfPartitions
   }
 
   // import z pliku - dane kolumnowe
@@ -37,12 +40,12 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
 
   // import z pliku - dane w json
   //def importObjects(objects: List[MinimalAlgorithmObject]): Unit = {
-  //  this.objects = sqlContext.sparkContext.parallelize(Seq(objects))s
+  //  this.objects = sqlContext.sparkContext.parallelize(Seq(objects))
   //}
 
-  def teraSort: this.type = {
-    import spark.implicits._
-    this.objects = this.objects.partitionBy(new RangePartitioner(this.numOfPartitions, objects.map(o => (o.getWeight(), o)))).persist().sortByKey()
+  /*def teraSort: this.type = {
+    import spark.implicits
+    this.objects = this.objects.partitionBy(new RangePartitioner(this.numOfPartitions, objects.map(o => (o.getWeight, o)))).persist().sortByKey()
     this
   }
 
@@ -65,6 +68,31 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
       .collect().scanLeft(0)(_ + _).toList)
 
     this
+  }
+
+  def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, (Int, MinimalAlgorithmObject))] = {
+    this.balancedObjects.mapPartitionsWithIndex((i, iter) => {
+      if (windowLen <= this.itemsCntByPartition) {
+        iter.map {case (r, mao) =>
+          if (i+1 < this.numOfPartitions) {
+            List((i, (r, mao)), (i+1, (r, mao)))
+          } else {
+            List((i, (r, mao)))
+          }
+        }.flatten.toIterator
+      } else {
+        val remRelM = (windowLen-1) / this.itemsCntByPartition
+        iter.map {case (r, mao) =>
+          if (i+remRelM+1 < this.numOfPartitions) {
+            List((i, (r, mao)), (i+remRelM, (r, mao)), (i+remRelM+1, (r, mao)))
+          } else if (i+remRelM < this.numOfPartitions) {
+            List((i, (r, mao)), (i+remRelM, (r, mao)))
+          } else {
+            List((i, (r, mao)))
+          }
+        }.flatten.toIterator
+      }
+    })
   }
 
   def sendDataToRemotelyRelevantPartitions(rdd: RDD[(Int, (Int, Int))],
@@ -105,5 +133,5 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
       res + x._2.getWeight()
     }
     rdd.mapPartitions(iter => Iterator(iter.toList.foldLeft(0)(addWeights)))
-  }
+  }*/
 }
