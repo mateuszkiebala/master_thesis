@@ -1,8 +1,6 @@
 package minimal_algorithms
 
 import org.apache.spark.Partitioner
-import org.apache.spark.SparkContext._
-import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
@@ -19,111 +17,72 @@ case class KeyPartitioner(numPartitions: Int) extends Partitioner {
   }
 }
 
+// MinimalAlgorithm has to allow for all subclasses of MAO
 class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
-  var sc = spark.sparkContext
+  val sc = spark.sparkContext
   var objects: RDD[(Int, MinimalAlgorithmObject)] = sc.emptyRDD
-  //var prefixSums: Broadcast[List[Int]]
-  //var balancedObjects: RDD[(Int, MinimalAlgorithmObject)]
+  var balancedObjects: RDD[(Int, MinimalAlgorithmObject)] = sc.emptyRDD
   var itemsCntByPartition: Int = 0
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
   def importObjects(rdd: RDD[MinimalAlgorithmObject]): this.type = {
-    rdd.collect().foreach(println)
     objects = rdd.map{mao => (mao.weight, mao)}
-    itemsCntByPartition = (rdd.count().toInt+numOfPartitions-1) / numOfPartitions
+    itemsCntByPartition = (rdd.count().toInt+this.numOfPartitions-1) / this.numOfPartitions
     this
   }
 
   def teraSort: this.type = {
     import spark.implicits._
-    objects = objects.partitionBy(new RangePartitioner(numOfPartitions, objects)).persist().sortByKey()
+    this.objects = this.objects.partitionBy(new RangePartitioner(numOfPartitions, this.objects)).sortByKey().persist()
     this
   }
-
 
   def perfectBalance: this.type = {
-    this.objects.collect().foreach(println)
-    //this.prefixSums = sc.broadcast((0 until this.objects.partitions.size)
-    //  .zip(getPartitionsSize.collect().scanLeft(0)(_ + _))
-    //  .toMap)
-
-    /*this.balancedObjects = this.objects.mapPartitionsWithIndex((i, iter) => {
-        val offset = this.prefixSums.value(i)
-        if (iter.isEmpty) Iterator()
-        else iter.next.map {case (o, pos) => (pos+offset, o)}.toIterator
+    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(this.objects).collect().scanLeft(0)(_ + _))
+    this.balancedObjects = this.objects.mapPartitionsWithIndex((index, partition) => {
+        val offset = prefixSumsOfPartitionSizes.value(index)
+        if (partition.isEmpty)
+          Iterator()
+        else
+          partition.toList.zipWithIndex.map{
+            case (maoPairRDD, i) => (i+offset, maoPairRDD._2)
+            case _               => throw new Exception("Error while balancing objects");
+          }.toIterator
       })
-      .partitionBy(new PerfectPartitioner(numOfPartitions, itemsCntByPartition))
+      .partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
       .persist()
-
-    this.prefixSums = sc.broadcast(getParitionsWeights(this.balancedObjects)
-      .collect().scanLeft(0)(_ + _).toList)
-     */
     this
   }
-  /*
-  def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, (Int, MinimalAlgorithmObject))] = {
-    this.balancedObjects.mapPartitionsWithIndex((i, iter) => {
-      if (windowLen <= this.itemsCntByPartition) {
-        iter.map {case (r, mao) =>
-          if (i+1 < this.numOfPartitions) {
-            List((i, (r, mao)), (i+1, (r, mao)))
+
+  def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, MinimalAlgorithmObject)] = {
+    val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
+    val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
+    this.balancedObjects.mapPartitionsWithIndex((pIndex, partition) => {
+      if (windowLen <= itemsCntByPartitionBroadcast) {
+        partition.flatMap {rankMaoPair =>
+          if (pIndex+1 < numOfPartitionsBroadcast) {
+            List((pIndex, rankMaoPair), (pIndex+1, rankMaoPair))
           } else {
-            List((i, (r, mao)))
+            List((pIndex, rankMaoPair))
           }
-        }.flatten.toIterator
+        }
       } else {
-        val remRelM = (windowLen-1) / this.itemsCntByPartition
-        iter.map {case (r, mao) =>
-          if (i+remRelM+1 < this.numOfPartitions) {
-            List((i, (r, mao)), (i+remRelM, (r, mao)), (i+remRelM+1, (r, mao)))
-          } else if (i+remRelM < this.numOfPartitions) {
-            List((i, (r, mao)), (i+remRelM, (r, mao)))
+        val remRelM = (windowLen-1) / itemsCntByPartitionBroadcast
+        partition.flatMap {rankMaoPair =>
+          if (pIndex+remRelM+1 < numOfPartitionsBroadcast) {
+            List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair), (pIndex+remRelM+1, rankMaoPair))
+          } else if (pIndex+remRelM < numOfPartitionsBroadcast) {
+            List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair))
           } else {
-            List((i, (r, mao)))
+            List((pIndex, rankMaoPair))
           }
-        }.flatten.toIterator
+        }
       }
-    })
+    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2).persist()
   }
 
-  def sendDataToRemotelyRelevantPartitions(rdd: RDD[(Int, (Int, Int))],
-    windowLen: Int,
-    numOfPartitions: Int,
-    itemsCntByPartition: Int): RDD[(Int, (Int, Int, Int))] = {
-    rdd.mapPartitionsWithIndex((i, iter) => {
-      if (windowLen <= itemsCntByPartition) {
-        iter.map {case (r, (k, w)) =>
-          if (i+1 < numOfPartitions) {
-            List((i, (r, k, w)), (i+1, (r, k, w)))
-          } else {
-            List((i, (r, k, w)))
-          }
-        }.flatten.toIterator
-      } else {
-        val remRelM = (windowLen-1) / itemsCntByPartition
-        iter.map {case (r, (k, w)) =>
-          if (i+remRelM+1 < numOfPartitions) {
-            List((i, (r, k, w)), (i+remRelM, (r, k, w)),
-              (i+remRelM+1, (r, k, w)))
-          } else if (i+remRelM < numOfPartitions) {
-            List((i, (r, k, w)), (i+remRelM, (r, k, w)))
-          } else {
-            List((i, (r, k, w)))
-          }
-        }.flatten.toIterator
-      }
-    })
-  }*/
-
-  def getPartitionsSize: RDD[Int] = {
-    this.objects.mapPartitions(iter => Iterator(iter.length))
-  }
-
-  def getParitionsWeights(rdd: RDD[(Int, MinimalAlgorithmObject)]): RDD[Int] = {
-    def addWeights(res: Int, x: (Int, MinimalAlgorithmObject)): Int = {
-      res + x._2.weight
-    }
-    rdd.mapPartitions(iter => Iterator(iter.toList.foldLeft(0)(addWeights)))
+  def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
+    rdd.mapPartitions(partition => Iterator(partition.length))
   }
 }
