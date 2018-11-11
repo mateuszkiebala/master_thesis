@@ -1,6 +1,6 @@
 ### Master thesis
-##### Title:
+#### Title:
 A library for implementing minimal algorithms.
 
-##### Author:
+#### Author:
 Mateusz Kiebala
