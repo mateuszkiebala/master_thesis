@@ -38,20 +38,43 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
     this
   }
 
+  def computePrefixSum: RDD[(Int, MinimalAlgorithmObject)] = {
+    val prefixSumsOfObjects = sc.broadcast(getPartitionSums(this.objects).collect().scanLeft(0)(_ + _))
+    this.objects.mapPartitionsWithIndex((index, partition) => {
+      if (partition.isEmpty) {
+        Iterator()
+      } else {
+        val maoObjects = partition.toList
+        val prefSums = maoObjects.map(maoPair => maoPair._2.weight).scanLeft(prefixSumsOfObjects.value(index))(_+_).tail
+        maoObjects.zipWithIndex.map{
+          case (maoPairRDD, i) => (prefSums(i), maoPairRDD._2)
+          case _               => throw new Exception("Error while creating prefix sums")
+        }.toIterator
+      }
+    })
+  }
+
+  def computeRanking: RDD[(Int, MinimalAlgorithmObject)] = {
+    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(this.objects).collect().scanLeft(0)(_+_))
+    this.objects.mapPartitionsWithIndex((index, partition) => {
+      val offset = prefixSumsOfPartitionSizes.value(index)
+      if (partition.isEmpty)
+        Iterator()
+      else
+        partition.toList.zipWithIndex.map{
+          case (maoPairRDD, i) => (i+offset, maoPairRDD._2)
+          case _               => throw new Exception("Error while creating ranking")
+        }.toIterator
+    })
+  }
+
   def perfectBalance: this.type = {
-    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(this.objects).collect().scanLeft(0)(_ + _))
-    this.balancedObjects = this.objects.mapPartitionsWithIndex((index, partition) => {
-        val offset = prefixSumsOfPartitionSizes.value(index)
-        if (partition.isEmpty)
-          Iterator()
-        else
-          partition.toList.zipWithIndex.map{
-            case (maoPairRDD, i) => (i+offset, maoPairRDD._2)
-            case _               => throw new Exception("Error while balancing objects");
-          }.toIterator
-      })
-      .partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
-      .persist()
+    this.balancedObjects = this.computeRanking.partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition)).persist()
+    this
+  }
+
+  def perfectSort: this.type = {
+    this.teraSort.perfectBalance
     this
   }
 
@@ -84,5 +107,9 @@ class MinimalAlgorithm(spark: SparkSession, numOfPartitions: Int) {
 
   def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.length))
+  }
+
+  def getPartitionSums(rdd: RDD[(Int, MinimalAlgorithmObject)]): RDD[Int] = {
+    rdd.mapPartitions(partition => Iterator(partition.map(o => o._2.weight).sum))
   }
 }

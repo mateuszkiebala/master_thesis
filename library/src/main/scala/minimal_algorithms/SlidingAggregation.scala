@@ -42,8 +42,7 @@ object SlidingAggregation {
   }
 
   def main(args: Array[String]) = {
-    val spark = SparkSession.builder().appName("SlidingAggregation")
-      .master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("SlidingAggregation").master("local").getOrCreate()
 
     //val inputPath = "hdfs://192.168.0.220:9000/user/mati/test.txt"
     val windowLen = 4
@@ -55,7 +54,7 @@ object SlidingAggregation {
       new MinimalAlgorithmObject(p(0).toInt, p(1).toInt)})
 
     val minimalAlgorithm = new MinimalAlgorithm(spark, 5)
-    val distData = minimalAlgorithm.importObjects(inputMapped).teraSort.perfectBalance.sendDataToRemotelyRelevantPartitions(windowLen)
+    val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.sendDataToRemotelyRelevantPartitions(windowLen)
     val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.balancedObjects).collect().scanLeft(0)(_ + _).toList).value
     computeWindowValues(distData, minimalAlgorithm.itemsCntByPartition, windowLen, prefixedWeights)
       .map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
