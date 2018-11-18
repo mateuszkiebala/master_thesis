@@ -18,9 +18,9 @@ case class KeyPartitioner(numPartitions: Int) extends Partitioner {
 }
 
 class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numOfPartitions: Int) {
-  val sc = spark.sparkContext
-  var objects: RDD[(Int, MinimalAlgorithmObject[T])] = sc.emptyRDD
-  var balancedObjects: RDD[(Int, MinimalAlgorithmObject[T])] = sc.emptyRDD
+  private val sc = spark.sparkContext
+  private var objects: RDD[(Int, MinimalAlgorithmObject[T])] = sc.emptyRDD
+  private var balancedObjects: RDD[(Int, MinimalAlgorithmObject[T])] = sc.emptyRDD
   var itemsCntByPartition: Int = 0
   object PerfectPartitioner {}
   object KeyPartitioner {}
@@ -72,12 +72,16 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     this
   }
 
+  def getBalanced: RDD[T] = {
+    this.balancedObjects.map(o => o._2).asInstanceOf[RDD[T]]
+  }
+
   def perfectSort: this.type = {
     this.teraSort.perfectBalance
     this
   }
 
-  def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, MinimalAlgorithmObject[T])] = {
+  def distributeData(windowLen: Int): RDD[(Int, T)] = {
     val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
     val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
     this.balancedObjects.mapPartitionsWithIndex((pIndex, partition) => {
@@ -101,7 +105,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
           }
         }
       }
-    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2).persist()
+    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2).asInstanceOf[RDD[(Int, T)]].persist()
   }
 
   def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {

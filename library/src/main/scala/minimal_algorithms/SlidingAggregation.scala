@@ -4,14 +4,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object SlidingAggregation {
-  def getPartitionsWeights(rdd: RDD[(Int, MinimalAlgorithmObject[MyW])]): RDD[Int] = {
-    def addWeights(res: Int, pair: (Int, MinimalAlgorithmObject[MyW])): Int = {
-      res + pair._2.getWeight
+  def getPartitionsWeights(rdd: RDD[MyKW]): RDD[Int] = {
+    def addWeights(res: Int, o: MyKW): Int = {
+      res + o.getWeight
     }
     rdd.mapPartitions(partition => Iterator(partition.toList.foldLeft(0)(addWeights)))
   }
 
-  def computeWindowValues(rdd: RDD[(Int, MinimalAlgorithmObject[MyW])],
+  def computeWindowValues(rdd: RDD[(Int, MyKW)],
                           itemsCntByPartition: Int, windowLen: Int,
                           partitionsPrefixWeights: List[Int]): RDD[(Int, Int)] = {
     rdd.mapPartitionsWithIndex((index, partition) => {
@@ -36,7 +36,7 @@ object SlidingAggregation {
         val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1
         val w1 = prefixWeights(maxRank) - prefixWeights(minRank-1)
         val w3 = if (alpha == pIndex) 0 else prefixWeights(rank) - prefixWeights(pEleMinRank) + baseObjects.head._2.getWeight
-        (mao.getWeight, w1 + w2 + w3)
+        (mao.getKey, w1 + w2 + w3)
       }}.toIterator
     })
   }
@@ -51,11 +51,11 @@ object SlidingAggregation {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new MyW(p(1).toInt)})
+      new MyKW(p(0).toInt, p(1).toInt)})
 
-    val minimalAlgorithm = new MinimalAlgorithm[MyW](spark, 5)
-    val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.sendDataToRemotelyRelevantPartitions(windowLen)
-    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.balancedObjects).collect().scanLeft(0)(_ + _).toList).value
+    val minimalAlgorithm = new MinimalAlgorithmWithKey[MyKW](spark, 5)
+    val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.distributeData(windowLen)
+    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.getBalanced).collect().scanLeft(0)(_ + _).toList).value
     computeWindowValues(distData, minimalAlgorithm.itemsCntByPartition, windowLen, prefixedWeights)
       .map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
 
