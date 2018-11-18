@@ -11,6 +11,9 @@ library/build
 library/classpath
 library/project
 library/settings
+library/out_sliding_agg
+library/out_prefix_sum
+library/out_ranking
 Prezentacja_seminarium.pptx
 library/test.txt
 seminarium_omowienie.docx

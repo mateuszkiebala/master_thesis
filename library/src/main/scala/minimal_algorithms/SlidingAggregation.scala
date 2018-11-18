@@ -4,14 +4,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object SlidingAggregation {
-  def getPartitionsWeights(rdd: RDD[(Int, MinimalAlgorithmObject)]): RDD[Int] = {
-    def addWeights(res: Int, pair: (Int, MinimalAlgorithmObject)): Int = {
-      res + pair._2.weight
+  def getPartitionsWeights(rdd: RDD[(Int, MinimalAlgorithmObject[MyW])]): RDD[Int] = {
+    def addWeights(res: Int, pair: (Int, MinimalAlgorithmObject[MyW])): Int = {
+      res + pair._2.getWeight
     }
     rdd.mapPartitions(partition => Iterator(partition.toList.foldLeft(0)(addWeights)))
   }
 
-  def computeWindowValues(rdd: RDD[(Int, MinimalAlgorithmObject)],
+  def computeWindowValues(rdd: RDD[(Int, MinimalAlgorithmObject[MyW])],
                           itemsCntByPartition: Int, windowLen: Int,
                           partitionsPrefixWeights: List[Int]): RDD[(Int, Int)] = {
     rdd.mapPartitionsWithIndex((index, partition) => {
@@ -21,7 +21,7 @@ object SlidingAggregation {
       val partitionObjects = partition.toList.sorted
       val baseObjects = partitionObjects.filter {case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
       val prefixWeights = ((-1) :: partitionObjects.map {case (rank, _) => rank})
-        .zip(partitionObjects.scanLeft(0)((result, rankMaoPair) => result + rankMaoPair._2.weight)).toMap
+        .zip(partitionObjects.scanLeft(0)((result, rankMaoPair) => result + rankMaoPair._2.getWeight)).toMap
 
       baseObjects.map {case (rank, mao) => {
         val a = (rank+1-windowLen+itemsCntByPartition) / itemsCntByPartition
@@ -35,8 +35,8 @@ object SlidingAggregation {
         }
         val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1
         val w1 = prefixWeights(maxRank) - prefixWeights(minRank-1)
-        val w3 = if (alpha == pIndex) 0 else prefixWeights(rank) - prefixWeights(pEleMinRank) + baseObjects.head._2.weight
-        (mao.key, w1 + w2 + w3)
+        val w3 = if (alpha == pIndex) 0 else prefixWeights(rank) - prefixWeights(pEleMinRank) + baseObjects.head._2.getWeight
+        (mao.getWeight, w1 + w2 + w3)
       }}.toIterator
     })
   }
@@ -47,13 +47,13 @@ object SlidingAggregation {
     //val inputPath = "hdfs://192.168.0.220:9000/user/mati/test.txt"
     val windowLen = 4
     val inputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/test.txt"
-    val outputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/out"
+    val outputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/out_sliding_agg"
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new MinimalAlgorithmObject(p(0).toInt, p(1).toInt)})
+      new MyW(p(1).toInt)})
 
-    val minimalAlgorithm = new MinimalAlgorithm(spark, 5)
+    val minimalAlgorithm = new MinimalAlgorithm[MyW](spark, 5)
     val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.sendDataToRemotelyRelevantPartitions(windowLen)
     val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.balancedObjects).collect().scanLeft(0)(_ + _).toList).value
     computeWindowValues(distData, minimalAlgorithm.itemsCntByPartition, windowLen, prefixedWeights)

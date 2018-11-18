@@ -10,9 +10,9 @@ object Ranking {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new MinimalAlgorithmObject(p(0).toInt, p(1).toInt)})
+      new MyW(p(1).toInt)})
 
-    val minimalAlgorithm = new MinimalAlgorithm(spark, 5)
+    val minimalAlgorithm = new MinimalAlgorithm[MyW](spark, 5)
     minimalAlgorithm.importObjects(inputMapped).teraSort.computeRanking.saveAsTextFile(outputPath)
     spark.stop()
   }
