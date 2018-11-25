@@ -12,4 +12,8 @@ class MyW(weight: Int) extends MinimalAlgorithmObject[MyW] {
   override def getWeight: Int = {
     this.weight
   }
+
+  override def sortValue: Int = {
+    this.getWeight
+  }
 }

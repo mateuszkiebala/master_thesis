@@ -5,8 +5,8 @@ import org.apache.spark.sql.SparkSession
 object PrefixSum {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("Ranking").master("local").getOrCreate()
-    val inputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/test.txt"
-    val outputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/out_prefix_sum"
+    val inputPath = "test.txt"
+    val outputPath = "out_prefix_sum"
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')

@@ -46,8 +46,8 @@ object SlidingAggregation {
 
     //val inputPath = "hdfs://192.168.0.220:9000/user/mati/test.txt"
     val windowLen = 4
-    val inputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/test.txt"
-    val outputPath = "/Users/mateuszkiebala/Documents/studia/magisterka/library/out_sliding_agg"
+    val inputPath = "test.txt"
+    val outputPath = "out_sliding_agg"
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
@@ -55,7 +55,7 @@ object SlidingAggregation {
 
     val minimalAlgorithm = new MinimalAlgorithmWithKey[MyKW](spark, 5)
     val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.distributeData(windowLen)
-    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.getBalanced).collect().scanLeft(0)(_ + _).toList).value
+    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.getObjects).collect().scanLeft(0)(_ + _).toList).value
     computeWindowValues(distData, minimalAlgorithm.itemsCntByPartition, windowLen, prefixedWeights)
       .map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
 
