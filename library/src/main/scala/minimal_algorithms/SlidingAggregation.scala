@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 object SlidingAggregation {
-  def getPartitionsWeights(rdd: RDD[MyKW]): RDD[Int] = {
+  /*def getPartitionsWeights(rdd: RDD[MyKW]): RDD[Int] = {
     def addWeights(res: Int, o: MyKW): Int = {
       res + o.getWeight
     }
@@ -39,7 +39,7 @@ object SlidingAggregation {
         (mao.getKey, w1 + w2 + w3)
       }}.toIterator
     })
-  }
+  }*/
 
   def main(args: Array[String]) = {
     val spark = SparkSession.builder().appName("SlidingAggregation").master("local").getOrCreate()
@@ -53,12 +53,14 @@ object SlidingAggregation {
       val p = line.split(' ')
       new MyKW(p(0).toInt, p(1).toInt)})
 
-    val minimalAlgorithm = new MinimalAlgorithmWithKey[MyKW](spark, 5)
-    val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.distributeData(windowLen)
-    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.getObjects).collect().scanLeft(0)(_ + _).toList).value
-    computeWindowValues(distData, minimalAlgorithm.itemsCntByPartition, windowLen, prefixedWeights)
-      .map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
+    //val minimalAlgorithm = new MinimalAlgorithmWithKey[MyKW](spark, 5)
+    //val distData = minimalAlgorithm.importObjects(inputMapped).perfectSort.distributeData(windowLen)
+    //val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(minimalAlgorithm.getObjects).collect().scanLeft(0)(_ + _).toList).value
+    //computeWindowValues(distData, minimalAlgorithm.itemsCntByPartition, windowLen, prefixedWeights)
+    // .map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
 
+    val msa = new MinimalSlidingAggregation[MyKW](spark, 5)
+    msa.execute(inputMapped, windowLen)
     spark.stop()
   }
 }

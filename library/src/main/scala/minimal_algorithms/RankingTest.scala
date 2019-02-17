@@ -2,9 +2,9 @@ package minimal_algorithms
 
 import org.apache.spark.sql.SparkSession
 
-object Ranking {
+object RankingTest {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("Ranking").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("RankingTest").master("local").getOrCreate()
     val inputPath = "test.txt"
     val outputPath = "out_ranking"
     val input = spark.sparkContext.textFile(inputPath)

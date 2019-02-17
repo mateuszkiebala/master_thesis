@@ -31,13 +31,17 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
   }
 
   def teraSort: this.type = {
+    this.objects = teraSorted(this.objects)
+    this
+  }
+
+  def teraSorted(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[MinimalAlgorithmObject[T]] = {
     import spark.implicits._
-    val pairedObjects = this.objects.map{mao => (mao.sortValue, mao)}
-    this.objects = pairedObjects.partitionBy(new RangePartitioner(numOfPartitions, pairedObjects))
+    val pairedObjects = rdd.map{mao => (mao.sortValue, mao)}
+    pairedObjects.partitionBy(new RangePartitioner(numOfPartitions, pairedObjects))
       .sortByKey()
       .map(pair => pair._2)
       .persist()
-    this
   }
 
   def computePrefixSum: RDD[(Int, MinimalAlgorithmObject[T])] = {
@@ -56,9 +60,11 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     })
   }
 
-  def computeRanking: RDD[(Int, MinimalAlgorithmObject[T])] = {
-    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(this.objects).collect().scanLeft(0)(_+_))
-    this.objects.mapPartitionsWithIndex((index, partition) => {
+  def computeRanking: RDD[(Int, MinimalAlgorithmObject[T])] = computeRanking(this.objects)
+
+  def computeRanking(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[(Int, MinimalAlgorithmObject[T])] = {
+    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(rdd).collect().scanLeft(0)(_+_))
+    rdd.mapPartitionsWithIndex((index, partition) => {
       val offset = prefixSumsOfPartitionSizes.value(index)
       if (partition.isEmpty)
         Iterator()
@@ -71,25 +77,35 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
   }
 
   def perfectBalance: this.type = {
-    this.objects = this.computeRanking.partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
-      .map(o => o._2)
-      .persist()
+    this.objects = perfectlyBalanced(this.objects).map(o => o._2).persist()
     this
+  }
+
+  def perfectlyBalanced(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[(Int, MinimalAlgorithmObject[T])] = {
+    computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+  }
+
+  def perfectSort: this.type = {
+    teraSort.perfectBalance
+    this
+  }
+
+  def perfectlySortedWithRanks: RDD[(Int, MinimalAlgorithmObject[T])] = {
+    perfectlyBalanced(teraSorted(this.objects))
   }
 
   def getObjects: RDD[T] = {
     this.objects.asInstanceOf[RDD[T]]
   }
 
-  def perfectSort: this.type = {
-    this.teraSort.perfectBalance
-    this
+  def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, MinimalAlgorithmObject[T])] = {
+    sendDataToRemotelyRelevantPartitions(perfectlySortedWithRanks, windowLen)
   }
 
-  def distributeData(windowLen: Int): RDD[(Int, T)] = {
+  def sendDataToRemotelyRelevantPartitions(rdd: RDD[(Int, MinimalAlgorithmObject[T])], windowLen: Int): RDD[(Int, MinimalAlgorithmObject[T])] = {
     val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
     val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
-    this.objects.mapPartitionsWithIndex((pIndex, partition) => {
+    rdd.mapPartitionsWithIndex((pIndex, partition) => {
       if (windowLen <= itemsCntByPartitionBroadcast) {
         partition.flatMap {rankMaoPair =>
           if (pIndex+1 < numOfPartitionsBroadcast) {
@@ -110,7 +126,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
           }
         }
       }
-    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2).asInstanceOf[RDD[(Int, T)]].persist()
+    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2).persist()
   }
 
   def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
