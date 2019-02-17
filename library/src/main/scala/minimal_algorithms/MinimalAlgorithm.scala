@@ -4,6 +4,7 @@ import org.apache.spark.Partitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
+import scala.reflect.ClassTag
 
 case class PerfectPartitioner(numPartitions: Int, itemsCntByPartition: Int) extends Partitioner {
   override def getPartition(key: Any): Int = {
@@ -17,15 +18,15 @@ case class KeyPartitioner(numPartitions: Int) extends Partitioner {
   }
 }
 
-class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numOfPartitions: Int) {
+class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int) {
   protected val sc = spark.sparkContext
-  protected var objects: RDD[MinimalAlgorithmObject[T]] = sc.emptyRDD
+  protected var objects: RDD[T] = sc.emptyRDD
   var itemsCntByPartition: Int = 0
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
   def importObjects(rdd: RDD[T]): this.type = {
-    this.objects = rdd.map{o => o.asInstanceOf[MinimalAlgorithmObject[T]]}
+    this.objects = rdd
     itemsCntByPartition = (rdd.count().toInt+this.numOfPartitions-1) / this.numOfPartitions
     this
   }
@@ -35,7 +36,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     this
   }
 
-  def teraSorted(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[MinimalAlgorithmObject[T]] = {
+  def teraSorted(rdd: RDD[T]): RDD[T] = {
     import spark.implicits._
     val pairedObjects = rdd.map{mao => (mao.sortValue, mao)}
     pairedObjects.partitionBy(new RangePartitioner(numOfPartitions, pairedObjects))
@@ -44,7 +45,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
       .persist()
   }
 
-  def computePrefixSum: RDD[(Int, MinimalAlgorithmObject[T])] = {
+  def computePrefixSum: RDD[(Int, T)] = {
     val prefixSumsOfObjects = sc.broadcast(getPartitionSums(this.objects).collect().scanLeft(0)(_ + _))
     this.objects.mapPartitionsWithIndex((index, partition) => {
       if (partition.isEmpty) {
@@ -60,9 +61,9 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     })
   }
 
-  def computeRanking: RDD[(Int, MinimalAlgorithmObject[T])] = computeRanking(this.objects)
+  def computeRanking: RDD[(Int, T)] = computeRanking(this.objects)
 
-  def computeRanking(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[(Int, MinimalAlgorithmObject[T])] = {
+  def computeRanking(rdd: RDD[T]): RDD[(Int, T)] = {
     val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(rdd).collect().scanLeft(0)(_+_))
     rdd.mapPartitionsWithIndex((index, partition) => {
       val offset = prefixSumsOfPartitionSizes.value(index)
@@ -81,8 +82,8 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     this
   }
 
-  def perfectlyBalanced(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[(Int, MinimalAlgorithmObject[T])] = {
-    computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+  def perfectlyBalanced(rdd: RDD[T]): RDD[(Int, T)] = {
+    computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition)).persist()
   }
 
   def perfectSort: this.type = {
@@ -90,19 +91,11 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     this
   }
 
-  def perfectlySortedWithRanks: RDD[(Int, MinimalAlgorithmObject[T])] = {
+  def perfectlySortedWithRanks: RDD[(Int, T)] = {
     perfectlyBalanced(teraSorted(this.objects))
   }
 
-  def getObjects: RDD[T] = {
-    this.objects.asInstanceOf[RDD[T]]
-  }
-
-  def sendDataToRemotelyRelevantPartitions(windowLen: Int): RDD[(Int, MinimalAlgorithmObject[T])] = {
-    sendDataToRemotelyRelevantPartitions(perfectlySortedWithRanks, windowLen)
-  }
-
-  def sendDataToRemotelyRelevantPartitions(rdd: RDD[(Int, MinimalAlgorithmObject[T])], windowLen: Int): RDD[(Int, MinimalAlgorithmObject[T])] = {
+  def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLen: Int): RDD[(Int, T)] = {
     val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
     val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
     rdd.mapPartitionsWithIndex((pIndex, partition) => {
@@ -133,7 +126,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T]](spark: SparkSession, numO
     rdd.mapPartitions(partition => Iterator(partition.length))
   }
 
-  private[this] def getPartitionSums(rdd: RDD[MinimalAlgorithmObject[T]]): RDD[Int] = {
+  private[this] def getPartitionSums(rdd: RDD[T]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.map(o => o.getWeight).sum))
   }
 }

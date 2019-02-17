@@ -2,8 +2,9 @@ package minimal_algorithms
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import scala.reflect.ClassTag
 
-class MinimalGroupBy[T <: KeyWeightedMAO[T]](spark: SparkSession, numOfPartitions: Int)
+class MinimalGroupBy[T <: KeyWeightedMAO[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithmWithKey[T](spark, numOfPartitions) {
 
   def groupBySum: RDD[(Int, Int)] = {
@@ -20,7 +21,7 @@ class MinimalGroupBy[T <: KeyWeightedMAO[T]](spark: SparkSession, numOfPartition
 
   private[this] def groupBy(startEle: Int, fun: (Int, Int) => Int): RDD[(Int, Int)] = {
     val masterIndex = 0
-    this.objects.asInstanceOf[RDD[KeyWeightedMAO[T]]].mapPartitionsWithIndex((pIndex, partition) => {
+    this.objects.mapPartitionsWithIndex((pIndex, partition) => {
       val grouped = partition.toList.groupBy(o => o.getKey)
       val minKey = grouped.keys.min
       val maxKey = grouped.keys.max
