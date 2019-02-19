@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
-class MinimalGroupBy[T <: KeyWeightedMAO[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
+class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithmWithKey[T](spark, numOfPartitions) {
 
   def groupBySum: RDD[(Int, Int)] = {

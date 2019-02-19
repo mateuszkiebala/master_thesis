@@ -1,7 +1,7 @@
 package minimal_algorithms
 
-class MySemiJoinType(key: Int, weight: Int, setType: Int) extends KeyWeightedMAO[MySemiJoinType] {
-  override def compareTo(o: MySemiJoinType): Int = {
+class TestSemiJoinType(key: Int, weight: Int, setType: Int) extends MinimalAlgorithmObjectWithKey[TestSemiJoinType] {
+  override def compareTo(o: TestSemiJoinType): Int = {
     val res = this.setType.compareTo(o.getSetType)
     if (res == 0)
       this.key.compareTo(o.getKey)

@@ -36,6 +36,10 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     this
   }
 
+  /** Super funkcja
+    * @param rdd
+    * @return
+    */
   def teraSorted(rdd: RDD[T]): RDD[T] = {
     import spark.implicits._
     val pairedObjects = rdd.map{mao => (mao.sortValue, mao)}

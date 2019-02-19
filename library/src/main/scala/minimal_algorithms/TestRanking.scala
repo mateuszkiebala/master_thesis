@@ -2,17 +2,17 @@ package minimal_algorithms
 
 import org.apache.spark.sql.SparkSession
 
-object RankingTest {
+object TestRanking {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("RankingTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("TestRanking").master("local").getOrCreate()
     val inputPath = "test.txt"
     val outputPath = "out_ranking"
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new MyW(p(1).toInt)})
+      new TestMao(p(1).toInt)})
 
-    val minimalAlgorithm = new MinimalAlgorithm[MyW](spark, 5)
+    val minimalAlgorithm = new MinimalAlgorithm[TestMao](spark, 5)
     minimalAlgorithm.importObjects(inputMapped).teraSort.computeRanking.saveAsTextFile(outputPath)
     spark.stop()
   }

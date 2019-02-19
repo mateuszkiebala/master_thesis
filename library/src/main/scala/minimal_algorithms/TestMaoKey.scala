@@ -1,7 +1,7 @@
 package minimal_algorithms
 
-class MyKW(key: Int, weight: Int) extends KeyWeightedMAO[MyKW] {
-  override def compareTo(o: MyKW): Int = {
+class TestMaoKey(key: Int, weight: Int) extends MinimalAlgorithmObjectWithKey[TestMaoKey] {
+  override def compareTo(o: TestMaoKey): Int = {
     this.weight.compareTo(o.getWeight)
   }
 

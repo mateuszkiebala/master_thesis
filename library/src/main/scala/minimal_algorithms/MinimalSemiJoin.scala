@@ -4,14 +4,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
-  extends MinimalAlgorithmWithKey[MySemiJoinType](spark, numOfPartitions) {
+  extends MinimalAlgorithmWithKey[TestSemiJoinType](spark, numOfPartitions) {
 
-  def importObjects(rddR: RDD[MySemiJoinType], rddT: RDD[MySemiJoinType]): this.type = {
+  def importObjects(rddR: RDD[TestSemiJoinType], rddT: RDD[TestSemiJoinType]): this.type = {
     this.objects = rddR.union(rddT)
     this
   }
 
-  def execute: RDD[MySemiJoinType] = {
+  def execute: RDD[TestSemiJoinType] = {
     val bounds = sc.broadcast(this.objects.mapPartitions(partition => {
       val tKeys = partition.filter(o => o.getSetType == MySemiJoinType.TType).toList
       if (tKeys.nonEmpty)
