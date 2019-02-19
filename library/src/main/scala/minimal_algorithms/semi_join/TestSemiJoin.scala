@@ -1,5 +1,7 @@
 package minimal_algorithms.semi_join
 
+import minimal_algorithms.MinimalSemiJoin
+import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
 import org.apache.spark.sql.SparkSession
 
 object TestSemiJoin {
@@ -19,8 +21,8 @@ object TestSemiJoin {
       val p = line.split(' ')
       new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.TType)})
 
-    val minimalGroupBy = new MinimalSemiJoin(spark, 5).importObjects(inputMappedR, inputMappedT).teraSort
-    minimalGroupBy.execute.collect.foreach(println)
+    val minimalSemiJoin = new MinimalSemiJoin(spark, 5).importObjects(inputMappedR, inputMappedT).teraSort
+    minimalSemiJoin.execute.collect.foreach(println)
     spark.stop()
   }
 }
