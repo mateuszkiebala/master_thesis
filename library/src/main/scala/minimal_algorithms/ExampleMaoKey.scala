@@ -1,7 +1,7 @@
 package minimal_algorithms
 
-class TestMaoKey(key: Int, weight: Int) extends MinimalAlgorithmObjectWithKey[TestMaoKey] {
-  override def compareTo(o: TestMaoKey): Int = {
+class ExampleMaoKey(key: Int, weight: Int) extends MinimalAlgorithmObjectWithKey[ExampleMaoKey] {
+  override def compareTo(o: ExampleMaoKey): Int = {
     this.key.compareTo(o.getKey)
   }
 

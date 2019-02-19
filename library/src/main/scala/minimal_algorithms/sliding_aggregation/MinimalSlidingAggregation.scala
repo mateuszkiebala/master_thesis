@@ -1,11 +1,13 @@
-package minimal_algorithms
+package minimal_algorithms.sliding_aggregation
 
+import minimal_algorithms.{MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+
 import scala.reflect.ClassTag
 
 /**
-  * Class implementing sliding aggregation algorithm.
+  * Class implementing sliding aggregation algorithm. Currently works only for SUM.
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
   * @tparam T T <: MinimalAlgorithmObjectWithKey[T] : ClassTag

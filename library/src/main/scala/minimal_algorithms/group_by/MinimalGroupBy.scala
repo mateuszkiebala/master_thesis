@@ -1,7 +1,9 @@
-package minimal_algorithms
+package minimal_algorithms.group_by
 
+import minimal_algorithms.{KeyPartitioner, MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+
 import scala.reflect.ClassTag
 
 /**

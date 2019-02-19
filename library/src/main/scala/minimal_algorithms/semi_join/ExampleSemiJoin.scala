@@ -4,9 +4,9 @@ import minimal_algorithms.MinimalSemiJoin
 import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
 import org.apache.spark.sql.SparkSession
 
-object TestSemiJoin {
+object ExampleSemiJoin {
   def main(args: Array[String]) = {
-    val spark = SparkSession.builder().appName("TestSemiJoin").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("ExampleSemiJoin").master("local").getOrCreate()
 
     val inputPathR = "setR.txt"
     val inputPathT = "setT.txt"
