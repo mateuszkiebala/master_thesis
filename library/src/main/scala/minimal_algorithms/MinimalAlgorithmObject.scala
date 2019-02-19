@@ -10,10 +10,4 @@ trait MinimalAlgorithmObject[Self <: MinimalAlgorithmObject[Self]] extends Compa
     * @return Weight of the object.
     */
   def getWeight: Int
-
-  /**
-    * Provides integer value that represents weight of the object.
-    * @return
-    */
-  def sortValue: Int
 }

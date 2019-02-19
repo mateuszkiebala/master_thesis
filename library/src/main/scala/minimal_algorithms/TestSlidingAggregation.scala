@@ -16,7 +16,7 @@ object TestSlidingAggregation {
       new TestMaoKey(p(0).toInt, p(1).toInt)})
 
     val msa = new MinimalSlidingAggregation[TestMaoKey](spark, 5)
-    msa.execute(inputMapped, windowLen).map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
+    msa.execute(inputMapped, windowLen).collect().foreach(println)//.map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

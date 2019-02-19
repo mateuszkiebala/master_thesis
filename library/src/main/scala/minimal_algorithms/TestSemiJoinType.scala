@@ -9,10 +9,6 @@ class TestSemiJoinType(key: Int, weight: Int, setType: Int) extends MinimalAlgor
       res
   }
 
-  override def sortValue: Int = {
-    this.getKey
-  }
-
   override def getKey: Int = {
     this.key
   }

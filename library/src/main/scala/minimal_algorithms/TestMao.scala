@@ -12,8 +12,4 @@ class TestMao(weight: Int) extends MinimalAlgorithmObject[TestMao] {
   override def getWeight: Int = {
     this.weight
   }
-
-  override def sortValue: Int = {
-    this.getWeight
-  }
 }

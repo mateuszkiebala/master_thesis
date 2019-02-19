@@ -42,11 +42,9 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     */
   def teraSorted(rdd: RDD[T]): RDD[T] = {
     import spark.implicits._
-    val pairedObjects = rdd.map{mao => (mao.sortValue, mao)}
-    pairedObjects.partitionBy(new RangePartitioner(numOfPartitions, pairedObjects))
-      .sortByKey()
-      .map(pair => pair._2)
-      .persist()
+    val pairedObjects = rdd.map{mao => (mao, mao)}
+    pairedObjects.partitionBy(new RangePartitioner[T, T](numOfPartitions, pairedObjects))
+      .sortByKey().values.persist()
   }
 
   def computePrefixSum: RDD[(Int, T)] = {
