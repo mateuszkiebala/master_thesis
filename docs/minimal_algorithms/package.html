@@ -1,0 +1,360 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>minimal_algorithms - minimal_algorithms</title>
+          <meta name="description" content="minimal algorithms - minimal algorithms" />
+          <meta name="keywords" content="minimal algorithms minimal algorithms" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'minimal_algorithms.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img alt="Package" src="../lib/package_big.png" />
+        
+        <h1>minimal_algorithms</h1><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">minimal_algorithms</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="minimal_algorithms.ExampleMao" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ExampleMaoextendsMinimalAlgorithmObject[minimal_algorithms.ExampleMao]"></a>
+      <a id="ExampleMao:ExampleMao"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ExampleMao.html"><span class="name">ExampleMao</span></a><span class="result"> extends <a href="MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<a href="ExampleMao.html" class="extype" name="minimal_algorithms.ExampleMao">ExampleMao</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@ExampleMaoextendsMinimalAlgorithmObject[minimal_algorithms.ExampleMao]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.ExampleMaoKey" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ExampleMaoKeyextendsMinimalAlgorithmObjectWithKey[minimal_algorithms.ExampleMaoKey]"></a>
+      <a id="ExampleMaoKey:ExampleMaoKey"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="ExampleMaoKey.html"><span class="name">ExampleMaoKey</span></a><span class="result"> extends <a href="MinimalAlgorithmObjectWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObjectWithKey">MinimalAlgorithmObjectWithKey</a>[<a href="ExampleMaoKey.html" class="extype" name="minimal_algorithms.ExampleMaoKey">ExampleMaoKey</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@ExampleMaoKeyextendsMinimalAlgorithmObjectWithKey[minimal_algorithms.ExampleMaoKey]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.KeyPartitioner" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="KeyPartitionerextendsPartitionerwithProductwithSerializable"></a>
+      <a id="KeyPartitioner:KeyPartitioner"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="KeyPartitioner.html"><span class="name">KeyPartitioner</span></a><span class="params">(<span name="numPartitions">numPartitions: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="org.apache.spark.Partitioner">Partitioner</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@KeyPartitionerextendsPartitionerwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Sends an object to partition which index equals object's key.</p><div class="fullcomment"><div class="comment cmt"><p>Sends an object to partition which index equals object's key.</p></div><dl class="paramcmts block"><dt class="param">numPartitions</dt><dd class="cmt"><p>Number of partitions.</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="MinimalAlgorithm[T&lt;:minimal_algorithms.MinimalAlgorithmObject[T]]extendsAnyRef"></a>
+      <a id="MinimalAlgorithm[T&lt;:MinimalAlgorithmObject[T]]:MinimalAlgorithm[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalAlgorithm.html"><span class="name">MinimalAlgorithm</span></a><span class="tparams">[<span name="T">T &lt;: <a href="MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@MinimalAlgorithm[T&lt;:minimal_algorithms.MinimalAlgorithmObject[T]]extendsAnyRef" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Class implementing base functions required to create a minimal algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Class implementing base functions required to create a minimal algorithm.</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>T &lt;: MinimalAlgorithmObject[T] : ClassTag</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithmObject" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="MinimalAlgorithmObject[Self&lt;:minimal_algorithms.MinimalAlgorithmObject[Self]]extendsComparable[Self]withSerializable"></a>
+      <a id="MinimalAlgorithmObject[Self&lt;:MinimalAlgorithmObject[Self]]:MinimalAlgorithmObject[Self]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalAlgorithmObject.html"><span class="name">MinimalAlgorithmObject</span></a><span class="tparams">[<span name="Self">Self &lt;: <a href="MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithmObject.Self">Self</span>]</span>]</span><span class="result"> extends <span class="extype" name="java.lang.Comparable">Comparable</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithmObject.Self">Self</span>] with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@MinimalAlgorithmObject[Self&lt;:minimal_algorithms.MinimalAlgorithmObject[Self]]extendsComparable[Self]withSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Interface for the most basic object which can be used in the Minimal Algorithm.</p>
+    </li><li name="minimal_algorithms.MinimalAlgorithmObjectWithKey" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="MinimalAlgorithmObjectWithKey[Self&lt;:minimal_algorithms.MinimalAlgorithmObjectWithKey[Self]]extendsMinimalAlgorithmObject[Self]"></a>
+      <a id="MinimalAlgorithmObjectWithKey[Self&lt;:MinimalAlgorithmObjectWithKey[Self]]:MinimalAlgorithmObjectWithKey[Self]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalAlgorithmObjectWithKey.html"><span class="name">MinimalAlgorithmObjectWithKey</span></a><span class="tparams">[<span name="Self">Self &lt;: <a href="MinimalAlgorithmObjectWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObjectWithKey">MinimalAlgorithmObjectWithKey</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithmObjectWithKey.Self">Self</span>]</span>]</span><span class="result"> extends <a href="MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithmObjectWithKey.Self">Self</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@MinimalAlgorithmObjectWithKey[Self&lt;:minimal_algorithms.MinimalAlgorithmObjectWithKey[Self]]extendsMinimalAlgorithmObject[Self]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Interface for more advanced object which can be used in the Minimal Algorithm.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for more advanced object which can be used in the Minimal Algorithm.
+We force an object to possess a key and weight.</p></div></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithmWithKey" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MinimalAlgorithmWithKey[T&lt;:minimal_algorithms.MinimalAlgorithmObjectWithKey[T]]extendsMinimalAlgorithm[T]"></a>
+      <a id="MinimalAlgorithmWithKey[T&lt;:MinimalAlgorithmObjectWithKey[T]]:MinimalAlgorithmWithKey[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalAlgorithmWithKey.html"><span class="name">MinimalAlgorithmWithKey</span></a><span class="tparams">[<span name="T">T &lt;: <a href="MinimalAlgorithmObjectWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObjectWithKey">MinimalAlgorithmObjectWithKey</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey.T">T</span>]</span>]</span><span class="result"> extends <a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@MinimalAlgorithmWithKey[T&lt;:minimal_algorithms.MinimalAlgorithmObjectWithKey[T]]extendsMinimalAlgorithm[T]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.MinimalSemiJoin" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="MinimalSemiJoinextendsMinimalAlgorithmWithKey[minimal_algorithms.examples.SemiJoinType]"></a>
+      <a id="MinimalSemiJoin:MinimalSemiJoin"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalSemiJoin.html"><span class="name">MinimalSemiJoin</span></a><span class="result"> extends <a href="MinimalAlgorithmWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey">MinimalAlgorithmWithKey</a>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@MinimalSemiJoinextendsMinimalAlgorithmWithKey[minimal_algorithms.examples.SemiJoinType]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Class implementing semi join algorithm.</p>
+    </li><li name="minimal_algorithms.PerfectPartitioner" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PerfectPartitionerextendsPartitionerwithProductwithSerializable"></a>
+      <a id="PerfectPartitioner:PerfectPartitioner"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="PerfectPartitioner.html"><span class="name">PerfectPartitioner</span></a><span class="params">(<span name="numPartitions">numPartitions: <span class="extype" name="scala.Int">Int</span></span>, <span name="itemsCntByPartition">itemsCntByPartition: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result"> extends <span class="extype" name="org.apache.spark.Partitioner">Partitioner</span> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@PerfectPartitionerextendsPartitionerwithProductwithSerializable" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Distributes data into numerically equal partitions thanks to object's unique key that represents ranking position.</p><div class="fullcomment"><div class="comment cmt"><p>Distributes data into numerically equal partitions thanks to object's unique key that represents ranking position.</p></div><dl class="paramcmts block"><dt class="param">numPartitions</dt><dd class="cmt"><p>Number of partitions.</p></dd><dt class="param">itemsCntByPartition</dt><dd class="cmt"><p>Maximum number of items on each partition.</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="minimal_algorithms.examples" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="examples"></a>
+      <a id="examples:examples"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="examples/package.html"><span class="name">examples</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@examples" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.group_by" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="group_by"></a>
+      <a id="group_by:group_by"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="group_by/package.html"><span class="name">group_by</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@group_by" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.prefix_sum" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="prefix_sum"></a>
+      <a id="prefix_sum:prefix_sum"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="prefix_sum/package.html"><span class="name">prefix_sum</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@prefix_sum" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.ranking" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ranking"></a>
+      <a id="ranking:ranking"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="ranking/package.html"><span class="name">ranking</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@ranking" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.semi_join" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="semi_join"></a>
+      <a id="semi_join:semi_join"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="semi_join/package.html"><span class="name">semi_join</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@semi_join" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.sliding_aggregation" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="sliding_aggregation"></a>
+      <a id="sliding_aggregation:sliding_aggregation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a href="sliding_aggregation/package.html"><span class="name">sliding_aggregation</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.package@sliding_aggregation" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
