@@ -6,18 +6,43 @@ import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
+/**
+  * Distributes data into numerically equal partitions thanks to object's unique key that represents ranking position.
+  * @param numPartitions  Number of partitions.
+  * @param itemsCntByPartition  Maximum number of items on each partition.
+  */
 case class PerfectPartitioner(numPartitions: Int, itemsCntByPartition: Int) extends Partitioner {
+  /**
+    * Returns partition index for given object.
+    * @param key Ranking position of the object.
+    * @return Partition index (key / itemsCntByPartition).
+    */
   override def getPartition(key: Any): Int = {
     key.asInstanceOf[Int] / itemsCntByPartition
   }
 }
 
+/**
+  * Sends an object to partition which index equals object's key.
+  * @param numPartitions  Number of partitions.
+  */
 case class KeyPartitioner(numPartitions: Int) extends Partitioner {
+  /**
+    * Returns partition index which equals the key.
+    * @param key Object key = partition index.
+    * @return Index of partition.
+    */
   override def getPartition(key: Any): Int = {
     key.asInstanceOf[Int]
   }
 }
 
+/**
+  * Class implementing base functions required to create a minimal algorithm.
+  * @param spark  SparkSession object
+  * @param numOfPartitions  Number of partitions.
+  * @tparam T T <: MinimalAlgorithmObject[T] : ClassTag
+  */
 class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int) {
   protected val sc = spark.sparkContext
   protected var objects: RDD[T] = sc.emptyRDD
@@ -25,20 +50,29 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
+  /**
+    * Imports objects.
+    * @param rdd  Objects to be processed by minimal algorithm.
+    * @return this
+    */
   def importObjects(rdd: RDD[T]): this.type = {
     this.objects = rdd
     itemsCntByPartition = (rdd.count().toInt+this.numOfPartitions-1) / this.numOfPartitions
     this
   }
 
+  /**
+    * Applies Tera Sort algorithm on imported objects. Function affects imported objects.
+    * @return this
+    */
   def teraSort: this.type = {
     this.objects = teraSorted(this.objects)
     this
   }
 
-  /** Super funkcja
-    * @param rdd
-    * @return
+  /** Applies Tera Sort algorithm on provided RDD. Provided RDD will not be affected.
+    * @param rdd  RDD on which Tera Sort will be performed.
+    * @return Sorted RDD
     */
   def teraSorted(rdd: RDD[T]): RDD[T] = {
     import spark.implicits._
@@ -47,9 +81,23 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
       .sortByKey().values.persist()
   }
 
-  def computePrefixSum: RDD[(Int, T)] = {
-    val prefixSumsOfObjects = sc.broadcast(getPartitionSums(this.objects).collect().scanLeft(0)(_ + _))
-    this.objects.mapPartitionsWithIndex((index, partition) => {
+  /**
+    * Applies prefix sum algorithm on imported objects. First orders elements and then computes prefix sums.
+    * Order for equal objects is picked randomly.
+    * @return RDD of pairs (prefixSum, object)
+    */
+  def computeUniquePrefixSum: RDD[(Int, T)] = computeUniquePrefixSum(this.objects)
+
+  /**
+    * Applies prefix sum algorithm on provided RDD. First orders elements and then computes prefix sums.
+    * Order for equal objects is picked randomly.
+    * @param rdd  RDD with objects to process.
+    * @return RDD of pairs (prefixSum, object)
+    */
+  def computeUniquePrefixSum(rdd: RDD[T]): RDD[(Int, T)] = {
+    val sortedRdd = teraSorted(rdd)
+    val prefixSumsOfObjects = sc.broadcast(getPartitionSums(sortedRdd).collect().scanLeft(0)(_ + _))
+    sortedRdd.mapPartitionsWithIndex((index, partition) => {
       if (partition.isEmpty) {
         Iterator()
       } else {
@@ -63,11 +111,23 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     })
   }
 
-  def computeRanking: RDD[(Int, T)] = computeRanking(this.objects)
+  /**
+    * Applies ranking algorithm on imported objects. Order for equal objects is picked randomly.
+    * Each object has unique ranking.
+    * @return RDD of pairs (ranking, object)
+    */
+  def computeUniqueRanking: RDD[(Int, T)] = computeUniqueRanking(this.objects)
 
-  def computeRanking(rdd: RDD[T]): RDD[(Int, T)] = {
-    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(rdd).collect().scanLeft(0)(_+_))
-    rdd.mapPartitionsWithIndex((index, partition) => {
+  /**
+    * Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
+    * Each object has unique ranking.
+    * @param rdd  RDD with objects to process.
+    * @return RDD of pairs (ranking, object)
+    */
+  def computeUniqueRanking(rdd: RDD[T]): RDD[(Int, T)] = {
+    val sortedRdd = teraSorted(rdd)
+    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(sortedRdd).collect().scanLeft(0)(_+_))
+    sortedRdd.mapPartitionsWithIndex((index, partition) => {
       val offset = prefixSumsOfPartitionSizes.value(index)
       if (partition.isEmpty)
         Iterator()
@@ -79,29 +139,43 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     })
   }
 
-  def perfectBalance: this.type = {
-    this.objects = perfectlyBalanced(this.objects).map(o => o._2).persist()
-    this
-  }
-
-  def perfectlyBalanced(rdd: RDD[T]): RDD[(Int, T)] = {
-    computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition)).persist()
-  }
-
+  /**
+    * Sorts and perfectly balances imported objects. Function affects imported objects.
+    * @return this
+    */
   def perfectSort: this.type = {
-    teraSort.perfectBalance
+    this.objects = perfectlySortedWithRanks(this.objects).map(o => o._2).persist()
     this
   }
 
+  /**
+    * Sorts and perfectly balances imported objects.
+    * @return Perfectly balanced RDD of pairs (ranking, object)
+    */
   def perfectlySortedWithRanks: RDD[(Int, T)] = {
-    perfectlyBalanced(teraSorted(this.objects))
+    perfectlySortedWithRanks(this.objects)
   }
 
-  def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLen: Int): RDD[(Int, T)] = {
+  /**
+    * Sorts and perfectly balances provided RDD.
+    * @param rdd  RDD with objects to process.
+    * @return Perfectly balanced RDD of pairs (ranking, object)
+    */
+  def perfectlySortedWithRanks(rdd: RDD[T]): RDD[(Int, T)] = {
+    computeUniqueRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition)).persist()
+  }
+
+  /**
+    * Sends objects to remotely relevant partitions. Implements algorithm described in 'Minimal MapReduce Algorithms' paper.
+    * @param rdd  RDD with objects to process.
+    * @param windowLength  Window length.
+    * @return
+    */
+  def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLength: Int): RDD[(Int, T)] = {
     val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
     val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
     rdd.mapPartitionsWithIndex((pIndex, partition) => {
-      if (windowLen <= itemsCntByPartitionBroadcast) {
+      if (windowLength <= itemsCntByPartitionBroadcast) {
         partition.flatMap {rankMaoPair =>
           if (pIndex+1 < numOfPartitionsBroadcast) {
             List((pIndex, rankMaoPair), (pIndex+1, rankMaoPair))
@@ -110,7 +184,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
           }
         }
       } else {
-        val remRelM = (windowLen-1) / itemsCntByPartitionBroadcast
+        val remRelM = (windowLength-1) / itemsCntByPartitionBroadcast
         partition.flatMap {rankMaoPair =>
           if (pIndex+remRelM+1 < numOfPartitionsBroadcast) {
             List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair), (pIndex+remRelM+1, rankMaoPair))
@@ -124,6 +198,12 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2).persist()
   }
 
+  /**
+    * Returns number of elements on each partition.
+    * @param rdd  RDD with objects to process.
+    * @tparam A Type of RDD's objects.
+    * @return Number of elements on each partition
+    */
   def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.length))
   }

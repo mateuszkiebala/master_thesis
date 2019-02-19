@@ -13,7 +13,7 @@ object TestPrefixSum {
       new TestMao(p(1).toInt)})
 
     val minimalAlgorithm = new MinimalAlgorithm[TestMao](spark, 5)
-    minimalAlgorithm.importObjects(inputMapped).teraSort.computePrefixSum.saveAsTextFile(outputPath)
+    minimalAlgorithm.importObjects(inputMapped).computeUniquePrefixSum.saveAsTextFile(outputPath)
     spark.stop()
   }
 }

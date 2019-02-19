@@ -13,7 +13,7 @@ object TestRanking {
       new TestMao(p(1).toInt)})
 
     val minimalAlgorithm = new MinimalAlgorithm[TestMao](spark, 5)
-    minimalAlgorithm.importObjects(inputMapped).teraSort.computeRanking.saveAsTextFile(outputPath)
+    minimalAlgorithm.importObjects(inputMapped).computeUniqueRanking.saveAsTextFile(outputPath)
     spark.stop()
   }
 }
