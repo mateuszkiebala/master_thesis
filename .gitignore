@@ -1,4 +1,3 @@
-library/target/
 *.class
 *.log
 *.iml

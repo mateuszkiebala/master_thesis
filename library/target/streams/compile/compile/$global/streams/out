@@ -1,0 +1,28 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/MinimalSemiJoin.scala:12:35: not found: type SemiJoinType[0m
+[0m[[0m[31merror[0m] [0m[0m  extends MinimalAlgorithmWithKey[SemiJoinType](spark, numOfPartitions) {[0m
+[0m[[0m[31merror[0m] [0m[0m                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/MinimalSemiJoin.scala:20:31: not found: type SemiJoinType[0m
+[0m[[0m[31merror[0m] [0m[0m  def importObjects(rddR: RDD[SemiJoinType], rddT: RDD[SemiJoinType]): this.type = {[0m
+[0m[[0m[31merror[0m] [0m[0m                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/MinimalSemiJoin.scala:20:56: not found: type SemiJoinType[0m
+[0m[[0m[31merror[0m] [0m[0m  def importObjects(rddR: RDD[SemiJoinType], rddT: RDD[SemiJoinType]): this.type = {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/MinimalSemiJoin.scala:29:20: not found: type TestSemiJoinType[0m
+[0m[[0m[31merror[0m] [0m[0m  def execute: RDD[TestSemiJoinType] = {[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/TestSemiJoin.scala:15:11: not found: type SemiJoinType[0m
+[0m[[0m[31merror[0m] [0m[0m      new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.RType)})[0m
+[0m[[0m[31merror[0m] [0m[0m          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/TestSemiJoin.scala:15:48: not found: value SemiJoinTypeEnum[0m
+[0m[[0m[31merror[0m] [0m[0m      new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.RType)})[0m
+[0m[[0m[31merror[0m] [0m[0m                                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/TestSemiJoin.scala:20:11: not found: type SemiJoinType[0m
+[0m[[0m[31merror[0m] [0m[0m      new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.TType)})[0m
+[0m[[0m[31merror[0m] [0m[0m          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/TestSemiJoin.scala:20:48: not found: value SemiJoinTypeEnum[0m
+[0m[[0m[31merror[0m] [0m[0m      new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.TType)})[0m
+[0m[[0m[31merror[0m] [0m[0m                                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/Users/mateuszkiebala/master_thesis/library/src/main/scala/minimal_algorithms/semi_join/TestSemiJoin.scala:22:30: not found: type MinimalSemiJoin[0m
+[0m[[0m[31merror[0m] [0m[0m    val minimalGroupBy = new MinimalSemiJoin(spark, 5).importObjects(inputMappedR, inputMappedT).teraSort[0m
+[0m[[0m[31merror[0m] [0m[0m                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m9 errors found[0m
