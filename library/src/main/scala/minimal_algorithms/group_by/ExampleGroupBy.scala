@@ -14,7 +14,7 @@ object ExampleGroupBy {
       val p = line.split(' ')
       new ExampleMaoKey(p(0).toInt, p(1).toInt)})
 
-    val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 5).importObjects(inputMapped).teraSort
+    val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 5).importObjects(inputMapped)
     minimalGroupBy.groupBySum.saveAsTextFile(outputPath + "sum")
     minimalGroupBy.groupByMin.saveAsTextFile(outputPath + "min")
     spark.stop()

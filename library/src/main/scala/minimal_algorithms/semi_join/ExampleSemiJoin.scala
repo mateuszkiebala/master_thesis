@@ -21,7 +21,7 @@ object ExampleSemiJoin {
       val p = line.split(' ')
       new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.TType)})
 
-    val minimalSemiJoin = new MinimalSemiJoin(spark, 5).importObjects(inputMappedR, inputMappedT).teraSort
+    val minimalSemiJoin = new MinimalSemiJoin(spark, 5).importObjects(inputMappedR, inputMappedT)
     minimalSemiJoin.execute.collect.foreach(println)
     spark.stop()
   }

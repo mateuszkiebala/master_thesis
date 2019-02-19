@@ -41,7 +41,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
 
   private[this] def groupBy(startEle: Int, fun: (Int, Int) => Int): RDD[(Int, Int)] = {
     val masterIndex = 0
-    this.objects.mapPartitionsWithIndex((pIndex, partition) => {
+    teraSorted(this.objects).mapPartitionsWithIndex((pIndex, partition) => {
       val grouped = partition.toList.groupBy(o => o.getKey)
       val minKey = grouped.keys.min
       val maxKey = grouped.keys.max
