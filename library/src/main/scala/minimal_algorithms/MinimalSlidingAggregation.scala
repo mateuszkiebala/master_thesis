@@ -4,11 +4,36 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
+/**
+  * Class implementing sliding aggregation algorithm.
+  * @param spark  SparkSession
+  * @param numOfPartitions  Number of partitions
+  * @tparam T T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
+  */
 class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithmWithKey[T](spark, numOfPartitions) {
 
-  def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
-                          partitionsPrefixWeights: List[Int]): RDD[(Int, Int)] = {
+  /**
+    * Computes sliding aggregation values for provided RDD.
+    * @param input  Initial RDD with objects.
+    * @param windowLength Window length
+    * @return RDD of pairs (object's key, sliding aggregation value)
+    */
+  def execute(input: RDD[T], windowLength: Int): RDD[(Int, Int)] = {
+    val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()
+    val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
+    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(dataWithRanks).collect().scanLeft(0)(_ + _).toList).value
+    computeWindowValues(distributedData, this.itemsCntByPartition, windowLength, prefixedWeights)
+  }
+
+  private[this] def getPartitionsWeights(rdd: RDD[(Int, T)]): RDD[Int] = {
+    rdd.mapPartitions(partition =>
+      Iterator(partition.toList.foldLeft(0){(acc, p) => acc + p._2.getWeight})
+    )
+  }
+
+  private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
+                                        partitionsPrefixWeights: List[Int]): RDD[(Int, Int)] = {
     rdd.mapPartitionsWithIndex((index, partition) => {
       val pIndex = index + 1
       val pEleMinRank = index * itemsCntByPartition
@@ -33,19 +58,6 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
         (mao.getKey, w1 + w2 + w3)
       }}.toIterator
     })
-  }
-
-  def execute(input: RDD[T], windowLength: Int): RDD[(Int, Int)] = {
-    val dataWithRanks = importObjects(input).perfectlySortedWithRanks
-    val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength)
-    val prefixedWeights = spark.sparkContext.broadcast(getPartitionsWeights(dataWithRanks).collect().scanLeft(0)(_ + _).toList).value
-    computeWindowValues(distributedData, this.itemsCntByPartition, windowLength, prefixedWeights)
-  }
-
-  private[this] def getPartitionsWeights(rdd: RDD[(Int, T)]): RDD[Int] = {
-    rdd.mapPartitions(partition =>
-      Iterator(partition.toList.foldLeft(0){(acc, p) => acc + p._2.getWeight})
-    )
   }
 }
 
