@@ -36,7 +36,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * @return RDD of pairs (group key, maximum object from group)
     */
   def groupByMax: RDD[(Int, Int)] = {
-    this.groupBy(0, (x: Int, y: Int) => math.max(x, y))
+    this.groupBy(Int.MinValue, (x: Int, y: Int) => math.max(x, y))
   }
 
   private[this] def groupBy(startEle: Int, fun: (Int, Int) => Int): RDD[(Int, Int)] = {

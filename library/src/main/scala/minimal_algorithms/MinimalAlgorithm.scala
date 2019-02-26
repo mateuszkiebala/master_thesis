@@ -134,39 +134,6 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
   }
 
   /**
-    * Sends objects to remotely relevant partitions. Implements algorithm described in 'Minimal MapReduce Algorithms' paper.
-    * @param rdd  RDD with objects to process.
-    * @param windowLength  Window length.
-    * @return RDD of pairs (ranking, object)
-    */
-  def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLength: Int): RDD[(Int, T)] = {
-    val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
-    val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
-    rdd.mapPartitionsWithIndex((pIndex, partition) => {
-      if (windowLength <= itemsCntByPartitionBroadcast) {
-        partition.flatMap {rankMaoPair =>
-          if (pIndex+1 < numOfPartitionsBroadcast) {
-            List((pIndex, rankMaoPair), (pIndex+1, rankMaoPair))
-          } else {
-            List((pIndex, rankMaoPair))
-          }
-        }
-      } else {
-        val remRelM = (windowLength-1) / itemsCntByPartitionBroadcast
-        partition.flatMap {rankMaoPair =>
-          if (pIndex+remRelM+1 < numOfPartitionsBroadcast) {
-            List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair), (pIndex+remRelM+1, rankMaoPair))
-          } else if (pIndex+remRelM < numOfPartitionsBroadcast) {
-            List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair))
-          } else {
-            List((pIndex, rankMaoPair))
-          }
-        }
-      }
-    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
-  }
-
-  /**
     * Returns number of elements on each partition.
     * @param rdd  RDD with objects to process.
     * @tparam A Type of RDD's objects.

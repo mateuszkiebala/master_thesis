@@ -17,7 +17,9 @@ object ExampleSlidingAggregation {
       new ExampleMaoKey(p(0).toInt, p(1).toInt)})
 
     val msa = new MinimalSlidingAggregation[ExampleMaoKey](spark, 5)
-    msa.execute(inputMapped, windowLen).collect().foreach(println)//.map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
+    msa.aggregateSum(inputMapped, windowLen).collect().foreach(println)//.map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
+    msa.aggregateMin(inputMapped, windowLen).collect().foreach(println)
+    msa.aggregateMax(inputMapped, windowLen).collect().foreach(println)
     spark.stop()
   }
 }
