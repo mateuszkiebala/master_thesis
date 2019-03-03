@@ -44,4 +44,3 @@ class GroupByTest extends FunSuite {
     assert(Set((1, -1.0), (2, 5.5), (5, 1.5), (10, 3.0)) == minimalGroupBy.averageGroupBy.collect().toSet)
   }
 }
-
