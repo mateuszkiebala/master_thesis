@@ -42,7 +42,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
                             averageResult: Boolean = false): RDD[(Int, Double)] = {
     val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
-    val elements = getPartitionsAggregatedWeights(dataWithRanks, aggFun).collect().zipWithIndex.toList
+    val elements = getPartitionsAggregatedWeights(dataWithRanks, aggFun, aggDefaultValue).collect().zipWithIndex.toList
     val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements, aggFun, aggDefaultValue)).value
     computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun, aggDefaultValue, averageResult)
   }
@@ -54,8 +54,8 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @return RDD of pairs (ranking, object)
     */
   private[this] def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLength: Int): RDD[(Int, T)] = {
-    val numOfPartitionsBroadcast = sc.broadcast(this.numOfPartitions).value
-    val itemsCntByPartitionBroadcast = sc.broadcast(this.itemsCntByPartition).value
+    val numOfPartitionsBroadcast = spark.sparkContext.broadcast(this.numOfPartitions).value
+    val itemsCntByPartitionBroadcast = spark.sparkContext.broadcast(this.itemsCntByPartition).value
     rdd.mapPartitionsWithIndex((pIndex, partition) => {
       if (windowLength <= itemsCntByPartitionBroadcast) {
         partition.flatMap {rankMaoPair =>
@@ -80,9 +80,9 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
   }
 
-  private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], fun: (Int, Int) => Int): RDD[Int] = {
+  private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: (Int, Int) => Int, aggDefaultValue: Int): RDD[Int] = {
     rdd.mapPartitions(partition =>
-      Iterator(partition.toList.foldLeft(0){(acc, p) => fun(acc, p._2.getWeight)})
+      Iterator(partition.toList.foldLeft(aggDefaultValue){(acc, p) => aggFun(acc, p._2.getWeight)})
     )
   }
 
