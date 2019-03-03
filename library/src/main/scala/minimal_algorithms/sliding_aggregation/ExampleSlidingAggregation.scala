@@ -20,6 +20,7 @@ object ExampleSlidingAggregation {
     msa.aggregateSum(inputMapped, windowLen).collect().foreach(println)//.map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath)
     msa.aggregateMin(inputMapped, windowLen).collect().foreach(println)
     msa.aggregateMax(inputMapped, windowLen).collect().foreach(println)
+    msa.aggregateAverage(inputMapped, windowLen).collect().foreach(println)
     spark.stop()
   }
 }

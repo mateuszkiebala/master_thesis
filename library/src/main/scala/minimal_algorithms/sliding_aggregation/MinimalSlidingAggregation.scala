@@ -15,15 +15,19 @@ import scala.reflect.ClassTag
 class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithmWithKey[T](spark, numOfPartitions) {
 
-  def aggregateSum(input: RDD[T], windowLength: Int): RDD[(Int, Int)] = {
+  def aggregateSum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => x + y, 0)
   }
 
-  def aggregateMin(input: RDD[T], windowLength: Int): RDD[(Int, Int)] = {
+  def aggregateAverage(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+    execute(input, windowLength, (x: Int, y: Int) => x + y, 0, true)
+  }
+
+  def aggregateMin(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => math.min(x, y), Int.MaxValue)
   }
 
-  def aggregateMax(input: RDD[T], windowLength: Int): RDD[(Int, Int)] = {
+  def aggregateMax(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
   }
 
@@ -34,12 +38,13 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param aggFun  Aggragation function: sum, max, min
     * @return RDD of pairs (object's key, sliding aggregation value)
     */
-  private[this] def execute(input: RDD[T], windowLength: Int, aggFun: (Int, Int) => Int, aggDefaultValue: Int): RDD[(Int, Int)] = {
+  private[this] def execute(input: RDD[T], windowLength: Int, aggFun: (Int, Int) => Int, aggDefaultValue: Int,
+                            averageResult: Boolean = false): RDD[(Int, Double)] = {
     val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
     val elements = getPartitionsAggregatedWeights(dataWithRanks, aggFun).collect().zipWithIndex.toList
     val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements, aggFun, aggDefaultValue)).value
-    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun, aggDefaultValue)
+    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun, aggDefaultValue, averageResult)
   }
 
   /**
@@ -81,8 +86,8 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     )
   }
 
-  private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
-                                        partitionsRangeTree: RangeTree, aggFun: (Int, Int) => Int, aggDefaultValue: Int): RDD[(Int, Int)] = {
+  private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int, partitionsRangeTree: RangeTree,
+                                        aggFun: (Int, Int) => Int, aggDefaultValue: Int, averageResult: Boolean): RDD[(Int, Double)] = {
     rdd.mapPartitionsWithIndex((index, partition) => {
       val pEleMinRank = index * itemsCntByPartition
       val pEleMaxRank = (index + 1) * itemsCntByPartition - 1
@@ -99,11 +104,11 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
           val w1 = rangeTree.query(rankToIndex(minRank), rankToIndex((alpha+1)*itemsCntByPartition-1))
           val w2 = partitionsRangeTree.query(alpha+1, index-1)
           val w3 = rangeTree.query(rankToIndex(pEleMinRank), rankToIndex(rank))
-          w1 + w2 + w3
+          aggFun(aggFun(w1, w2), w3)
         } else {
           rangeTree.query(rankToIndex(minRank), rankToIndex(rank))
         }
-        (mao.getKey, result)
+        (mao.getKey, if (averageResult) result.toDouble / (rank-minRank+1) else result)
       }}.toIterator
     })
   }
