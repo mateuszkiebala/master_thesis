@@ -216,19 +216,19 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#averageGroupBy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="averageGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
-      <a id="averageGroupBy:RDD[(Int,Double)]"></a>
+    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#avg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="avg:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="avg:RDD[(Int,Double)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">averageGroupBy</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+        <span class="name">avg</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@averageGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@avg:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -256,73 +256,73 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#computeUniquePrefixSum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computeUniquePrefixSum(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="computeUniquePrefixSum(RDD[T]):RDD[(Int,T)]"></a>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#computePrefix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computePrefix(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="computePrefix(RDD[T],AggregationFunction):RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeUniquePrefixSum</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
+        <span class="name">computePrefix</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>]</span>, <span name="aggFun">aggFun: <a href="../aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computeUniquePrefixSum(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computePrefix(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Applies prefix sum algorithm on provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Applies prefix sum algorithm on provided RDD. First orders elements and then computes prefix sums.
-Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (prefixSum, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#computeUniquePrefixSum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computeUniquePrefixSum:org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="computeUniquePrefixSum:RDD[(Int,T)]"></a>
+      <p class="shortcomment cmt">Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
+Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt class="param">aggFun</dt><dd class="cmt"><p>Aggregation function</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (prefixValue, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#computePrefix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computePrefix(aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="computePrefix(AggregationFunction):RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeUniquePrefixSum</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
+        <span class="name">computePrefix</span><span class="params">(<span name="aggFun">aggFun: <a href="../aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computeUniquePrefixSum:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computePrefix(aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Applies prefix sum algorithm on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies prefix sum algorithm on imported objects. First orders elements and then computes prefix sums.
-Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of pairs (prefixSum, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#computeUniqueRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computeUniqueRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="computeUniqueRanking(RDD[T]):RDD[(Int,T)]"></a>
+      <p class="shortcomment cmt">Applies prefix aggregation (SUM, MIN, MAX) function on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies prefix aggregation (SUM, MIN, MAX) function on imported objects. First orders elements and then computes prefixes.
+Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"><dt class="param">aggFun</dt><dd class="cmt"><p>Aggregation function</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (prefixSum, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#computeRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computeRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="computeRanking(RDD[T]):RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeUniqueRanking</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
+        <span class="name">computeRanking</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computeUniqueRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computeRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Applies ranking algorithm on given RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
 Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#computeUniqueRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computeUniqueRanking:org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="computeUniqueRanking:RDD[(Int,T)]"></a>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#computeRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computeRanking:org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="computeRanking:RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeUniqueRanking</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
+        <span class="name">computeRanking</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computeUniqueRanking:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@computeRanking:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -419,6 +419,23 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <p class="shortcomment cmt">Returns number of elements on each partition.</p><div class="fullcomment"><div class="comment cmt"><p>Returns number of elements on each partition.</p></div><dl class="paramcmts block"><dt class="tparam">A</dt><dd class="cmt"><p>Type of RDD's objects.</p></dd><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Number of elements on each partition</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#getPartitionsAggregatedWeights" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getPartitionsAggregatedWeights(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[Int]"></a>
+      <a id="getPartitionsAggregatedWeights(RDD[T],AggregationFunction):RDD[Int]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getPartitionsAggregatedWeights</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.group_by.MinimalGroupBy.T">T</span>]</span>, <span name="aggFun">aggFun: <a href="../aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="scala.Int">Int</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@getPartitionsAggregatedWeights(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[Int]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Computes aggregated values (SUM, MIN, MAX) for each partition.</p><div class="fullcomment"><div class="comment cmt"><p>Computes aggregated values (SUM, MIN, MAX) for each partition.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>Elements</p></dd><dt class="param">aggFun</dt><dd class="cmt"><p>Aggregation function</p></dd><dt>returns</dt><dd class="cmt"><p>RDD[aggregated value for partition]</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -487,36 +504,36 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#maxGroupBy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="maxGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
-      <a id="maxGroupBy:RDD[(Int,Double)]"></a>
+    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#max" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="max:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="max:RDD[(Int,Double)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">maxGroupBy</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+        <span class="name">max</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@maxGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@max:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Groups objects by key and computes maximum object from each group.</p><div class="fullcomment"><div class="comment cmt"><p>Groups objects by key and computes maximum object from each group.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of pairs (group key, maximum object from group)</p></dd></dl></div>
-    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#minGroupBy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="minGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
-      <a id="minGroupBy:RDD[(Int,Double)]"></a>
+    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#min" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="min:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="min:RDD[(Int,Double)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">minGroupBy</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+        <span class="name">min</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@minGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@min:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -657,19 +674,19 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#sumGroupBy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="sumGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
-      <a id="sumGroupBy:RDD[(Int,Double)]"></a>
+    </li><li name="minimal_algorithms.group_by.MinimalGroupBy#sum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sum:org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="sum:RDD[(Int,Double)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">sumGroupBy</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+        <span class="name">sum</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@sumGroupBy:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.MinimalGroupBy@sum:org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
