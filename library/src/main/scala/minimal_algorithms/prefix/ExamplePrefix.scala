@@ -1,12 +1,12 @@
-package minimal_algorithms.prefix_sum
+package minimal_algorithms.prefix
 
 import minimal_algorithms.aggregation_function.SumAggregation
 import minimal_algorithms.{ExampleMao, MinimalAlgorithm}
 import org.apache.spark.sql.SparkSession
 
-object ExamplePrefixSum {
+object ExamplePrefix {
   def main(args: Array[String]): Unit = {
-    val spark = SparkSession.builder().appName("ExamplePrefixSum").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("ExamplePrefix").master("local").getOrCreate()
     val inputPath = "test.txt"
     val outputPath = "out_prefix_sum"
     val input = spark.sparkContext.textFile(inputPath)
