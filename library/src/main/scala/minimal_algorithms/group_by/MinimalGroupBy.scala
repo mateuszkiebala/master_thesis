@@ -20,7 +20,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * Groups objects by key and computes sum on each group.
     * @return RDD of pairs (group key, sum of group objects)
     */
-  def sumGroupBy: RDD[(Int, Double)] = {
+  def sum: RDD[(Int, Double)] = {
     this.groupBy(new SumAggregation)
   }
 
@@ -28,7 +28,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * Groups objects by key and computes average on each group.
     * @return RDD of pairs (group key, average of group objects)
     */
-  def averageGroupBy: RDD[(Int, Double)] = {
+  def avg: RDD[(Int, Double)] = {
     this.groupBy(new AverageAggregation)
   }
 
@@ -36,7 +36,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * Groups objects by key and computes minimum object from each group.
     * @return RDD of pairs (group key, minimum object from group)
     */
-  def minGroupBy: RDD[(Int, Double)] = {
+  def min: RDD[(Int, Double)] = {
     this.groupBy(new MinAggregation)
   }
 
@@ -44,7 +44,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * Groups objects by key and computes maximum object from each group.
     * @return RDD of pairs (group key, maximum object from group)
     */
-  def maxGroupBy: RDD[(Int, Double)] = {
+  def max: RDD[(Int, Double)] = {
     this.groupBy(new MaxAggregation)
   }
 

@@ -14,7 +14,7 @@ object ExampleRanking {
       new ExampleMao(p(1).toInt)})
 
     val minimalAlgorithm = new MinimalAlgorithm[ExampleMao](spark, 5)
-    minimalAlgorithm.importObjects(inputMapped).computeUniqueRanking.saveAsTextFile(outputPath)
+    minimalAlgorithm.importObjects(inputMapped).computeRanking.saveAsTextFile(outputPath)
     spark.stop()
   }
 }

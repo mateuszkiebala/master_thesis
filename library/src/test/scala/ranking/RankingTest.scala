@@ -18,7 +18,7 @@ class RankObj(weight: Int, weightTwo: Int) extends MinimalAlgorithmObject[RankOb
     this.weightTwo
   }
 
-  override def toString = {
+  override def toString: String = {
     "W: " + this.weight + " | W2: " + this.weightTwo
   }
 }
@@ -35,7 +35,7 @@ class RankingTest extends FunSuite with SharedSparkContext with Matchers {
       // then
     val expected = Array((0, elements(2)), (1, elements(8)), (2, elements(5)), (3, elements(3)), (4, elements(9)),
       (5, elements(0)), (6, elements(4)), (7, elements(1)), (8, elements(7)), (9, elements(6)))
-    val result = minimalRanking.computeUniqueRanking.collect()
+    val result = minimalRanking.computeRanking.collect()
     assert(expected.map(o => (o._1, o._2.getWeight, o._2.getWeightTwo)) sameElements result.map(o => (o._1, o._2.getWeight, o._2.getWeightTwo)))
   }
 }

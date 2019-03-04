@@ -15,10 +15,10 @@ object ExampleGroupBy {
       new ExampleMaoKey(p(0).toInt, p(1).toInt)})
 
     val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 5).importObjects(inputMapped)
-    minimalGroupBy.sumGroupBy.collect().foreach(println)
-    minimalGroupBy.minGroupBy.collect().foreach(println)
-    minimalGroupBy.maxGroupBy.collect().foreach(println)
-    minimalGroupBy.averageGroupBy.collect().foreach(println)
+    minimalGroupBy.sum.collect().foreach(println)
+    minimalGroupBy.min.collect().foreach(println)
+    minimalGroupBy.max.collect().foreach(println)
+    minimalGroupBy.avg.collect().foreach(println)
     spark.stop()
   }
 }

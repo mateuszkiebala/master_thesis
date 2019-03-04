@@ -60,9 +60,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * Computes sliding aggregation values for provided RDD and aggregation function.
     * @param input  Initial RDD with objects.
     * @param windowLength Window length
-    * @param aggFun  Aggragation function: sum, max, min
-    * @param aggDefaultValue  Aggregation start value
-    * @param averageResult  true if result should be an average
+    * @param aggFun  Aggregation function
     * @return RDD of pairs (object's key, sliding aggregation value)
     */
   private[this] def execute(input: RDD[T], windowLength: Int, aggFun: AggregationFunction): RDD[(Int, Double)] = {
@@ -110,7 +108,6 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * Computes aggregated values for each partition.
     * @param rdd  Ranked elements
     * @param aggFun Aggregation function
-    * @param aggDefaultValue  Aggregation start value
     * @return RDD[aggregated value for partition]
     */
   private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: AggregationFunction): RDD[Int] = {

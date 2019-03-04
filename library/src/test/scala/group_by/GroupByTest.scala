@@ -16,7 +16,7 @@ class GroupByTest extends FunSuite with SharedSparkContext with Matchers {
     val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 2).importObjects(elements)
 
       // then
-    assert(Set((1, -3.0), (2, 11.0), (5, 3.0), (10, 12.0)) == minimalGroupBy.sumGroupBy.collect().toSet)
+    assert(Set((1, -3.0), (2, 11.0), (5, 3.0), (10, 12.0)) == minimalGroupBy.sum.collect().toSet)
   }
 
   test("GroupBy min") {
@@ -24,7 +24,7 @@ class GroupByTest extends FunSuite with SharedSparkContext with Matchers {
     val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 2).importObjects(elements)
 
       // then
-    assert(Set((1, -10.0), (2, 1.0), (5, 1.0), (10, -7.0)) == minimalGroupBy.minGroupBy.collect().toSet)
+    assert(Set((1, -10.0), (2, 1.0), (5, 1.0), (10, -7.0)) == minimalGroupBy.min.collect().toSet)
   }
 
   test("GroupBy max") {
@@ -32,7 +32,7 @@ class GroupByTest extends FunSuite with SharedSparkContext with Matchers {
     val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 2).importObjects(elements)
 
       // then
-    assert(Set((1, 5.0), (2, 10.0), (5, 2.0), (10, 12.0)) == minimalGroupBy.maxGroupBy.collect().toSet)
+    assert(Set((1, 5.0), (2, 10.0), (5, 2.0), (10, 12.0)) == minimalGroupBy.max.collect().toSet)
   }
 
   test("GroupBy average") {
@@ -40,6 +40,6 @@ class GroupByTest extends FunSuite with SharedSparkContext with Matchers {
     val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, 2).importObjects(elements)
 
       // then
-    assert(Set((1, -1.0), (2, 5.5), (5, 1.5), (10, 3.0)) == minimalGroupBy.averageGroupBy.collect().toSet)
+    assert(Set((1, -1.0), (2, 5.5), (5, 1.5), (10, 3.0)) == minimalGroupBy.avg.collect().toSet)
   }
 }

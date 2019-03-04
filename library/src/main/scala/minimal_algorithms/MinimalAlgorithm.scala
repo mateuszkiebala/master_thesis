@@ -52,18 +52,18 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
   }
 
   /**
-    * Applies prefix sum algorithm on imported objects. First orders elements and then computes prefix sums.
+    * Applies prefix aggregation (SUM, MIN, MAX) function on imported objects. First orders elements and then computes prefixes.
     * Order for equal objects is picked randomly.
+    * @param aggFun Aggregation function
     * @return RDD of pairs (prefixSum, object)
     */
   def computePrefix(aggFun: AggregationFunction): RDD[(Int, T)] = computePrefix(this.objects, aggFun)
 
   /**
-    * Applies prefix aggregation (SUM, MIN, MAX) algorithm on provided RDD. First orders elements and then computes prefixes.
+    * Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
     * Order for equal objects is picked randomly.
     * @param rdd  RDD with objects to process.
     * @param aggFun Aggregation function
-    * @param aggDefault  Aggregation start value
     * @return RDD of pairs (prefixValue, object)
     */
   def computePrefix(rdd: RDD[T], aggFun: AggregationFunction): RDD[(Int, T)] = {
@@ -89,7 +89,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Each object has unique ranking. Ranking starts from 0 index.
     * @return RDD of pairs (ranking, object)
     */
-  def computeUniqueRanking: RDD[(Int, T)] = computeUniqueRanking(this.objects)
+  def computeRanking: RDD[(Int, T)] = computeRanking(this.objects)
 
   /**
     * Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
@@ -97,7 +97,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (ranking, object)
     */
-  def computeUniqueRanking(rdd: RDD[T]): RDD[(Int, T)] = {
+  def computeRanking(rdd: RDD[T]): RDD[(Int, T)] = {
     val sortedRdd = teraSorted(rdd).persist()
     val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(sortedRdd).collect().scanLeft(0)(_+_))
     sortedRdd.mapPartitionsWithIndex((index, partition) => {
@@ -135,7 +135,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
   def perfectlySortedWithRanks(rdd: RDD[T]): RDD[(Int, T)] = {
-    computeUniqueRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+    computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
   }
 
   /**
@@ -152,7 +152,6 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Computes aggregated values (SUM, MIN, MAX) for each partition.
     * @param rdd  Elements
     * @param aggFun Aggregation function
-    * @param aggDefault  Aggregation start value
     * @return RDD[aggregated value for partition]
     */
   def getPartitionsAggregatedWeights(rdd: RDD[T], aggFun: AggregationFunction): RDD[Int] = {
