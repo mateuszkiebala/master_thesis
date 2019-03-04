@@ -14,7 +14,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation sum") {
       // when
-    val result = minimalSlidingAggregation.aggregateSum(elements, 7).collect()
+    val result = minimalSlidingAggregation.sum(elements, 7).collect()
 
       // then
     val expected = Array((1, 2.0), (2, -8.0), (3, -3.0), (4, -2.0), (5, 10.0), (6, 11.0), (7, 13.0), (8, 21.0), (9, 33.0), (10, 21.0), (11, 25.0))
@@ -23,7 +23,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation min") {
       // when
-    val result = minimalSlidingAggregation.aggregateMin(elements, 7).collect()
+    val result = minimalSlidingAggregation.min(elements, 7).collect()
 
       // then
     val expected = Array((1, 2.0), (2, -10.0), (3, -10.0), (4, -10.0), (5, -10), (6, -10.0), (7, -10.0), (8, -10.0), (9, 1.0), (10, -7.0), (11, -7.0))
@@ -32,7 +32,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation max") {
       // when
-    val result = minimalSlidingAggregation.aggregateMax(elements, 7).collect()
+    val result = minimalSlidingAggregation.max(elements, 7).collect()
 
       // then
     val expected = Array((1, 2.0), (2, 2.0), (3, 5.0), (4, 5.0), (5, 12.0), (6, 12.0), (7, 12.0), (8, 12.0), (9, 12.0), (10, 12.0), (11, 12.0))
@@ -41,7 +41,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation average") {
       // when
-    val result = minimalSlidingAggregation.aggregateAverage(elements, 7).collect()
+    val result = minimalSlidingAggregation.avg(elements, 7).collect()
 
       // then
     val expected = Array((1, 2.0), (2, -4.0), (3, -1.0), (4, -0.5), (5, 2.0), (6, 11.0 / 6), (7, 13.0 / 7), (8, 3.0), (9, 33.0 / 7), (10, 3.0), (11, 25.0 / 7))

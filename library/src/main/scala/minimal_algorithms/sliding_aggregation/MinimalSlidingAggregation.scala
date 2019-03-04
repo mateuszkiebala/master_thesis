@@ -7,7 +7,7 @@ import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
 /**
-  * Class implementing sliding aggregation algorithm. Currently works only for SUM.
+  * Class implementing sliding aggregation algorithms (SUM, AVG, MIN, MAX).
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
   * @tparam T T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
@@ -15,19 +15,43 @@ import scala.reflect.ClassTag
 class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithmWithKey[T](spark, numOfPartitions) {
 
-  def aggregateSum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+  /**
+    * Computes sliding sum values for provided RDD and window length.
+    * @param input  RDD with input elements
+    * @param windowLength window length
+    * @return list of [(object o's key, sum of l largest objects not exceeding o)
+    */
+  def sum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => x + y, 0)
   }
 
-  def aggregateAverage(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+  /**
+    * Computes sliding average values for provided RDD and window length.
+    * @param input  RDD with input elements
+    * @param windowLength window length
+    * @return list of [(object o's key, average value of l largest objects not exceeding o)
+    */
+  def avg(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => x + y, 0, true)
   }
 
-  def aggregateMin(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+  /**
+    * Computes sliding minimum values for provided RDD and window length.
+    * @param input  RDD with input elements
+    * @param windowLength window length
+    * @return list of [(object o's key, minimum of l largest objects not exceeding o)
+    */
+  def min(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => math.min(x, y), Int.MaxValue)
   }
 
-  def aggregateMax(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+  /**
+    * Computes sliding maximum values for provided RDD and window length.
+    * @param input  RDD with input elements
+    * @param windowLength window length
+    * @return list of [(object o's key, maximum of l largest objects not exceeding o)
+    */
+  def max(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     execute(input, windowLength, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
   }
 
@@ -36,6 +60,8 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param input  Initial RDD with objects.
     * @param windowLength Window length
     * @param aggFun  Aggragation function: sum, max, min
+    * @param aggDefaultValue  Aggregation start value
+    * @param averageResult  true if result should be an average
     * @return RDD of pairs (object's key, sliding aggregation value)
     */
   private[this] def execute(input: RDD[T], windowLength: Int, aggFun: (Int, Int) => Int, aggDefaultValue: Int,
@@ -80,6 +106,13 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
   }
 
+  /**
+    * Computes aggregated values for each partition.
+    * @param rdd  Ranked elements
+    * @param aggFun Aggregation function
+    * @param aggDefaultValue  Aggregation start value
+    * @return RDD[aggregated value for partition]
+    */
   private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: (Int, Int) => Int, aggDefaultValue: Int): RDD[Int] = {
     rdd.mapPartitions(partition =>
       Iterator(partition.toList.foldLeft(aggDefaultValue){(acc, p) => aggFun(acc, p._2.getWeight)})
