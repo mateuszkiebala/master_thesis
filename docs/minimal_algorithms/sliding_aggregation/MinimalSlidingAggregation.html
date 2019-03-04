@@ -49,7 +49,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Class implementing sliding aggregation algorithm. Currently works only for SUM.</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>T &lt;: MinimalAlgorithmObjectWithKey[T] : ClassTag</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Class implementing sliding aggregation algorithms (SUM, AVG, MIN, MAX).</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>T &lt;: MinimalAlgorithmObjectWithKey[T] : ClassTag</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="../MinimalAlgorithmWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey">MinimalAlgorithmWithKey</a>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>], <a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -216,6 +216,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation#avg" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="avg(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="avg(RDD[T],Int):RDD[(Int,Double)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">avg</span><span class="params">(<span name="input">input: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation@avg(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Computes sliding average values for provided RDD and window length.</p><div class="fullcomment"><div class="comment cmt"><p>Computes sliding average values for provided RDD and window length.</p></div><dl class="paramcmts block"><dt class="param">input</dt><dd class="cmt"><p>RDD with input elements</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>window length</p></dd><dt>returns</dt><dd class="cmt"><p>list of [(object o's key, average value of l largest objects not exceeding o)</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a>
       <a id="clone():AnyRef"></a>
@@ -311,23 +328,6 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
     </span>
       <p class="shortcomment cmt">Applies ranking algorithm on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies ranking algorithm on imported objects. Order for equal objects is picked randomly.
 Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#distributeDataToRemotelyRelevantPartitions" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="distributeDataToRemotelyRelevantPartitions(rdd:org.apache.spark.rdd.RDD[(Int,T)],windowLength:Int):org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="distributeDataToRemotelyRelevantPartitions(RDD[(Int,T)],Int):RDD[(Int,T)]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">distributeDataToRemotelyRelevantPartitions</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>)]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>)]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation@distributeDataToRemotelyRelevantPartitions(rdd:org.apache.spark.rdd.RDD[(Int,T)],windowLength:Int):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Sends objects to remotely relevant partitions.</p><div class="fullcomment"><div class="comment cmt"><p>Sends objects to remotely relevant partitions. Implements algorithm described in 'Minimal MapReduce Algorithms' paper.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>Window length.</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -362,23 +362,6 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation#execute" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="execute(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Int)]"></a>
-      <a id="execute(RDD[T],Int):RDD[(Int,Int)]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">execute</span><span class="params">(<span name="input">input: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Int">Int</span>)]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation@execute(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Int)]" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Computes sliding aggregation values for provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Computes sliding aggregation values for provided RDD.</p></div><dl class="paramcmts block"><dt class="param">input</dt><dd class="cmt"><p>Initial RDD with objects.</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>Window length</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (object's key, sliding aggregation value)</p></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -504,6 +487,40 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+    </li><li name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation#max" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="max(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="max(RDD[T],Int):RDD[(Int,Double)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">max</span><span class="params">(<span name="input">input: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation@max(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Computes sliding maximum values for provided RDD and window length.</p><div class="fullcomment"><div class="comment cmt"><p>Computes sliding maximum values for provided RDD and window length.</p></div><dl class="paramcmts block"><dt class="param">input</dt><dd class="cmt"><p>RDD with input elements</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>window length</p></dd><dt>returns</dt><dd class="cmt"><p>list of [(object o's key, maximum of l largest objects not exceeding o)</p></dd></dl></div>
+    </li><li name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation#min" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="min(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="min(RDD[T],Int):RDD[(Int,Double)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">min</span><span class="params">(<span name="input">input: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation@min(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Computes sliding minimum values for provided RDD and window length.</p><div class="fullcomment"><div class="comment cmt"><p>Computes sliding minimum values for provided RDD and window length.</p></div><dl class="paramcmts block"><dt class="param">input</dt><dd class="cmt"><p>RDD with input elements</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>window length</p></dd><dt>returns</dt><dd class="cmt"><p>list of [(object o's key, minimum of l largest objects not exceeding o)</p></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -640,6 +657,23 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="../MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+    </li><li name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation#sum" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sum(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]"></a>
+      <a id="sum(RDD[T],Int):RDD[(Int,Double)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sum</span><span class="params">(<span name="input">input: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation.T">T</span>]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Double">Double</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation@sum(input:org.apache.spark.rdd.RDD[T],windowLength:Int):org.apache.spark.rdd.RDD[(Int,Double)]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Computes sliding sum values for provided RDD and window length.</p><div class="fullcomment"><div class="comment cmt"><p>Computes sliding sum values for provided RDD and window length.</p></div><dl class="paramcmts block"><dt class="param">input</dt><dd class="cmt"><p>RDD with input elements</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>window length</p></dd><dt>returns</dt><dd class="cmt"><p>list of [(object o's key, sum of l largest objects not exceeding o)</p></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>

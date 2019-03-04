@@ -314,23 +314,6 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
     </span>
       <p class="shortcomment cmt">Applies ranking algorithm on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies ranking algorithm on imported objects. Order for equal objects is picked randomly.
 Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#distributeDataToRemotelyRelevantPartitions" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="distributeDataToRemotelyRelevantPartitions(rdd:org.apache.spark.rdd.RDD[(Int,T)],windowLength:Int):org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="distributeDataToRemotelyRelevantPartitions(RDD[(Int,T)],Int):RDD[(Int,T)]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">distributeDataToRemotelyRelevantPartitions</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey.T">T</span>)]</span>, <span name="windowLength">windowLength: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey.T">T</span>)]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalAlgorithmWithKey@distributeDataToRemotelyRelevantPartitions(rdd:org.apache.spark.rdd.RDD[(Int,T)],windowLength:Int):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Sends objects to remotely relevant partitions.</p><div class="fullcomment"><div class="comment cmt"><p>Sends objects to remotely relevant partitions. Implements algorithm described in 'Minimal MapReduce Algorithms' paper.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt class="param">windowLength</dt><dd class="cmt"><p>Window length.</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
