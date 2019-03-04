@@ -1,5 +1,6 @@
 package minimal_algorithms.sliding_aggregation
 
+import minimal_algorithms.aggregation_function._
 import minimal_algorithms.{KeyPartitioner, MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey, RangeTree}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -22,7 +23,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @return list of [(object o's key, sum of l largest objects not exceeding o)
     */
   def sum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
-    execute(input, windowLength, (x: Int, y: Int) => x + y, 0)
+    execute(input, windowLength, new SumAggregation)
   }
 
   /**
@@ -32,7 +33,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @return list of [(object o's key, average value of l largest objects not exceeding o)
     */
   def avg(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
-    execute(input, windowLength, (x: Int, y: Int) => x + y, 0, true)
+    execute(input, windowLength, new AverageAggregation)
   }
 
   /**
@@ -42,7 +43,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @return list of [(object o's key, minimum of l largest objects not exceeding o)
     */
   def min(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
-    execute(input, windowLength, (x: Int, y: Int) => math.min(x, y), Int.MaxValue)
+    execute(input, windowLength, new MinAggregation)
   }
 
   /**
@@ -52,7 +53,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @return list of [(object o's key, maximum of l largest objects not exceeding o)
     */
   def max(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
-    execute(input, windowLength, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
+    execute(input, windowLength, new MaxAggregation)
   }
 
   /**
@@ -64,13 +65,12 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param averageResult  true if result should be an average
     * @return RDD of pairs (object's key, sliding aggregation value)
     */
-  private[this] def execute(input: RDD[T], windowLength: Int, aggFun: (Int, Int) => Int, aggDefaultValue: Int,
-                            averageResult: Boolean = false): RDD[(Int, Double)] = {
+  private[this] def execute(input: RDD[T], windowLength: Int, aggFun: AggregationFunction): RDD[(Int, Double)] = {
     val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
-    val elements = getPartitionsAggregatedWeights(dataWithRanks, aggFun, aggDefaultValue).collect().zipWithIndex.toList
-    val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements, aggFun, aggDefaultValue)).value
-    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun, aggDefaultValue, averageResult)
+    val elements = getPartitionsAggregatedWeights(dataWithRanks, aggFun).collect().zipWithIndex.toList
+    val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements, aggFun)).value
+    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun)
   }
 
   /**
@@ -113,21 +113,21 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param aggDefaultValue  Aggregation start value
     * @return RDD[aggregated value for partition]
     */
-  private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: (Int, Int) => Int, aggDefaultValue: Int): RDD[Int] = {
+  private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: AggregationFunction): RDD[Int] = {
     rdd.mapPartitions(partition =>
-      Iterator(partition.toList.foldLeft(aggDefaultValue){(acc, p) => aggFun(acc, p._2.getWeight)})
+      Iterator(partition.toList.foldLeft(aggFun.defaultValue){(acc, p) => aggFun.apply(acc, p._2.getWeight)})
     )
   }
 
-  private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int, partitionsRangeTree: RangeTree,
-                                        aggFun: (Int, Int) => Int, aggDefaultValue: Int, averageResult: Boolean): RDD[(Int, Double)] = {
+  private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
+                                        partitionsRangeTree: RangeTree, aggFun: AggregationFunction): RDD[(Int, Double)] = {
     rdd.mapPartitionsWithIndex((index, partition) => {
       val pEleMinRank = index * itemsCntByPartition
       val pEleMaxRank = (index + 1) * itemsCntByPartition - 1
       val partitionObjects = partition.toList.sorted
       val baseObjects = partitionObjects.filter {case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
       val rankToIndex= partitionObjects.map {case (rank, _) => rank}.zipWithIndex.toMap
-      val rangeTree = new RangeTree(partitionObjects.map {case (rank, o) => (o.getWeight, rankToIndex(rank))}, aggFun, aggDefaultValue)
+      val rangeTree = new RangeTree(partitionObjects.map {case (rank, o) => (o.getWeight, rankToIndex(rank))}, aggFun)
 
       baseObjects.map {case (rank, mao) => {
         val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1
@@ -137,11 +137,11 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
           val w1 = rangeTree.query(rankToIndex(minRank), rankToIndex((alpha+1)*itemsCntByPartition-1))
           val w2 = partitionsRangeTree.query(alpha+1, index-1)
           val w3 = rangeTree.query(rankToIndex(pEleMinRank), rankToIndex(rank))
-          aggFun(aggFun(w1, w2), w3)
+          aggFun.apply(aggFun.apply(w1, w2), w3)
         } else {
           rangeTree.query(rankToIndex(minRank), rankToIndex(rank))
         }
-        (mao.getKey, if (averageResult) result.toDouble / (rank-minRank+1) else result)
+        (mao.getKey, if (aggFun.average) result.toDouble / (rank-minRank+1) else result)
       }}.toIterator
     })
   }

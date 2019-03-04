@@ -1,6 +1,7 @@
 package minimal_algorithms.ranking
 
-import minimal_algorithms.{MinimalAlgorithm, ExampleMaoKey}
+import minimal_algorithms.aggregation_function.SumAggregation
+import minimal_algorithms.{ExampleMaoKey, MinimalAlgorithm}
 import org.apache.spark.sql.SparkSession
 
 /**
@@ -17,7 +18,7 @@ object ExampleRankingUsingPrefixSum {
       new ExampleMaoKey(p(1).toInt, 1)})
 
     val minimalAlgorithm = new MinimalAlgorithm[ExampleMaoKey](spark, 5)
-    minimalAlgorithm.importObjects(inputMapped).computeUniquePrefixSum.collect().foreach(println)
+    minimalAlgorithm.importObjects(inputMapped).computePrefix(new SumAggregation).collect().foreach(println)
     spark.stop()
   }
 }

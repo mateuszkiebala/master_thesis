@@ -1,8 +1,10 @@
 package minimal_algorithms
 
+import minimal_algorithms.aggregation_function.AggregationFunction
 import org.apache.spark.rdd.RDD
 import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
+
 import scala.reflect.ClassTag
 
 /**
@@ -54,26 +56,29 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Order for equal objects is picked randomly.
     * @return RDD of pairs (prefixSum, object)
     */
-  def computeUniquePrefixSum: RDD[(Int, T)] = computeUniquePrefixSum(this.objects)
+  def computePrefix(aggFun: AggregationFunction): RDD[(Int, T)] = computePrefix(this.objects, aggFun)
 
   /**
-    * Applies prefix sum algorithm on provided RDD. First orders elements and then computes prefix sums.
+    * Applies prefix aggregation (SUM, MIN, MAX) algorithm on provided RDD. First orders elements and then computes prefixes.
     * Order for equal objects is picked randomly.
     * @param rdd  RDD with objects to process.
-    * @return RDD of pairs (prefixSum, object)
+    * @param aggFun Aggregation function
+    * @param aggDefault  Aggregation start value
+    * @return RDD of pairs (prefixValue, object)
     */
-  def computeUniquePrefixSum(rdd: RDD[T]): RDD[(Int, T)] = {
+  def computePrefix(rdd: RDD[T], aggFun: AggregationFunction): RDD[(Int, T)] = {
     val sortedRdd = teraSorted(rdd).persist()
-    val prefixSumsOfObjects = sc.broadcast(getPartitionSums(sortedRdd).collect().scanLeft(0)(_ + _))
+    val prefixPartitions = sc.broadcast(getPartitionsAggregatedWeights(sortedRdd, aggFun).collect()
+      .scanLeft(aggFun.defaultValue)((res, x) => aggFun.apply(res, x)))
     sortedRdd.mapPartitionsWithIndex((index, partition) => {
       if (partition.isEmpty) {
         Iterator()
       } else {
         val maoObjects = partition.toList
-        val prefSums = maoObjects.map(mao => mao.getWeight).scanLeft(prefixSumsOfObjects.value(index))(_+_).tail
+        val prefix = maoObjects.map(mao => mao.getWeight).scanLeft(prefixPartitions.value(index))((res, x) => aggFun.apply(res, x)).tail
         maoObjects.zipWithIndex.map{
-          case (mao, i) => (prefSums(i), mao)
-          case _        => throw new Exception("Error while creating prefix sums")
+          case (mao, i) => (prefix(i), mao)
+          case _        => throw new Exception("Error while creating prefix values")
         }.toIterator
       }
     })
@@ -143,7 +148,14 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     rdd.mapPartitions(partition => Iterator(partition.length))
   }
 
-  private[this] def getPartitionSums(rdd: RDD[T]): RDD[Int] = {
-    rdd.mapPartitions(partition => Iterator(partition.map(o => o.getWeight).sum))
+  /**
+    * Computes aggregated values (SUM, MIN, MAX) for each partition.
+    * @param rdd  Elements
+    * @param aggFun Aggregation function
+    * @param aggDefault  Aggregation start value
+    * @return RDD[aggregated value for partition]
+    */
+  def getPartitionsAggregatedWeights(rdd: RDD[T], aggFun: AggregationFunction): RDD[Int] = {
+    rdd.mapPartitions(partition => Iterator(partition.toList.foldLeft(aggFun.defaultValue){(acc, o) => aggFun.apply(acc, o.getWeight)}))
   }
 }

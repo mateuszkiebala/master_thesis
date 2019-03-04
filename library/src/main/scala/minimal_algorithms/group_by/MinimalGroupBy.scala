@@ -1,5 +1,6 @@
 package minimal_algorithms.group_by
 
+import minimal_algorithms.aggregation_function._
 import minimal_algorithms.{KeyPartitioner, MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -20,7 +21,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * @return RDD of pairs (group key, sum of group objects)
     */
   def sumGroupBy: RDD[(Int, Double)] = {
-    this.groupBy(0, (x: Int, y: Int) => x + y)
+    this.groupBy(new SumAggregation)
   }
 
   /**
@@ -28,7 +29,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * @return RDD of pairs (group key, average of group objects)
     */
   def averageGroupBy: RDD[(Int, Double)] = {
-    this.groupBy(0, (x: Int, y: Int) => x + y, true)
+    this.groupBy(new AverageAggregation)
   }
 
   /**
@@ -36,7 +37,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * @return RDD of pairs (group key, minimum object from group)
     */
   def minGroupBy: RDD[(Int, Double)] = {
-    this.groupBy(Int.MaxValue, (x: Int, y: Int) => math.min(x, y))
+    this.groupBy(new MinAggregation)
   }
 
   /**
@@ -44,17 +45,19 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * @return RDD of pairs (group key, maximum object from group)
     */
   def maxGroupBy: RDD[(Int, Double)] = {
-    this.groupBy(Int.MinValue, (x: Int, y: Int) => math.max(x, y))
+    this.groupBy(new MaxAggregation)
   }
 
-  private[this] def groupBy(startEle: Int, aggFun: (Int, Int) => Int, averageResult: Boolean = false): RDD[(Int, Double)] = {
+  private[this] def groupBy(aggFun: AggregationFunction): RDD[(Int, Double)] = {
     val masterIndex = 0
     teraSorted(this.objects).mapPartitionsWithIndex((pIndex, partition) => {
       val grouped = partition.toList.groupBy(o => o.getKey)
       val minKey = grouped.keys.min
       val maxKey = grouped.keys.max
       grouped.map{ case (k, v) => {
-        (if (k == minKey || k == maxKey) masterIndex else pIndex, new GroupByObject(k, v.foldLeft(startEle)((res, o) => aggFun(res, o.getWeight)), v.length))
+        val destMachine = if (k == minKey || k == maxKey) masterIndex else pIndex
+        val groupedObject = new GroupedObject(k, v.foldLeft(aggFun.defaultValue)((res, o) => aggFun.apply(res, o.getWeight)), v.length)
+        (destMachine, groupedObject)
       }}(collection.breakOut).toIterator
     }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(p => p._2)
       .mapPartitionsWithIndex((pIndex, partition) => {
@@ -62,12 +65,12 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
           partition.toList
             .groupBy{ o => o.key }
             .map{ case (key, objects) => {
-              val result = objects.foldLeft(new GroupByObject(key, startEle, 0))((res, o) => {
-                res.value = aggFun(res.value, o.value)
+              val result = objects.foldLeft(new GroupedObject(key, aggFun.defaultValue, 0))((res, o) => {
+                res.value = aggFun.apply(res.value, o.value)
                 res.length += o.length
                 res
               })
-              (result.key, if (averageResult) result.value.toDouble / result.length else result.value)
+              (result.key, if (aggFun.average) result.value.toDouble / result.length else result.value)
             } }(collection.breakOut)
             .toIterator
         } else {
@@ -77,7 +80,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
   }
 }
 
-class GroupByObject(k: Int, v: Int, l: Int) extends Serializable {
+class GroupedObject(k: Int, v: Int, l: Int) extends Serializable {
   var value: Int = v
   var key: Int = k
   var length: Int = l

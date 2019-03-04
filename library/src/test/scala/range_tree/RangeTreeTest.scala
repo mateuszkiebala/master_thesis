@@ -1,6 +1,7 @@
 package range_tree
 import org.scalatest.FunSuite
 import minimal_algorithms.RangeTree
+import minimal_algorithms.aggregation_function.{MaxAggregation, MinAggregation, SumAggregation}
 
 class RangeTreeTest extends FunSuite {
   test("RangeTree.init one node tree") {
@@ -8,7 +9,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 0))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => x + y, 0)
+    val rangeTree = new RangeTree(elements, new SumAggregation)
 
       // then
     assert(1 == rangeTree.BASE)
@@ -21,7 +22,7 @@ class RangeTreeTest extends FunSuite {
 
       // when, then
     val caught = intercept[Exception] {
-        new RangeTree(elements, (x: Int, y: Int) => x + y, 0)
+        new RangeTree(elements, new SumAggregation)
       }
 
     assert(caught.getMessage == "Position out of range: 4")
@@ -32,7 +33,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 0), (2, 1), (3, 2), (3, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => x + y, 0)
+    val rangeTree = new RangeTree(elements, new SumAggregation)
 
       // then
     val caught = intercept[Exception] {
@@ -47,7 +48,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 0), (2, 1), (3, 2), (4, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => x + y, 0)
+    val rangeTree = new RangeTree(elements, new SumAggregation)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -59,7 +60,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 1), (2, 4), (3, 0), (4, 2), (10, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => x + y, 0)
+    val rangeTree = new RangeTree(elements, new SumAggregation)
 
       // then
     assert(8 == rangeTree.BASE)
@@ -71,7 +72,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 1), (2, 4), (3, 0), (4, 2), (10, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => x + y, 0)
+    val rangeTree = new RangeTree(elements, new SumAggregation)
 
       // then
     assert(3 == rangeTree.query(0, 0))
@@ -88,7 +89,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 0), (2, 1), (3, 2), (4, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.min(x, y), Int.MaxValue)
+    val rangeTree = new RangeTree(elements, new MinAggregation)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -100,7 +101,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 1), (2, 4), (3, 0), (-4, 2), (10, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.min(x, y), Int.MaxValue)
+    val rangeTree = new RangeTree(elements, new MinAggregation)
 
       // then
     assert(8 == rangeTree.BASE)
@@ -112,7 +113,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 1), (2, 4), (3, 0), (4, 2), (10, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.min(x, y), Int.MaxValue)
+    val rangeTree = new RangeTree(elements, new MinAggregation)
 
       // then
     assert(3 == rangeTree.query(0, 0))
@@ -129,7 +130,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 0), (2, 1), (3, 2), (4, 3))
 
     // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
+    val rangeTree = new RangeTree(elements, new MaxAggregation)
 
     // then
     assert(4 == rangeTree.BASE)
@@ -141,7 +142,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((-1, 0), (-2, 1), (-3, 2), (-4, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
+    val rangeTree = new RangeTree(elements, new MaxAggregation)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -154,7 +155,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 1), (2, 4), (3, 0), (4, 2), (10, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
+    val rangeTree = new RangeTree(elements, new MaxAggregation)
 
       // then
     assert(8 == rangeTree.BASE)
@@ -166,7 +167,7 @@ class RangeTreeTest extends FunSuite {
     val elements = List((1, 1), (2, 4), (3, 0), (4, 2), (10, 3))
 
       // when
-    val rangeTree = new RangeTree(elements, (x: Int, y: Int) => math.max(x, y), Int.MinValue)
+    val rangeTree = new RangeTree(elements, new MaxAggregation)
 
       // then
     assert(3 == rangeTree.query(0, 0))

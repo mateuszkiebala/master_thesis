@@ -1,5 +1,6 @@
 package prefix_sum
 
+import minimal_algorithms.aggregation_function.SumAggregation
 import minimal_algorithms.{ExampleMao, MinimalAlgorithm}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
@@ -12,7 +13,7 @@ class PrefixSumTest extends FunSuite with SharedSparkContext with Matchers {
   test("Prefix sum") {
       // when
     val minimalAlgorithm = new MinimalAlgorithm[ExampleMao](spark, 2)
-    val result = minimalAlgorithm.importObjects(rdd).computeUniquePrefixSum.collect()
+    val result = minimalAlgorithm.importObjects(rdd).computePrefix(new SumAggregation).collect()
 
       // then
     val expected = Array(-10, -17, -16, -15, -14, -12, -10, -5, 5, 17)
