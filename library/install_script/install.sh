@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Author: Jacek Sroka
 . ./settings.sh
 
@@ -8,11 +9,11 @@ stop-dfs.sh
 
 mkdir -p ${download_dir}
 
-wget -nc -P ${download_dir} --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jdk-8u202-linux-x64.tar.gz
+wget -nc -P ${download_dir} --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" https://download.oracle.com/otn-pub/java/jdk/8u202-b08/1961070e4c9b4e26a04e7f5a083f551e/jdk-8u202-linux-i586.tar.gz
 wget -nc -P ${download_dir} http://archive.apache.org/dist/hadoop/common/hadoop-2.8.3/hadoop-2.8.3.tar.gz
 wget -nc -P ${download_dir} https://archive.apache.org/dist/spark/spark-2.3.0/spark-2.3.0-bin-hadoop2.7.tgz
 
-tar -xvf ${download_dir}/jdk-8u202-linux-x64.tar.gz -C ${install_superdir}
+tar -xvf ${download_dir}/jdk-8u202-linux-i586.tar.gz -C ${install_superdir}
 tar -xvf ${download_dir}/hadoop-2.8.3.tar.gz -C ${install_superdir}
 tar -xvf ${download_dir}/spark-2.3.0-bin-hadoop2.7.tgz -C ${install_superdir}
 
@@ -25,7 +26,7 @@ master=$(hostname)
 #changine this
 cat <<EOF > ${etc_hadoop}/slaves
 $(hostname)
-10.1.1.21
+192.168.0.242
 EOF
 
 sed -i -e "s|^export JAVA_HOME=\${JAVA_HOME}|export JAVA_HOME=$JAVA_HOME|g" ${etc_hadoop}/hadoop-env.sh

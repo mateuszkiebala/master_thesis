@@ -1,12 +1,12 @@
-export download_dir=~/hadoop/download
-export install_superdir=~/hadoop
-export data_superdir=~/hadoop/library
+export download_dir=~/hadoop/library/tmp/download
+export install_superdir=~/hadoop/library/tmp
+export data_superdir=~/hadoop/library/tmp
 
 #export hdfs_dir="$( mktemp -d /tmp/hadoop.XXXXXX )"
 export hdfs_dir=${data_superdir}
 export datanode_dir=${hdfs_dir}/datanode
 export namenode_dir=${hdfs_dir}/namenode
-export user=mk359758
+export user=mati
 
 export JAVA_HOME=$install_superdir/jdk1.8.0_202
 export HADOOP_INSTALL=$install_superdir/hadoop-2.8.3
