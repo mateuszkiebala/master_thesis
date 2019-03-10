@@ -123,15 +123,15 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
       val pEleMaxRank = (index + 1) * itemsCntByPartition - 1
       val partitionObjects = partition.toList.sorted
       val baseObjects = partitionObjects.filter {case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
-      val rankToIndex= partitionObjects.map {case (rank, _) => rank}.zipWithIndex.toMap
+      val rankToIndex = partitionObjects.map {case (rank, _) => rank}.zipWithIndex.toMap
       val rangeTree = new RangeTree(partitionObjects.map {case (rank, o) => (o.getWeight, rankToIndex(rank))}, aggFun)
 
       baseObjects.map {case (rank, mao) => {
         val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1
         val a = ((rank+1-windowLen+itemsCntByPartition) / itemsCntByPartition) - 1
-        val alpha = if (a >= 0) a else 0
+        val alpha = if (a >= 0) a else -1
         val result = if (index > alpha + 1) {
-          val w1 = rangeTree.query(rankToIndex(minRank), rankToIndex((alpha+1)*itemsCntByPartition-1))
+          val w1 = if (alpha < 0) 0 else rangeTree.query(rankToIndex(minRank), rankToIndex((alpha+1)*itemsCntByPartition-1))
           val w2 = partitionsRangeTree.query(alpha+1, index-1)
           val w3 = rangeTree.query(rankToIndex(pEleMinRank), rankToIndex(rank))
           aggFun.apply(aggFun.apply(w1, w2), w3)
