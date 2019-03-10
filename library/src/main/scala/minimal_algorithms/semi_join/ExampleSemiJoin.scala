@@ -8,9 +8,10 @@ object ExampleSemiJoin {
   def main(args: Array[String]) = {
     val spark = SparkSession.builder().appName("ExampleSemiJoin").master("local").getOrCreate()
 
-    val inputPathR = "setR.txt"
-    val inputPathT = "setT.txt"
-    val outputPath = "out_semi_join"
+    val numOfPartitions = args(0).toInt
+    val inputPathR = args(1)
+    val inputPathT = args(2)
+    val outputPath = args(3)
     val inputR = spark.sparkContext.textFile(inputPathR)
     val inputMappedR = inputR.map(line => {
       val p = line.split(' ')
@@ -21,8 +22,8 @@ object ExampleSemiJoin {
       val p = line.split(' ')
       new SemiJoinType(p(0).toInt, p(1).toInt, SemiJoinTypeEnum.TType)})
 
-    val minimalSemiJoin = new MinimalSemiJoin(spark, 5).importObjects(inputMappedR, inputMappedT)
-    minimalSemiJoin.execute.collect.foreach(println)
+    val minimalSemiJoin = new MinimalSemiJoin(spark, numOfPartitions).importObjects(inputMappedR, inputMappedT)
+    minimalSemiJoin.execute.map(res => res.getKey.toString + " " + res.getWeight.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

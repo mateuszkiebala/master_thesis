@@ -5,31 +5,34 @@ ORANGE='\033[0;35m'
 CYAN='\033[1;36m'
 COLOR_OFF='\033[0m'
 
-echo "===== Creating group_by user on HDFS ====="
-hdfs dfs -mkdir -p /user/group_by
+echo "===== Creating semi_join user on HDFS ====="
+hdfs dfs -mkdir -p /user/semi_join
 
-USER_PATH="/user/group_by"
-INPUT_TEST="input"
-INPUT_HDFS="$USER_PATH/input"
+USER_PATH="/user/semi_join"
+INPUT_R_TEST="input_R"
+INPUT_T_TEST="input_T"
+INPUT_R_HDFS="$USER_PATH/$INPUT_R_TEST"
+INPUT_T_HDFS="$USER_PATH/$INPUT_T_TEST"
 
 echo "===== Creating input directory on HDFS ====="
-hdfs dfs -rm -r $INPUT_HDFS
-hdfs dfs -mkdir $INPUT_HDFS
+hdfs dfs -rm -r $INPUT_R_HDFS
+hdfs dfs -rm -r $INPUT_T_HDFS
+hdfs dfs -mkdir $INPUT_R_HDFS
+hdfs dfs -mkdir $INPUT_T_HDFS
 
-echo "===== Copying test input directory to HDFS ====="
-hdfs dfs -put $INPUT_TEST/* $INPUT_HDFS
+echo "===== Copying test input directories to HDFS ====="
+hdfs dfs -put $INPUT_R_TEST/* $INPUT_R_HDFS
+hdfs dfs -put $INPUT_T_TEST/* $INPUT_T_HDFS
 
 HDFS="hdfs://192.168.0.220:9000"
-NUM_OF_PARTITIONS=$1
 OUTPUT_HDFS=$USER_PATH
 
 hdfs dfs -rm -r $OUTPUT_HDFS
-spark-submit --class minimal_algorithms.group_by.ExampleGroupBy --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
+spark-submit --class minimal_algorithms.semi_join.ExampleSemiJoin --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar 10 "$HDFS/$INPUT_R_HDFS" "$HDFS/$INPUT_T_HDFS" "$HDFS/$OUTPUT_HDFS"
 
 run() {
-    ALGORITHM=$1
-    LOGS="result_$ALGORITHM"
-    CORRECT_OUT_DIR="output_$ALGORITHM"
+    LOGS="result"
+    CORRECT_OUT_DIR="output"
 
     mkdir -p tmp
     rm -rf "tmp/$CORRECT_OUT_DIR"
@@ -53,9 +56,4 @@ run() {
     printf "RESULT: ${CYAN}$PASSED${COLOR_OFF} / ${ORANGE}$ALL${COLOR_OFF}\n" >> $LOGS
 }
 
-run "sum"
-#declare -a arr=("sum" "min" "max" "avg")
-#for i in "${arr[@]}"
-#do
-#   run 10 $i
-#done
+run
