@@ -17,12 +17,12 @@ for d in [SUM_OUT, MIN_OUT, MAX_OUT, AVG_OUT]:
     if not os.path.exists(d):
         os.makedirs(d)
 
-input_data = [(randint(1, 5), randint(-100, 5000)) for n in range(NUM_OF_ELEMENTS)]
-#for n in range(NUM_OF_PARTITIONS):
-#    with open('input/input_{0}.txt'.format(n), 'w') as file:
-#        for m in range(NUM_OF_ELEMENTS / NUM_OF_PARTITIONS):
-#            o = input_data[m * (n + 1)]
-#            file.write("{0}, {1}\n".format(o[0], o[1]))
+input_data = [(randint(1, 10), randint(-100, 5000)) for n in range(NUM_OF_ELEMENTS)]
+for n in range(NUM_OF_PARTITIONS):
+    with open('input/input_{0}.txt'.format(n), 'w') as file:
+        for m in range(NUM_OF_ELEMENTS_PER_PARTITION):
+            o = input_data[n * NUM_OF_ELEMENTS_PER_PARTITION + m]
+            file.write("{0} {1}\n".format(o[0], o[1]))
 
 i = 0
 result_sum = {}
@@ -43,10 +43,11 @@ def write_output(dir_name, data):
         with open('{0}/output_{1}.txt'.format(dir_name, n), 'w') as file:
             for m in range(NUM_OF_ELEMENTS_PER_PARTITION):
                 index = n * NUM_OF_ELEMENTS_PER_PARTITION + m
-                print(index, len(keys))
-                if index > len(keys):
+                if index >= len(keys):
                     return
-                key = keys[index]
-                file.write("{0}, {1}\n".format(key, data[key]))
+                file.write("{0} {1}\n".format(keys[index], data[keys[index]]))
 
 write_output(SUM_OUT, result_sum)
+write_output(MIN_OUT, result_min)
+write_output(MAX_OUT, result_max)
+write_output(AVG_OUT, result_avg)

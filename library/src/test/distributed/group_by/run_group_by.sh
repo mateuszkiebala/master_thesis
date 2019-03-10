@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
+#!/usr/bin/env bash
 OKGREEN='\033[0;32m'
 WARNING='\033[0;31m'
 ORANGE='\033[0;35m'
 CYAN='\033[1;36m'
 COLOR_OFF='\033[0m'
 
-echo "===== Creating sliding_aggregation user on HDFS ====="
-hdfs dfs -mkdir -p /user/sliding_aggregation
+echo "===== Creating group_by user on HDFS ====="
+hdfs dfs -mkdir -p /user/group_by
 
-USER_PATH="/user/sliding_aggregation"
+USER_PATH="/user/group_by"
 INPUT_TEST="input"
 INPUT_HDFS="$USER_PATH/input"
 
@@ -20,27 +21,26 @@ echo "===== Copying test input directory to HDFS ====="
 hdfs dfs -put $INPUT_TEST/* $INPUT_HDFS
 
 HDFS="hdfs://192.168.0.220:9000"
+NUM_OF_PARTITIONS=$1
+OUTPUT_HDFS=$USER_PATH
+
+hdfs dfs -rm -r $OUTPUT_HDFS
+spark-submit --class minimal_algorithms.group_by.ExampleGroupBy --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
 
 run() {
-    NUM_OF_PARTITIONS=$1
-    WINDOW_LENGTH=$2
-    CORRECT_OUT_DIR="window_length_$WINDOW_LENGTH"
-    OUTPUT_HDFS="$USER_PATH/$CORRECT_OUT_DIR"
-    LOGS="result_$WINDOW_LENGTH"
-
-    hdfs dfs -rm -r $OUTPUT_HDFS
-    spark-submit --class minimal_algorithms.sliding_aggregation.ExampleSlidingAggregation --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$WINDOW_LENGTH" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
+    ALGORITHM=$1
+    LOGS="result_$ALGORITHM"
+    CORRECT_OUT_DIR="output_$ALGORITHM"
 
     mkdir -p tmp
-    rm -rf "tmp/$CORRECT_OUT_DIR"
-    hdfs dfs -get $OUTPUT_HDFS tmp
+    rm -rf "tmp/output_$ALGORITHM"
+    hdfs dfs -get "$OUTPUT_HDFS/$CORRECT_OUT_DIR" tmp
 
     rm -rf $LOGS
     PASSED=0
     ALL=0
     for file in tmp/$CORRECT_OUT_DIR/part-*
     do
-        ALL=$((ALL+1))
         correct_output="$CORRECT_OUT_DIR/output_$ALL.txt"
         printf "$file <-> $correct_output" >> $LOGS
         if diff -Bb -c $file $correct_output >/dev/null ; then
@@ -49,12 +49,14 @@ run() {
         else
             printf "${WARNING} FAIL ${COLOR_OFF}\n" >> $LOGS
         fi
+        ALL=$((ALL+1))
     done
     printf "RESULT: ${CYAN}$PASSED${COLOR_OFF} / ${ORANGE}$ALL${COLOR_OFF}\n" >> $LOGS
 }
 
-declare -a arr=("5" "7" "17" "3000")
-for i in "${arr[@]}"
-do
-   run 10 $i
-done
+run "sum"
+#declare -a arr=("sum" "min" "max" "avg")
+#for i in "${arr[@]}"
+#do
+#   run 10 $i
+#done
