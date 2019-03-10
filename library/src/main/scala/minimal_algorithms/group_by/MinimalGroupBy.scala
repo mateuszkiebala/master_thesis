@@ -50,15 +50,20 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
 
   private[this] def groupBy(aggFun: AggregationFunction): RDD[(Int, Double)] = {
     val masterIndex = 0
-    teraSorted(this.objects).mapPartitionsWithIndex((pIndex, partition) => {
-      val grouped = partition.toList.groupBy(o => o.getKey)
-      val minKey = grouped.keys.min
-      val maxKey = grouped.keys.max
-      grouped.map{ case (k, v) => {
-        val destMachine = if (k == minKey || k == maxKey) masterIndex else pIndex
-        val groupedObject = new GroupedObject(k, v.foldLeft(aggFun.defaultValue)((res, o) => aggFun.apply(res, o.getWeight)), v.length)
-        (destMachine, groupedObject)
-      }}(collection.breakOut).toIterator
+    perfectlySorted(this.objects).mapPartitionsWithIndex((pIndex, partition) => {
+      if (partition.isEmpty) {
+        Iterator()
+      } else {
+        val grouped = partition.toList.groupBy(o => o.getKey)
+        val minKey = grouped.keys.min
+        val maxKey = grouped.keys.max
+        grouped.map { case (k, v) => {
+          val destMachine = if (k == minKey || k == maxKey) masterIndex else pIndex
+          val groupedObject = new GroupedObject(k, v.foldLeft(aggFun.defaultValue)((res, o) => aggFun.apply(res, o.getWeight)), v.length)
+          (destMachine, groupedObject)
+        }
+        }(collection.breakOut).toIterator
+      }
     }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(p => p._2)
       .mapPartitionsWithIndex((pIndex, partition) => {
         if (pIndex == masterIndex) {

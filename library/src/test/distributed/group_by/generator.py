@@ -1,6 +1,7 @@
 from random import randint
 from itertools import groupby
 import os
+import math
 
 if not os.path.exists('input'):
     os.makedirs('input')
@@ -17,7 +18,7 @@ for d in [SUM_OUT, MIN_OUT, MAX_OUT, AVG_OUT]:
     if not os.path.exists(d):
         os.makedirs(d)
 
-input_data = [(randint(1, 10), randint(-100, 5000)) for n in range(NUM_OF_ELEMENTS)]
+input_data = [(randint(1, 16), randint(-100, 5000)) for n in range(NUM_OF_ELEMENTS)]
 for n in range(NUM_OF_PARTITIONS):
     with open('input/input_{0}.txt'.format(n), 'w') as file:
         for m in range(NUM_OF_ELEMENTS_PER_PARTITION):
@@ -39,6 +40,7 @@ for key, group in groupby(sorted(input_data), lambda x: x[0]):
 
 def write_output(dir_name, data):
     keys = list(sorted(data.keys()))
+    NUM_OF_ELEMENTS_PER_PARTITION = int(math.ceil(float(len(keys)) / NUM_OF_PARTITIONS))
     for n in range(NUM_OF_PARTITIONS):
         with open('{0}/output_{1}.txt'.format(dir_name, n), 'w') as file:
             for m in range(NUM_OF_ELEMENTS_PER_PARTITION):

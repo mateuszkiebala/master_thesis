@@ -20,10 +20,15 @@ echo "===== Copying test input directory to HDFS ====="
 hdfs dfs -put $INPUT_TEST/* $INPUT_HDFS
 
 HDFS="hdfs://192.168.0.220:9000"
-NUM_OF_PARTITIONS=$1
+NUM_OF_PARTITIONS=10
 OUTPUT_HDFS=$USER_PATH
 
-hdfs dfs -rm -r $OUTPUT_HDFS
+declare -a arr=("sum" "min" "max" "avg")
+for i in "${arr[@]}"
+do
+    hdfs dfs -rm -r "$OUTPUT_HDFS/output_$i"
+done
+
 spark-submit --class minimal_algorithms.group_by.ExampleGroupBy --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
 
 run() {

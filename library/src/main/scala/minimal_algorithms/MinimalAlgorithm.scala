@@ -15,7 +15,7 @@ import scala.reflect.ClassTag
   */
 class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int) {
   protected val sc = spark.sparkContext
-  protected var objects: RDD[T] = sc.emptyRDD
+  var objects: RDD[T] = sc.emptyRDD
   var itemsCntByPartition: Int = 0
   object PerfectPartitioner {}
   object KeyPartitioner {}
@@ -48,7 +48,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     import spark.implicits._
     val pairedObjects = rdd.map{mao => (mao, mao)}
     pairedObjects.partitionBy(new RangePartitioner[T, T](numOfPartitions, pairedObjects))
-      .sortByKey().values
+      .mapPartitions(partition => partition.map(p => p._2).toList.sorted.toIterator)
   }
 
   /**
@@ -119,6 +119,15 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
   def perfectSort: this.type = {
     this.objects = perfectlySortedWithRanks(this.objects).map(o => o._2).persist()
     this
+  }
+
+  /**
+    * Sorts and perfectly balances provided RDD.
+    * @param rdd  RDD with objects to process.
+    * @return Perfectly balanced RDD of objects
+    */
+  def perfectlySorted(rdd: RDD[T]): RDD[T] = {
+    perfectlySortedWithRanks(rdd).map(o => o._2)
   }
 
   /**
