@@ -79,7 +79,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
             } }(collection.breakOut)
             .toIterator
         } else {
-          partition.map{ o => (o.key, o.value) }
+          partition.map{ o => (o.key, if (aggFun.average) o.value / o.length else o.value) }
         }
       }).persist()
   }

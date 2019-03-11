@@ -26,7 +26,7 @@ object ExampleGroupBy {
     outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_max")
 
     outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.avg.map(p => new ExampleMaoKey(p._1, p._2)))
-    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + "%.6f".format(res.getWeight).toDouble).saveAsTextFile(outputPath + "/output_avg")
+    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + "%.6f".format(res.getWeight)).saveAsTextFile(outputPath + "/output_avg")
 
     spark.stop()
   }
