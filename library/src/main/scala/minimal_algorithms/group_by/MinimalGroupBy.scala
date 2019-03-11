@@ -75,18 +75,18 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
                 res.length += o.length
                 res
               })
-              (result.key, if (aggFun.average) result.value.toDouble / result.length else result.value)
+              (result.key, if (aggFun.average) result.value / result.length else result.value)
             } }(collection.breakOut)
             .toIterator
         } else {
-          partition.map{ o => (o.key, o.value.toDouble) }
+          partition.map{ o => (o.key, o.value) }
         }
       }).persist()
   }
 }
 
-class GroupedObject(k: Int, v: Int, l: Int) extends Serializable {
-  var value: Int = v
+class GroupedObject(k: Int, v: Double, l: Int) extends Serializable {
+  var value: Double = v
   var key: Int = k
   var length: Int = l
 }

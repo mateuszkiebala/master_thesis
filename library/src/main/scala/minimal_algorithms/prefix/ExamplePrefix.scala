@@ -12,7 +12,7 @@ object ExamplePrefix {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new ExampleMao(p(1).toInt)})
+      new ExampleMao(p(1).toDouble)})
 
     val minimalAlgorithm = new MinimalAlgorithm[ExampleMao](spark, 5)
     minimalAlgorithm.importObjects(inputMapped).computePrefix(new SumAggregation).saveAsTextFile(outputPath)

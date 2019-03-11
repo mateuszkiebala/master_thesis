@@ -2,7 +2,7 @@ package minimal_algorithms.examples
 
 import minimal_algorithms.MinimalAlgorithmObjectWithKey
 
-class SemiJoinType(key: Int, weight: Int, setType: Int) extends MinimalAlgorithmObjectWithKey[SemiJoinType] {
+class SemiJoinType(key: Int, weight: Double, setType: Int) extends MinimalAlgorithmObjectWithKey[SemiJoinType] {
   override def compareTo(that: SemiJoinType): Int = {
     this.key.compareTo(that.getKey)
   }
@@ -11,7 +11,7 @@ class SemiJoinType(key: Int, weight: Int, setType: Int) extends MinimalAlgorithm
     this.key
   }
 
-  override def getWeight: Int = {
+  override def getWeight: Double = {
     this.weight
   }
 

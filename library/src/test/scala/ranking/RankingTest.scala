@@ -4,17 +4,17 @@ import minimal_algorithms.{MinimalAlgorithm, MinimalAlgorithmObject}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
 
-class RankObj(weight: Int, weightTwo: Int) extends MinimalAlgorithmObject[RankObj] {
+class RankObj(weight: Double, weightTwo: Double) extends MinimalAlgorithmObject[RankObj] {
   override def compareTo(o: RankObj): Int = {
     val res = this.weight.compareTo(o.getWeight)
     if (res != 0) res else this.weightTwo.compareTo(o.getWeightTwo)
   }
 
-  override def getWeight: Int = {
+  override def getWeight: Double = {
     this.weight
   }
 
-  def getWeightTwo: Int = {
+  def getWeightTwo: Double = {
     this.weightTwo
   }
 

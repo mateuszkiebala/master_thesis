@@ -11,14 +11,14 @@ MIN_OUT = 'output_min'
 MAX_OUT = 'output_max'
 AVG_OUT = 'output_avg'
 NUM_OF_PARTITIONS = 10
-NUM_OF_ELEMENTS = 50
+NUM_OF_ELEMENTS = 5000
 NUM_OF_ELEMENTS_PER_PARTITION = int(NUM_OF_ELEMENTS / NUM_OF_PARTITIONS)
 
 for d in [SUM_OUT, MIN_OUT, MAX_OUT, AVG_OUT]:
     if not os.path.exists(d):
         os.makedirs(d)
 
-input_data = [(randint(1, 16), randint(-100, 5000)) for n in range(NUM_OF_ELEMENTS)]
+input_data = [(randint(1, 100), randint(-100, 5000)) for n in range(NUM_OF_ELEMENTS)]
 for n in range(NUM_OF_PARTITIONS):
     with open('input/input_{0}.txt'.format(n), 'w') as file:
         for m in range(NUM_OF_ELEMENTS_PER_PARTITION):
@@ -38,7 +38,7 @@ for key, group in groupby(sorted(input_data), lambda x: x[0]):
     result_avg[key] = sum(g) / float(len(g))
 
 
-def write_output(dir_name, data):
+def write_output(dir_name, data, r=False):
     keys = list(sorted(data.keys()))
     NUM_OF_ELEMENTS_PER_PARTITION = int(math.ceil(float(len(keys)) / NUM_OF_PARTITIONS))
     for n in range(NUM_OF_PARTITIONS):
@@ -47,9 +47,10 @@ def write_output(dir_name, data):
                 index = n * NUM_OF_ELEMENTS_PER_PARTITION + m
                 if index >= len(keys):
                     return
-                file.write("{0} {1}\n".format(keys[index], data[keys[index]]))
+                value = '%.6f' % data[keys[index]] if r else data[keys[index]]
+                file.write("{0} {1}\n".format(keys[index], value))
 
 write_output(SUM_OUT, result_sum)
 write_output(MIN_OUT, result_min)
 write_output(MAX_OUT, result_max)
-write_output(AVG_OUT, result_avg)
+write_output(AVG_OUT, result_avg, True)

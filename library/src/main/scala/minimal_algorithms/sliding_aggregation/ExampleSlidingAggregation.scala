@@ -15,7 +15,7 @@ object ExampleSlidingAggregation {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new ExampleMaoKey(p(0).toInt, p(1).toInt)})
+      new ExampleMaoKey(p(0).toInt, p(1).toDouble)})
 
     val msa = new MinimalSlidingAggregation[ExampleMaoKey](spark, numOfPartitions)
     msa.sum(inputMapped, windowLen).map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath)

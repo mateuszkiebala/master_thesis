@@ -110,7 +110,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param aggFun Aggregation function
     * @return RDD[aggregated value for partition]
     */
-  private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: AggregationFunction): RDD[Int] = {
+  private[this] def getPartitionsAggregatedWeights(rdd: RDD[(Int, T)], aggFun: AggregationFunction): RDD[Double] = {
     rdd.mapPartitions(partition =>
       Iterator(partition.toList.foldLeft(aggFun.defaultValue){(acc, p) => aggFun.apply(acc, p._2.getWeight)})
     )

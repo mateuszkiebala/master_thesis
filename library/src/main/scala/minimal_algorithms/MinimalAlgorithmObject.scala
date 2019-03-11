@@ -6,8 +6,8 @@ package minimal_algorithms
   */
 trait MinimalAlgorithmObject[Self <: MinimalAlgorithmObject[Self]] extends Comparable[Self] with Serializable { self: Self =>
   /**
-    * Provides integer value that represents weight of the object.
+    * Provides real value that represents weight of the object.
     * @return Weight of the object.
     */
-  def getWeight: Int
+  def getWeight: Double
 }

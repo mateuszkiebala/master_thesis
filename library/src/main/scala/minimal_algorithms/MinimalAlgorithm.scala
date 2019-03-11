@@ -57,7 +57,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param aggFun Aggregation function
     * @return RDD of pairs (prefixSum, object)
     */
-  def computePrefix(aggFun: AggregationFunction): RDD[(Int, T)] = computePrefix(this.objects, aggFun)
+  def computePrefix(aggFun: AggregationFunction): RDD[(Double, T)] = computePrefix(this.objects, aggFun)
 
   /**
     * Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
@@ -66,7 +66,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param aggFun Aggregation function
     * @return RDD of pairs (prefixValue, object)
     */
-  def computePrefix(rdd: RDD[T], aggFun: AggregationFunction): RDD[(Int, T)] = {
+  def computePrefix(rdd: RDD[T], aggFun: AggregationFunction): RDD[(Double, T)] = {
     val sortedRdd = teraSorted(rdd).persist()
     val prefixPartitions = sc.broadcast(getPartitionsAggregatedWeights(sortedRdd, aggFun).collect()
       .scanLeft(aggFun.defaultValue)((res, x) => aggFun.apply(res, x)))
@@ -163,7 +163,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param aggFun Aggregation function
     * @return RDD[aggregated value for partition]
     */
-  def getPartitionsAggregatedWeights(rdd: RDD[T], aggFun: AggregationFunction): RDD[Int] = {
+  def getPartitionsAggregatedWeights(rdd: RDD[T], aggFun: AggregationFunction): RDD[Double] = {
     rdd.mapPartitions(partition => Iterator(partition.toList.foldLeft(aggFun.defaultValue){(acc, o) => aggFun.apply(acc, o.getWeight)}))
   }
 }

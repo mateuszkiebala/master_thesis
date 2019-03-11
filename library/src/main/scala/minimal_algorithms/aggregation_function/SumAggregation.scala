@@ -1,7 +1,7 @@
 package minimal_algorithms.aggregation_function
 
 class SumAggregation extends AggregationFunction {
-  override def defaultValue: Int = 0
-  override def apply: (Int, Int) => Int = (x: Int, y: Int) => x + y
+  override def defaultValue: Double = 0.0
+  override def apply: (Double, Double) => Double = (x: Double, y: Double) => x + y
   override def average: Boolean = false
 }

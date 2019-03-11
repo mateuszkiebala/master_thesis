@@ -58,9 +58,8 @@ run() {
     printf "RESULT: ${CYAN}$PASSED${COLOR_OFF} / ${ORANGE}$ALL${COLOR_OFF}\n" >> $LOGS
 }
 
-run "sum"
-#declare -a arr=("sum" "min" "max" "avg")
-#for i in "${arr[@]}"
-#do
-#   run 10 $i
-#done
+declare -a arr=("sum" "min" "max" "avg")
+for i in "${arr[@]}"
+do
+   run $i
+done

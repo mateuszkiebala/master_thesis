@@ -1,6 +1,6 @@
 package minimal_algorithms
 
-class ExampleMao(weight: Int) extends MinimalAlgorithmObject[ExampleMao] {
+class ExampleMao(weight: Double) extends MinimalAlgorithmObject[ExampleMao] {
   override def compareTo(o: ExampleMao): Int = {
     this.weight.compareTo(o.getWeight)
   }
@@ -9,7 +9,7 @@ class ExampleMao(weight: Int) extends MinimalAlgorithmObject[ExampleMao] {
     "Weight: " + this.weight
   }
 
-  override def getWeight: Int = {
+  override def getWeight: Double = {
     this.weight
   }
 }

@@ -13,14 +13,21 @@ object ExampleGroupBy {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new ExampleMaoKey(p(0).toInt, p(1).toInt)})
+      new ExampleMaoKey(p(0).toInt, p(1).toDouble)})
 
     val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, numOfPartitions).importObjects(inputMapped)
-    val outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.sum.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
-    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toString).saveAsTextFile(outputPath + "/output_sum")
-    //minimalGroupBy.min.map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath + "/min")
-    //minimalGroupBy.max.map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath + "/max")
-    //minimalGroupBy.avg.map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath + "/avg")
+    var outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.sum.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
+    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_sum")
+
+    outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.min.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
+    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_min")
+
+    outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.max.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
+    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_max")
+
+    outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.avg.map(p => new ExampleMaoKey(p._1, p._2)))
+    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + "%.6f".format(res.getWeight).toDouble).saveAsTextFile(outputPath + "/output_avg")
+
     spark.stop()
   }
 }

@@ -15,7 +15,7 @@ object ExampleRankingUsingPrefixSum {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new ExampleMaoKey(p(1).toInt, 1)})
+      new ExampleMaoKey(p(1).toInt, 1.0)})
 
     val minimalAlgorithm = new MinimalAlgorithm[ExampleMaoKey](spark, 5)
     minimalAlgorithm.importObjects(inputMapped).computePrefix(new SumAggregation).collect().foreach(println)

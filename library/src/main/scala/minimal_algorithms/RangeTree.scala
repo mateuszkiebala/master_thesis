@@ -2,14 +2,19 @@ package minimal_algorithms
 
 import minimal_algorithms.aggregation_function.AggregationFunction
 
-class RangeTree(elements: List[(Int, Int)], aggFun: AggregationFunction) extends Serializable {
+/**
+  * Fully binary tree.
+  * @param elements list of pairs (value, leaf position into which value will be inserted)
+  * @param aggFun aggregation function that will be applied on the tree (MAX, MIN, SUM)
+  */
+class RangeTree(elements: List[(Double, Int)], aggFun: AggregationFunction) extends Serializable {
   val log2: Double => Double = (x: Double) => math.log10(x) / math.log10(2.0)
   val BASE: Int = math.pow(2.0, math.ceil(log2(elements.length.toDouble))).toInt
-  var tree: Array[Int] = (1 to 2 * BASE map(_ => aggFun.defaultValue)).toArray
+  var tree: Array[Double] = (1 to 2 * BASE map(_ => aggFun.defaultValue)).toArray
 
   this.elements.foreach{ case(element, pos) => this.insert(element, pos) }
 
-  def insert(value: Int, start: Int) = {
+  def insert(value: Double, start: Int) = {
     if (start >= BASE)
       throw new IndexOutOfBoundsException("Position out of range: " + start)
 
