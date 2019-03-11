@@ -1,6 +1,6 @@
 package minimal_algorithms.semi_join
 
-import minimal_algorithms.MinimalSemiJoin
+import minimal_algorithms.{MinimalAlgorithm, MinimalSemiJoin}
 import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
 import org.apache.spark.sql.SparkSession
 
@@ -23,7 +23,8 @@ object ExampleSemiJoin {
       new SemiJoinType(p(0).toInt, p(1).toDouble, SemiJoinTypeEnum.TType)})
 
     val minimalSemiJoin = new MinimalSemiJoin(spark, numOfPartitions).importObjects(inputMappedR, inputMappedT)
-    minimalSemiJoin.execute.map(res => res.getKey.toString + " " + res.getWeight.toString).saveAsTextFile(outputPath)
+    val outputMA = new MinimalAlgorithm[SemiJoinType](spark, numOfPartitions).importObjects(minimalSemiJoin.execute)
+    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

@@ -4,7 +4,8 @@ import minimal_algorithms.MinimalAlgorithmObjectWithKey
 
 class SemiJoinType(key: Int, weight: Double, setType: Int) extends MinimalAlgorithmObjectWithKey[SemiJoinType] {
   override def compareTo(that: SemiJoinType): Int = {
-    this.key.compareTo(that.getKey)
+    val c = this.key.compareTo(that.getKey)
+    if (c != 0) c else this.weight.compareTo(that.getWeight)
   }
 
   override def getKey: Int = {

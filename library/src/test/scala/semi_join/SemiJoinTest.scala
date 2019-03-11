@@ -7,8 +7,10 @@ import setup.SharedSparkContext
 
 class SemiJoinTest extends FunSuite with SharedSparkContext with Matchers {
   val setR = Seq(new SemiJoinType(1, 2, 0), new SemiJoinType(1, -4, 0), new SemiJoinType(2, 10, 0),
-    new SemiJoinType(-5, 1, 0), new SemiJoinType(5, 2, 0), new SemiJoinType(1, 5, 0))
-  val setT = Seq(new SemiJoinType(1, 4, 1), new SemiJoinType(-5, 10, 1), new SemiJoinType(1, 11, 1))
+    new SemiJoinType(-5, 1, 0), new SemiJoinType(5, 2, 0), new SemiJoinType(1, 5, 0),
+    new SemiJoinType(-5099, 1, 0), new SemiJoinType(-500, 2, 0), new SemiJoinType(-100, 5, 0))
+  val setT = Seq(new SemiJoinType(1, 4, 1), new SemiJoinType(-5, 10, 1), new SemiJoinType(1, 11, 1),
+    new SemiJoinType(100, 12, 1), new SemiJoinType(100, 34, 1), new SemiJoinType(900, 23, 1))
   val rddR = spark.sparkContext.parallelize(setR)
   val rddT = spark.sparkContext.parallelize(setT)
 

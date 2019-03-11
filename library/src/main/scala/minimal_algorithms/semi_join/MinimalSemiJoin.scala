@@ -29,7 +29,7 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
     */
   def execute: RDD[SemiJoinType] = {
     val rdd = teraSorted(this.objects)
-    val bounds = sc.broadcast(rdd.mapPartitions(partition => {
+    val TBounds = sc.broadcast(rdd.mapPartitions(partition => {
       val tKeys = partition.filter(o => o.getSetType == SemiJoinTypeEnum.TType).toList
       if (tKeys.nonEmpty)
         Iterator(tKeys.min.getKey, tKeys.max.getKey)
@@ -37,11 +37,15 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
         Iterator.empty
     }).collect().toSet)
 
-    rdd.mapPartitionsWithIndex((pIndex, partition) => {
+    rdd.mapPartitions(partition => {
       val groupedByType = partition.toList.groupBy(o => o.getSetType)
-      val rObjects = groupedByType(SemiJoinTypeEnum.RType)
-      if (groupedByType.contains(SemiJoinTypeEnum.TType)) {
-        val tKeys = groupedByType(SemiJoinTypeEnum.TType).map(o => o.getKey).toSet.union(bounds.value)
+      if (groupedByType.contains(SemiJoinTypeEnum.RType)) {
+        val rObjects = groupedByType(SemiJoinTypeEnum.RType)
+        val tKeys = if (groupedByType.contains(SemiJoinTypeEnum.TType)) {
+          groupedByType(SemiJoinTypeEnum.TType).map(o => o.getKey).toSet.union(TBounds.value)
+        } else {
+          TBounds.value
+        }
         rObjects.filter(o => tKeys.contains(o.getKey)).toIterator
       } else {
         Iterator.empty

@@ -25,7 +25,7 @@ hdfs dfs -put $INPUT_R_TEST/* $INPUT_R_HDFS
 hdfs dfs -put $INPUT_T_TEST/* $INPUT_T_HDFS
 
 HDFS="hdfs://192.168.0.220:9000"
-OUTPUT_HDFS=$USER_PATH
+OUTPUT_HDFS="$USER_PATH/output"
 
 hdfs dfs -rm -r $OUTPUT_HDFS
 spark-submit --class minimal_algorithms.semi_join.ExampleSemiJoin --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar 10 "$HDFS/$INPUT_R_HDFS" "$HDFS/$INPUT_T_HDFS" "$HDFS/$OUTPUT_HDFS"
@@ -36,7 +36,7 @@ run() {
 
     mkdir -p tmp
     rm -rf "tmp/$CORRECT_OUT_DIR"
-    hdfs dfs -get "$OUTPUT_HDFS/$CORRECT_OUT_DIR" tmp
+    hdfs dfs -get $OUTPUT_HDFS tmp
 
     rm -rf $LOGS
     PASSED=0
