@@ -3,7 +3,8 @@ package minimal_algorithms
 import minimal_algorithms.aggregation_function.AggregationFunction
 
 /**
-  * Fully binary tree.
+  * Fully binary tree. Enables searching for MAX, MIN, SUM on given range (start, end) in complexity O(n log n)
+  * where n is number of initial elements.
   * @param elements list of pairs (value, leaf position into which value will be inserted)
   * @param aggFun aggregation function that will be applied on the tree (MAX, MIN, SUM)
   */
@@ -14,7 +15,7 @@ class RangeTree(elements: List[(Double, Int)], aggFun: AggregationFunction) exte
 
   this.elements.foreach{ case(element, pos) => this.insert(element, pos) }
 
-  def insert(value: Double, start: Int) = {
+  private[this] def insert(value: Double, start: Int): Unit = {
     if (start >= BASE)
       throw new IndexOutOfBoundsException("Position out of range: " + start)
 
@@ -32,7 +33,7 @@ class RangeTree(elements: List[(Double, Int)], aggFun: AggregationFunction) exte
     * @param end  [0 ... BASE - 1]
     * @return  Aggregated value in range.
     */
-  def query(start: Int, end: Int) = {
+  def query(start: Int, end: Int): Double = {
     if (start > end)
       throw new Exception("Start (" + start + ") greater than end (" + end + ")")
 

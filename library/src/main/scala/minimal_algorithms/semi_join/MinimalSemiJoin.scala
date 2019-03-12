@@ -19,7 +19,7 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
     * @return this
     */
   def importObjects(rddR: RDD[SemiJoinType], rddT: RDD[SemiJoinType]): this.type = {
-    this.objects = rddR.union(rddT)
+    super.importObjects(rddR.union(rddT))
     this
   }
 
@@ -28,7 +28,7 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
     * @return RDD of objects that belong to set R and have a match in set T.
     */
   def execute: RDD[SemiJoinType] = {
-    val rdd = teraSorted(this.objects)
+    val rdd = perfectlySorted(this.objects)
     val TBounds = sc.broadcast(rdd.mapPartitions(partition => {
       val tKeys = partition.filter(o => o.getSetType == SemiJoinTypeEnum.TType).toList
       if (tKeys.nonEmpty)
