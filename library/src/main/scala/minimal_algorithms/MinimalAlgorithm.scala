@@ -1,6 +1,6 @@
 package minimal_algorithms
 
-import minimal_algorithms.aggregation_function.AggregationFunction
+import minimal_algorithms.aggregations.AggregationFunction
 import org.apache.spark.rdd.RDD
 import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession

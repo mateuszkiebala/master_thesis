@@ -1,6 +1,6 @@
 package minimal_algorithms.prefix
 
-import minimal_algorithms.aggregation_function.SumAggregation
+//import minimal_algorithms.aggregations.SumAggregation
 import minimal_algorithms.{ExampleMao, MinimalAlgorithm}
 import org.apache.spark.sql.SparkSession
 
@@ -15,7 +15,7 @@ object ExamplePrefix {
       new ExampleMao(p(1).toDouble)})
 
     val minimalAlgorithm = new MinimalAlgorithm[ExampleMao](spark, 5)
-    minimalAlgorithm.importObjects(inputMapped).computePrefix(new SumAggregation).saveAsTextFile(outputPath)
+    //minimalAlgorithm.importObjects(inputMapped).computePrefix(new SumAggregation).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

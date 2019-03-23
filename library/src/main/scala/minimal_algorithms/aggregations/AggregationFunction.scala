@@ -1,4 +1,4 @@
-package minimal_algorithms.aggregation_function
+package minimal_algorithms.aggregations
 
 abstract class AggregationFunction extends Serializable {
   /**

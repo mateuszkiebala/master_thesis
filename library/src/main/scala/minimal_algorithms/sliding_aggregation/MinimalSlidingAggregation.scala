@@ -1,6 +1,6 @@
 package minimal_algorithms.sliding_aggregation
 
-import minimal_algorithms.aggregation_function._
+import minimal_algorithms.aggregations._
 import minimal_algorithms.{KeyPartitioner, MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey, RangeTree}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
@@ -22,8 +22,8 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param windowLength window length
     * @return list of [(object o's key, sum of l largest objects not exceeding o)
     */
-  def sum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
-    execute(input, windowLength, new SumAggregation)
+  /*def sum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+    //execute(input, windowLength, new SumAggregation)
   }
 
   /**
@@ -67,8 +67,8 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
     val elements = getPartitionsAggregatedWeights(dataWithRanks, aggFun).collect().zipWithIndex.toList
-    val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements, aggFun)).value
-    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun)
+    //val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements, aggFun)).value
+    //computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, aggFun)
   }
 
   /**
@@ -141,5 +141,5 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
         (mao.getKey, if (aggFun.average) result.toDouble / (rank-minRank+1) else result)
       }}.toIterator
     })
-  }
+  }*/
 }

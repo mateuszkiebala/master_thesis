@@ -15,7 +15,7 @@ object ExampleGroupBy {
       val p = line.split(' ')
       new ExampleMaoKey(p(0).toInt, p(1).toDouble)})
 
-    val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, numOfPartitions).importObjects(inputMapped)
+    /*val minimalGroupBy = new MinimalGroupBy[ExampleMaoKey](spark, numOfPartitions).importObjects(inputMapped)
     var outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.sum.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
     outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_sum")
 
@@ -27,7 +27,7 @@ object ExampleGroupBy {
 
     outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.avg.map(p => new ExampleMaoKey(p._1, p._2)))
     outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + "%.6f".format(res.getWeight)).saveAsTextFile(outputPath + "/output_avg")
-
+    */
     spark.stop()
   }
 }

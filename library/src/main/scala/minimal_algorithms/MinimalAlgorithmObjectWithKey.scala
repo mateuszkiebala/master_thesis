@@ -7,9 +7,9 @@ package minimal_algorithms
   */
 trait MinimalAlgorithmObjectWithKey[Self <: MinimalAlgorithmObjectWithKey[Self]] extends MinimalAlgorithmObject[Self] { self: Self =>
   /**
-    * Provides integer value that represents a key of the object.
+    * Provides value that represents a key of the object.
     * Key does not have to be unique.
     * @return Key of the object.
     */
-  def getKey: Int
+  def getKey: Any
 }

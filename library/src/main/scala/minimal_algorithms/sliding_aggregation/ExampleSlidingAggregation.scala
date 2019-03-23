@@ -18,7 +18,7 @@ object ExampleSlidingAggregation {
       new ExampleMaoKey(p(0).toInt, p(1).toDouble)})
 
     val msa = new MinimalSlidingAggregation[ExampleMaoKey](spark, numOfPartitions)
-    msa.sum(inputMapped, windowLen).map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath)
+    //msa.sum(inputMapped, windowLen).map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath)
     //msa.min(inputMapped, windowLen).collect().foreach(println)
     //msa.max(inputMapped, windowLen).collect().foreach(println)
     //msa.avg(inputMapped, windowLen).collect().foreach(println)

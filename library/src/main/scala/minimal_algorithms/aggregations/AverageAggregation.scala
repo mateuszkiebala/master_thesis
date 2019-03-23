@@ -1,4 +1,4 @@
-package minimal_algorithms.aggregation_function
+package minimal_algorithms.aggregations
 
 class AverageAggregation extends AggregationFunction {
   override def defaultValue: Double = 0
