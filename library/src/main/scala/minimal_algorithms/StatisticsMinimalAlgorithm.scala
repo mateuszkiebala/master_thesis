@@ -31,7 +31,11 @@ class StatisticsMinimalAlgorithm[A <: StatisticsAggregator[A] : ClassTag, T <: S
         Iterator()
       } else {
         val smaoObjects = partition.toList
-        val prefix = smaoObjects.map(smao => smao.getAggregator).scanLeft(prefixPartitionsStatistics.value(index))((res, a) => res.merge(a)).tail
+        val prefix = if (index == 0) {
+          smaoObjects.tail.scanLeft(smaoObjects.head.getAggregator){(res, a) => res.merge(a.getAggregator)}
+        } else {
+          smaoObjects.map(smao => smao.getAggregator).scanLeft(prefixPartitionsStatistics.value(index-1))((res, a) => res.merge(a)).tail
+        }
         smaoObjects.zipWithIndex.map{
           case (smao, i) => (prefix(i), smao)
           case _         => throw new Exception("Error while creating prefix values")
