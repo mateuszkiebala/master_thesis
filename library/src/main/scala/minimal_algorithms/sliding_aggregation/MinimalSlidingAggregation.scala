@@ -1,7 +1,7 @@
 package minimal_algorithms.sliding_aggregation
 
-import minimal_algorithms.aggregations._
-import minimal_algorithms.{KeyPartitioner, MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey, RangeTree}
+import minimal_algorithms.statistics_aggregators._
+import minimal_algorithms.{KeyPartitioner, RangeTree}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
   * @param numOfPartitions  Number of partitions
   * @tparam T T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
   */
-class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
+/*class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithmWithKey[T](spark, numOfPartitions) {
 
   /**
@@ -22,7 +22,7 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
     * @param windowLength window length
     * @return list of [(object o's key, sum of l largest objects not exceeding o)
     */
-  /*def sum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
+  def sum(input: RDD[T], windowLength: Int): RDD[(Int, Double)] = {
     //execute(input, windowLength, new SumAggregation)
   }
 
@@ -141,5 +141,5 @@ class MinimalSlidingAggregation[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
         (mao.getKey, if (aggFun.average) result.toDouble / (rank-minRank+1) else result)
       }}.toIterator
     })
-  }*/
-}
+  }
+}*/

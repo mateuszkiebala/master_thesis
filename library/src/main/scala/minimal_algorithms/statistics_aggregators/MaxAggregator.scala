@@ -1,11 +1,7 @@
-package minimal_algorithms.aggregations
+package minimal_algorithms.statistics_aggregators
 
-class MaxAggregator(value: Double) extends Aggregator[MaxAggregator] {
+class MaxAggregator(value: Double) extends StatisticsAggregator[MaxAggregator] {
   def getValue: Double = value
-
-  override def default: MaxAggregator = {
-    new MaxAggregator(Double.MinValue)
-  }
 
   override def merge(that: MaxAggregator): MaxAggregator = {
     new MaxAggregator(math.max(this.value, that.getValue))
@@ -20,8 +16,4 @@ class MaxAggregator(value: Double) extends Aggregator[MaxAggregator] {
     }
 
   override def hashCode: Int = this.value.hashCode
-}
-
-package object MaxImplicits {
-  implicit val maxAggregator: MaxAggregator = new MaxAggregator(Double.MinValue)
 }

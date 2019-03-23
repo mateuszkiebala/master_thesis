@@ -1,5 +1,6 @@
 package ranking
 
+/*
 import minimal_algorithms.{MinimalAlgorithm, MinimalAlgorithmObject}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
@@ -39,3 +40,4 @@ class RankingTest extends FunSuite with SharedSparkContext with Matchers {
     assert(expected.map(o => (o._1, o._2.getWeight, o._2.getWeightTwo)) sameElements result.map(o => (o._1, o._2.getWeight, o._2.getWeightTwo)))
   }
 }
+*/

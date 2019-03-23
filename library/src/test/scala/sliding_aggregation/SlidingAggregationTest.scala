@@ -1,6 +1,5 @@
 package sliding_aggregation
-
-import minimal_algorithms.ExampleMaoKey
+/*
 import minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
@@ -12,7 +11,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
     new ExampleMaoKey(8, 10), new ExampleMaoKey(10, -7), new ExampleMaoKey(9, 2), new ExampleMaoKey(11, 5)))
   val minimalSlidingAggregation = new MinimalSlidingAggregation[ExampleMaoKey](spark, 3).importObjects(elements)
 
-/*  test("SlidingAggregation sum") {
+  test("SlidingAggregation sum") {
       // when
     val result = minimalSlidingAggregation.sum(elements, 7).collect()
 
@@ -46,5 +45,5 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
       // then
     val expected = Array((1, 2.0), (2, -4.0), (3, -1.0), (4, -0.5), (5, 2.0), (6, 11.0 / 6), (7, 13.0 / 7), (8, 3.0), (9, 33.0 / 7), (10, 3.0), (11, 25.0 / 7))
     assert(expected sameElements result)
-  }*/
-}
+  }
+}*/

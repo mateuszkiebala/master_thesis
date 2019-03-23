@@ -1,8 +1,8 @@
 package minimal_algorithms.ranking
 
-import minimal_algorithms.{MinimalAlgorithm, ExampleMao}
+import minimal_algorithms.MinimalAlgorithm
 import org.apache.spark.sql.SparkSession
-
+/*
 object ExampleRanking {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("ExampleRanking").master("local").getOrCreate()
@@ -18,3 +18,4 @@ object ExampleRanking {
     spark.stop()
   }
 }
+*/

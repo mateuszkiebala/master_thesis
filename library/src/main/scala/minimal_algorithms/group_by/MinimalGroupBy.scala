@@ -1,12 +1,13 @@
 package minimal_algorithms.group_by
 
-import minimal_algorithms.aggregations._
-import minimal_algorithms.{KeyPartitioner, MinimalAlgorithmObjectWithKey, MinimalAlgorithmWithKey}
+import minimal_algorithms.statistics_aggregators._
+import minimal_algorithms.KeyPartitioner
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 import scala.reflect.ClassTag
 
+/*
 /**
   * Class implementing aggregation functions.
   * @param spark  SparkSession
@@ -20,7 +21,7 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
     * Groups objects by key and computes sum on each group.
     * @return RDD of pairs (group key, sum of group objects)
     */
-  /*def sum: RDD[(Int, Double)] = {
+  def sum: RDD[(Int, Double)] = {
     //this.groupBy(new SumAggregation)
   }
 
@@ -82,11 +83,13 @@ class MinimalGroupBy[T <: MinimalAlgorithmObjectWithKey[T] : ClassTag](spark: Sp
           partition.map{ o => (o.key, if (aggFun.average) o.value / o.length else o.value) }
         }
       }).persist()
-  }*/
-}
+  }
+}*/
 
+/*
 class GroupedObject(k: Int, v: Double, l: Int) extends Serializable {
   var value: Double = v
   var key: Int = k
   var length: Int = l
 }
+*/

@@ -1,34 +1,31 @@
 package range_tree
 import org.scalatest.FunSuite
 import minimal_algorithms.RangeTree
-import minimal_algorithms.aggregations._
-import minimal_algorithms.aggregations.SumImplicits._
-import minimal_algorithms.aggregations.MinImplicits._
-import minimal_algorithms.aggregations.MaxImplicits._
+import minimal_algorithms.statistics_aggregators._
 
 class RangeTreeTest extends FunSuite {
-  def sumWrapResult(elements: Array[Double]): Array[SumAggregator] = {
-    elements.map{e => new SumAggregator(e)}
-  }
-
   def sumWrapInsert(elements: Array[(Double, Int)]): Array[(SumAggregator, Int)] = {
     elements.map{case(e, pos) => (new SumAggregator(e), pos)}
   }
 
-  def minWrapResult(elements: Array[Double]): Array[MinAggregator] = {
-    elements.map{e => new MinAggregator(e)}
+  def sumUnwrap(elements: Array[SumAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) 0.0 else e.getValue}
   }
 
   def minWrapInsert(elements: Array[(Double, Int)]): Array[(MinAggregator, Int)] = {
     elements.map{case(e, pos) => (new MinAggregator(e), pos)}
   }
 
-  def maxWrapResult(elements: Array[Double]): Array[MaxAggregator] = {
-    elements.map{e => new MaxAggregator(e)}
+  def minUnwrap(elements: Array[MinAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) Double.MaxValue else e.getValue}
   }
 
   def maxWrapInsert(elements: Array[(Double, Int)]): Array[(MaxAggregator, Int)] = {
     elements.map{case(e, pos) => (new MaxAggregator(e), pos)}
+  }
+
+  def maxUnwrap(elements: Array[MaxAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) Double.MinValue else e.getValue}
   }
 
   test("RangeTree.init one node tree") {
@@ -40,7 +37,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(1 == rangeTree.BASE)
-    assert(sumWrapResult(Array(0.0, 1.0)).sameElements(rangeTree.tree))
+    assert(Array(0.0, 1.0).sameElements(sumUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init position out of range") {
@@ -79,7 +76,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(sumWrapResult(Array(0.0, 10.0, 3.0, 7.0, 1.0, 2.0, 3.0, 4.0)).sameElements(rangeTree.tree))
+    assert(Array(0.0, 10.0, 3.0, 7.0, 1.0, 2.0, 3.0, 4.0).sameElements(sumUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init not equal power of two sum") {
@@ -91,7 +88,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(8 == rangeTree.BASE)
-    assert(sumWrapResult(Array(0, 20, 18, 2, 4, 14, 2, 0, 3, 1, 4, 10, 2, 0, 0, 0).map(x => x.toDouble)).sameElements(rangeTree.tree))
+    assert(Array(0, 20, 18, 2, 4, 14, 2, 0, 3, 1, 4, 10, 2, 0, 0, 0).map(x => x.toDouble).sameElements(sumUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init query sum") {
@@ -120,7 +117,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(minWrapResult(Array(Double.MaxValue, 1, 1, 3, 1, 2, 3, 4)).sameElements(rangeTree.tree))
+    assert(Array(Double.MaxValue, 1, 1, 3, 1, 2, 3, 4).sameElements(minUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init not equal power of two min") {
@@ -132,7 +129,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(8 == rangeTree.BASE)
-    assert(minWrapResult(Array(Double.MaxValue, -4, -4, 2, 1, -4, 2, Double.MaxValue, 3, 1, -4, 10, 2, Double.MaxValue, Double.MaxValue, Double.MaxValue)).sameElements(rangeTree.tree))
+    assert(Array(Double.MaxValue, -4, -4, 2, 1, -4, 2, Double.MaxValue, 3, 1, -4, 10, 2, Double.MaxValue, Double.MaxValue, Double.MaxValue).sameElements(minUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init query min") {
@@ -161,7 +158,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(maxWrapResult(Array(Double.MinValue, 4, 2, 4, 1, 2, 3, 4)).sameElements(rangeTree.tree))
+    assert(Array(Double.MinValue, 4, 2, 4, 1, 2, 3, 4).sameElements(maxUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init all negative numbers max") {
@@ -173,7 +170,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(maxWrapResult(Array(Double.MinValue, -1, -1, -3, -1, -2, -3, -4)).sameElements(rangeTree.tree))
+    assert(Array(Double.MinValue, -1, -1, -3, -1, -2, -3, -4).sameElements(maxUnwrap(rangeTree.tree)))
   }
 
 
@@ -186,7 +183,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(8 == rangeTree.BASE)
-    assert(maxWrapResult(Array(Double.MinValue, 10, 10, 2, 3, 10, 2, Double.MinValue, 3, 1, 4, 10, 2, Double.MinValue, Double.MinValue, Double.MinValue)).sameElements(rangeTree.tree))
+    assert(Array(Double.MinValue, 10, 10, 2, 3, 10, 2, Double.MinValue, 3, 1, 4, 10, 2, Double.MinValue, Double.MinValue, Double.MinValue).sameElements(maxUnwrap(rangeTree.tree)))
   }
 
   test("RangeTree.init query max") {

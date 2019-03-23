@@ -1,6 +1,6 @@
 package minimal_algorithms
 
-import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
+/*import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -52,4 +52,4 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
       }
     })
   }
-}
+}*/

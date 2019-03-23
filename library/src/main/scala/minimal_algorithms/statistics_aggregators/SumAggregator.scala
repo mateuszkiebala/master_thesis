@@ -1,14 +1,14 @@
-package minimal_algorithms.aggregations
+package minimal_algorithms.statistics_aggregators
 
-class SumAggregator(value: Double) extends Aggregator[SumAggregator] {
+class SumAggregator(value: Double) extends StatisticsAggregator[SumAggregator] {
   def getValue: Double = value
-
-  override def default: SumAggregator = {
-    new SumAggregator(0.0)
-  }
 
   override def merge(that: SumAggregator): SumAggregator = {
     new SumAggregator(this.value + that.getValue)
+  }
+
+  override def toString: String = {
+    this.value.toString
   }
 
   def canEqual(a: Any): Boolean = a.isInstanceOf[SumAggregator]
@@ -20,8 +20,4 @@ class SumAggregator(value: Double) extends Aggregator[SumAggregator] {
     }
 
   override def hashCode: Int = this.value.hashCode
-}
-
-package object SumImplicits {
-  implicit val sumAggregator: SumAggregator = new SumAggregator(0.0)
 }

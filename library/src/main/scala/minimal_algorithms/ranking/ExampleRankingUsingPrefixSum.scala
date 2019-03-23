@@ -1,12 +1,13 @@
 package minimal_algorithms.ranking
 
 //import minimal_algorithms.aggregations.SumAggregation
-import minimal_algorithms.{ExampleMaoKey, MinimalAlgorithm}
+import minimal_algorithms.MinimalAlgorithm
 import org.apache.spark.sql.SparkSession
 
 /**
   * Simulate ranking algorithm with use of prefix sums.
   */
+/*
 object ExampleRankingUsingPrefixSum {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("ExampleRankingUsingPrefixSum").master("local").getOrCreate()
@@ -22,3 +23,4 @@ object ExampleRankingUsingPrefixSum {
     spark.stop()
   }
 }
+*/

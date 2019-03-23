@@ -1,6 +1,5 @@
 package minimal_algorithms
 
-import minimal_algorithms.aggregations.AggregationFunction
 import org.apache.spark.rdd.RDD
 import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
@@ -49,39 +48,6 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     val pairedObjects = rdd.map{mao => (mao, mao)}
     pairedObjects.partitionBy(new RangePartitioner[T, T](numOfPartitions, pairedObjects))
       .mapPartitions(partition => partition.map(p => p._2).toList.sorted.toIterator)
-  }
-
-  /**
-    * Applies prefix aggregation (SUM, MIN, MAX) function on imported objects. First orders elements and then computes prefixes.
-    * Order for equal objects is picked randomly.
-    * @param aggFun Aggregation function
-    * @return RDD of pairs (prefixSum, object)
-    */
-  def computePrefix(aggFun: AggregationFunction): RDD[(Double, T)] = computePrefix(this.objects, aggFun)
-
-  /**
-    * Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
-    * Order for equal objects is picked randomly.
-    * @param rdd  RDD with objects to process.
-    * @param aggFun Aggregation function
-    * @return RDD of pairs (prefixValue, object)
-    */
-  def computePrefix(rdd: RDD[T], aggFun: AggregationFunction): RDD[(Double, T)] = {
-    val sortedRdd = teraSorted(rdd).persist()
-    val prefixPartitions = sc.broadcast(getPartitionsAggregatedWeights(sortedRdd, aggFun).collect()
-      .scanLeft(aggFun.defaultValue)((res, x) => aggFun.apply(res, x)))
-    sortedRdd.mapPartitionsWithIndex((index, partition) => {
-      if (partition.isEmpty) {
-        Iterator()
-      } else {
-        val maoObjects = partition.toList
-        val prefix = maoObjects.map(mao => mao.getWeight).scanLeft(prefixPartitions.value(index))((res, x) => aggFun.apply(res, x)).tail
-        maoObjects.zipWithIndex.map{
-          case (mao, i) => (prefix(i), mao)
-          case _        => throw new Exception("Error while creating prefix values")
-        }.toIterator
-      }
-    })
   }
 
   /**
@@ -155,15 +121,5 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     */
   def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.length))
-  }
-
-  /**
-    * Computes aggregated values (SUM, MIN, MAX) for each partition.
-    * @param rdd  Elements
-    * @param aggFun Aggregation function
-    * @return RDD[aggregated value for partition]
-    */
-  def getPartitionsAggregatedWeights(rdd: RDD[T], aggFun: AggregationFunction): RDD[Double] = {
-    rdd.mapPartitions(partition => Iterator(partition.toList.foldLeft(aggFun.defaultValue){(acc, o) => aggFun.apply(acc, o.getWeight)}))
   }
 }
