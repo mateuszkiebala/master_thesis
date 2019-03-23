@@ -1,26 +1,39 @@
 package minimal_algorithms.ranking
 
-//import minimal_algorithms.aggregations.SumAggregation
-import minimal_algorithms.MinimalAlgorithm
+import minimal_algorithms.StatisticsMinimalAlgorithm
+import minimal_algorithms.prefix.PrefixSMAO
+import minimal_algorithms.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
 
 /**
   * Simulate ranking algorithm with use of prefix sums.
   */
-/*
+
+class RankAsPrefixSMAO(key: Int, weight: Double) extends PrefixSMAO[RankAsPrefixSMAO, SumAggregator](weight) {
+  override def compareTo(that: RankAsPrefixSMAO): Int = {
+    this.key.compareTo(that.getKey)
+  }
+
+  override def getAggregator: SumAggregator = {
+    new SumAggregator(this.weight)
+  }
+
+  def getKey: Int = this.key
+}
+
 object ExampleRankingUsingPrefixSum {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("ExampleRankingUsingPrefixSum").master("local").getOrCreate()
-    val inputPath = "test.txt"
-    val outputPath = "out_ranking_prefix_sum"
+    val numOfPartitions = args(0).toInt
+    val inputPath = args(1)
+    val outputPath = args(2)
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new ExampleMaoKey(p(1).toInt, 1.0)})
+      new RankAsPrefixSMAO(p(1).toInt, 1.0)})
 
-    val minimalAlgorithm = new MinimalAlgorithm[ExampleMaoKey](spark, 5)
-    //minimalAlgorithm.importObjects(inputMapped).computePrefix(new SumAggregation).collect().foreach(println)
+    val minimalAlgorithm = new StatisticsMinimalAlgorithm[SumAggregator, RankAsPrefixSMAO](spark, 5)
+    minimalAlgorithm.importObjects(inputMapped).computePrefix.collect().foreach(println)
     spark.stop()
   }
 }
-*/
