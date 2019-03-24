@@ -17,4 +17,6 @@ class AvgAggregator(sum: Double, count: Int) extends StatisticsAggregator[AvgAgg
     }
 
   override def hashCode: Int = (this.sum / this.count).hashCode
+
+  def getValue: Double = if (this.count == 0.0) 0.0 else this.sum / this.count
 }

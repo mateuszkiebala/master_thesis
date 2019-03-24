@@ -1,7 +1,7 @@
 package minimal_algorithms
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
-
+import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
 import scala.reflect.ClassTag
 
 /**
@@ -51,15 +51,5 @@ class RangeTree[A <: StatisticsAggregator[A] : ClassTag](elements: Array[(A, Int
       ve /= 2
     }
     result
-  }
-
-  def safeMerge(a: A, b: A): A = {
-    if (a == null) {
-      b
-    } else if (b == null) {
-      a
-    } else {
-      a.merge(b)
-    }
   }
 }

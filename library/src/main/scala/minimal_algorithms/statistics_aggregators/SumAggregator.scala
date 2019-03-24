@@ -8,7 +8,7 @@ class SumAggregator(value: Double) extends StatisticsAggregator[SumAggregator] {
   }
 
   override def toString: String = {
-    this.value.toString
+    "SUM: " + this.value.toString
   }
 
   def canEqual(a: Any): Boolean = a.isInstanceOf[SumAggregator]

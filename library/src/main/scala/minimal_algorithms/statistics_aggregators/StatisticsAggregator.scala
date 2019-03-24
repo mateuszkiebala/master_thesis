@@ -1,5 +1,5 @@
 package minimal_algorithms.statistics_aggregators
 
-trait StatisticsAggregator[T] extends Serializable {
-  def merge(agg: T): T
+trait StatisticsAggregator[A] extends Serializable {
+  def merge(agg: A): A
 }
