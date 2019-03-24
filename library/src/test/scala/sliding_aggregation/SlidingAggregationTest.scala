@@ -1,5 +1,6 @@
 package sliding_aggregation
 
+import minimal_algorithms.examples.sliding_aggregation.{AvgSlidingSMAO, MaxSlidingSMAO, MinSlidingSMAO, SumSlidingSMAO}
 import minimal_algorithms.sliding_aggregation._
 import minimal_algorithms.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
 import org.scalatest.{FunSuite, Matchers}

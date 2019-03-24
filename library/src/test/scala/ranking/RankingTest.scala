@@ -1,7 +1,7 @@
 package ranking
 
 
-import minimal_algorithms.ranking.RankingMAO
+import minimal_algorithms.examples.ranking.RankingMAO
 import minimal_algorithms.MinimalAlgorithm
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext

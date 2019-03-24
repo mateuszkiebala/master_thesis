@@ -1,4 +1,4 @@
-package minimal_algorithms.prefix
+package minimal_algorithms.examples.prefix
 
 import minimal_algorithms.StatisticsMinimalAlgorithmObject
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator

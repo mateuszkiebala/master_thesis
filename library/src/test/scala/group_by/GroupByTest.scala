@@ -1,6 +1,7 @@
 package group_by
 
-import minimal_algorithms.group_by.{GroupByObject, IntKey, MinimalGroupBy}
+import minimal_algorithms.examples.group_by.IntKey
+import minimal_algorithms.group_by.{GroupByObject, MinimalGroupBy}
 import minimal_algorithms.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext

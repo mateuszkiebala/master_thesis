@@ -1,15 +1,18 @@
 package minimal_algorithms
 
-import minimal_algorithms.semi_join.{SemiJoinType, SemiJoinTypeEnum}
+import minimal_algorithms.semi_join.{SemiJoinObject, SemiJoinSetTypeEnum}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+
+import scala.reflect.ClassTag
 
 /**
   * Class implementing semi join algorithm.
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
   */
-class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[SemiJoinType](spark, numOfPartitions) {
+class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
+  extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
     * Imports two sets: R and T from the same domain.
@@ -17,7 +20,7 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int) extends Minimal
     * @param rddT Set in which we look for matches.
     * @return this
     */
-  def importObjects(rddR: RDD[SemiJoinType], rddT: RDD[SemiJoinType]): this.type = {
+  def importObjects(rddR: RDD[T], rddT: RDD[T]): this.type = {
     super.importObjects(rddR.union(rddT))
     this
   }
@@ -26,26 +29,23 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int) extends Minimal
     * Applies semi join algorithm on imported data.
     * @return RDD of objects that belong to set R and have a match in set T.
     */
-  def execute: RDD[SemiJoinType] = {
+  def execute: RDD[T] = {
     val rdd = perfectlySorted(this.objects)
     val TBounds = sc.broadcast(rdd.mapPartitions(partition => {
-      val tKeys = partition.filter(o => o.getSetType == SemiJoinTypeEnum.TType).toList
-      if (tKeys.nonEmpty)
-        Iterator(tKeys.min.getKey, tKeys.max.getKey)
-      else
-        Iterator.empty
+      val tObjects = partition.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
+      if (tObjects.nonEmpty) Iterator(tObjects.min, tObjects.max) else Iterator.empty
     }).collect().toSet)
 
     rdd.mapPartitions(partition => {
       val groupedByType = partition.toList.groupBy(o => o.getSetType)
-      if (groupedByType.contains(SemiJoinTypeEnum.RType)) {
-        val rObjects = groupedByType(SemiJoinTypeEnum.RType)
-        val tKeys = if (groupedByType.contains(SemiJoinTypeEnum.TType)) {
-          groupedByType(SemiJoinTypeEnum.TType).map(o => o.getKey).toSet.union(TBounds.value)
+      if (groupedByType.contains(SemiJoinSetTypeEnum.RType)) {
+        val rObjects = groupedByType(SemiJoinSetTypeEnum.RType)
+        val tObjects = if (groupedByType.contains(SemiJoinSetTypeEnum.TType)) {
+          groupedByType(SemiJoinSetTypeEnum.TType).toSet.union(TBounds.value)
         } else {
           TBounds.value
         }
-        rObjects.filter(o => tKeys.contains(o.getKey)).toIterator
+        rObjects.filter(o => tObjects.contains(o)).toIterator
       } else {
         Iterator.empty
       }

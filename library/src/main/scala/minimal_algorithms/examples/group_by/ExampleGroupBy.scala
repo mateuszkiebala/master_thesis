@@ -1,4 +1,4 @@
-package minimal_algorithms.group_by
+//package minimal_algorithms.group_by
 
 import minimal_algorithms.MinimalAlgorithm
 import org.apache.spark.sql.SparkSession

@@ -2,7 +2,7 @@ package prefix
 
 import minimal_algorithms.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.StatisticsMinimalAlgorithm
-import minimal_algorithms.prefix.{MaxPrefixSMAO, MinPrefixSMAO, SumPrefixSMAO}
+import minimal_algorithms.examples.prefix.{MaxPrefixSMAO, MinPrefixSMAO, SumPrefixSMAO}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
 

@@ -1,4 +1,4 @@
-package minimal_algorithms.ranking
+package minimal_algorithms.examples.ranking
 
 import minimal_algorithms.MinimalAlgorithmObject
 
