@@ -1,27 +1,24 @@
 package semi_join
-/*
+
 import minimal_algorithms.MinimalSemiJoin
-import minimal_algorithms.examples.SemiJoinType
+import minimal_algorithms.semi_join.SemiJoinType
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
 
 class SemiJoinTest extends FunSuite with SharedSparkContext with Matchers {
-  val setR = Seq(new SemiJoinType(1, 2, 0), new SemiJoinType(1, -4, 0), new SemiJoinType(2, 10, 0),
-    new SemiJoinType(-5, 1, 0), new SemiJoinType(5, 2, 0), new SemiJoinType(1, 5, 0),
-    new SemiJoinType(-5099, 1, 0), new SemiJoinType(-500, 2, 0), new SemiJoinType(-100, 5, 0))
-  val setT = Seq(new SemiJoinType(1, 4, 1), new SemiJoinType(-5, 10, 1), new SemiJoinType(1, 11, 1),
-    new SemiJoinType(100, 12, 1), new SemiJoinType(100, 34, 1), new SemiJoinType(900, 23, 1))
-  val rddR = spark.sparkContext.parallelize(setR)
-  val rddT = spark.sparkContext.parallelize(setT)
-
   test("SemiJoin") {
+      // given
+    val setR = Array((1, 2), (1, -4), (2, 10), (-5, 1), (5, 2), (1, 5), (-5099, 1), (-500, 2), (-100, 5))
+    val setT = Array((1, 4), (-5, 10), (1, 11), (100, 12), (100, 34), (900, 23))
+    val rddR = spark.sparkContext.parallelize(setR.map{e => new SemiJoinType(e._1, e._2, 0)})
+    val rddT = spark.sparkContext.parallelize(setT.map{e => new SemiJoinType(e._1, e._2, 1)})
+
       // when
     val minimalSemiJoin = new MinimalSemiJoin(spark, 2).importObjects(rddR, rddT)
     val result = minimalSemiJoin.execute.collect
 
       // then
     val expected = Set(setR(0), setR(1), setR(3), setR(5))
-    assert(expected.map(o => (o.getKey, o.getWeight, o.getSetType)) == result.map(o => (o.getKey, o.getWeight, o.getSetType)).toSet)
+    assert(expected.map(o => (o._1, o._2, 0)) == result.map(o => (o.getKey, o.getWeight, o.getSetType)).toSet)
   }
 }
-*/

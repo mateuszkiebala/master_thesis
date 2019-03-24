@@ -1,7 +1,6 @@
 package minimal_algorithms.semi_join
 
-/*import minimal_algorithms.{MinimalAlgorithm, MinimalSemiJoin}
-import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
+import minimal_algorithms.{MinimalAlgorithm, MinimalSemiJoin}
 import org.apache.spark.sql.SparkSession
 
 object ExampleSemiJoin {
@@ -27,4 +26,4 @@ object ExampleSemiJoin {
     outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
-}*/
+}

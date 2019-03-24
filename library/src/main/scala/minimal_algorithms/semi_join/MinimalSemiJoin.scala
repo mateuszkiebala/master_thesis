@@ -1,6 +1,6 @@
 package minimal_algorithms
 
-/*import minimal_algorithms.examples.{SemiJoinType, SemiJoinTypeEnum}
+import minimal_algorithms.semi_join.{SemiJoinType, SemiJoinTypeEnum}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -9,8 +9,7 @@ import org.apache.spark.sql.SparkSession
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
   */
-class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
-  extends MinimalAlgorithmWithKey[SemiJoinType](spark, numOfPartitions) {
+class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[SemiJoinType](spark, numOfPartitions) {
 
   /**
     * Imports two sets: R and T from the same domain.
@@ -52,4 +51,4 @@ class MinimalSemiJoin(spark: SparkSession, numOfPartitions: Int)
       }
     })
   }
-}*/
+}
