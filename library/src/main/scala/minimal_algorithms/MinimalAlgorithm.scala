@@ -3,7 +3,6 @@ package minimal_algorithms
 import org.apache.spark.rdd.RDD
 import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
-
 import scala.reflect.ClassTag
 
 /**
@@ -82,9 +81,9 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Sorts and perfectly balances imported objects. Function affects imported objects.
     * @return this
     */
-  def perfectSort: this.type = {
+  def perfectSort: RDD[T] = {
     this.objects = perfectlySortedWithRanks(this.objects).map(o => o._2).persist()
-    this
+    this.objects
   }
 
   /**

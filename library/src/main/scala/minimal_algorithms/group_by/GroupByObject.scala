@@ -1,15 +1,16 @@
 package minimal_algorithms.group_by
 
-import minimal_algorithms.MinimalAlgorithmObject
+import minimal_algorithms.StatisticsMinimalAlgorithmObject
+import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 
-import scala.reflect.ClassTag
+class GroupByObject[A <: StatisticsAggregator[A], K <: GroupByKey[K]]
+  (aggregator: A, key: K) extends StatisticsMinimalAlgorithmObject[GroupByObject[A, K], A] {
 
-abstract class GroupByObject[Self <: GroupByObject[Self, K], K <: GroupByKey[K] : ClassTag](key: K)
-  extends MinimalAlgorithmObject[Self] {self: Self =>
-
-  final override def compareTo(that: Self): Int = {
+  final override def compareTo(that: GroupByObject[A, K]): Int = {
     this.key.compareTo(that.getKey)
   }
 
-  def getKey: K = key
+  override def getAggregator: A = this.aggregator
+
+  final def getKey: K = this.key
 }

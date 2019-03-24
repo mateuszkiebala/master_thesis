@@ -4,10 +4,11 @@ import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 import minimal_algorithms.{KeyPartitioner, RangeTree, StatisticsMinimalAlgorithm, StatisticsMinimalAlgorithmObject}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import scala.reflect.ClassTag
 import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
 
-class MinimalSlidingAggregation[A <: StatisticsAggregator[A], T <: StatisticsMinimalAlgorithmObject[T, A] : ClassTag]
+class MinimalSlidingAggregation[A <: StatisticsAggregator[A], T <: StatisticsMinimalAlgorithmObject[T, A] : ClassTag : TypeTag]
   (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[A, T](spark, numOfPartitions) {
 
   /**
