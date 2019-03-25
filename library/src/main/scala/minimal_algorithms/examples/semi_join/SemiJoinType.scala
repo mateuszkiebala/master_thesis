@@ -15,17 +15,7 @@ class SemiJoinType(key: Int, weight: Double, setType: SemiJoinSetTypeEnum) exten
 
   override def getSetType: SemiJoinSetTypeEnum = this.setType
 
-  override def equals(that: Any): Boolean =
-    that match {
-      case that: SemiJoinType => that.canEqual(this) && this.hashCode == that.hashCode
-      case _ => false
-    }
-
-  override def hashCode: Int = this.key.hashCode
-
-  def canEqual(a: Any): Boolean = a.isInstanceOf[SemiJoinType]
-
-  def getKey: Int = this.key
+  override def getKey: Int = this.key
 
   def getWeight: Double = this.weight
 }

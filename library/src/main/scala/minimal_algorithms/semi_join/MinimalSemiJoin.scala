@@ -33,7 +33,7 @@ class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, nu
     val rdd = perfectlySorted(this.objects)
     val TBounds = sc.broadcast(rdd.mapPartitions(partition => {
       val tObjects = partition.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
-      if (tObjects.nonEmpty) Iterator(tObjects.min, tObjects.max) else Iterator.empty
+      if (tObjects.nonEmpty) Iterator(tObjects.min.getKey, tObjects.max.getKey) else Iterator.empty
     }).collect().toSet)
 
     rdd.mapPartitions(partition => {
@@ -41,11 +41,11 @@ class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, nu
       if (groupedByType.contains(SemiJoinSetTypeEnum.RType)) {
         val rObjects = groupedByType(SemiJoinSetTypeEnum.RType)
         val tObjects = if (groupedByType.contains(SemiJoinSetTypeEnum.TType)) {
-          groupedByType(SemiJoinSetTypeEnum.TType).toSet.union(TBounds.value)
+          groupedByType(SemiJoinSetTypeEnum.TType).map{o => o.getKey}.toSet.union(TBounds.value)
         } else {
           TBounds.value
         }
-        rObjects.filter(o => tObjects.contains(o)).toIterator
+        rObjects.filter(o => tObjects.contains(o.getKey)).toIterator
       } else {
         Iterator.empty
       }

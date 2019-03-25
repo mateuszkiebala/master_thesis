@@ -1,7 +1,7 @@
 package minimal_algorithms.group_by
 
 import minimal_algorithms.statistics_aggregators._
-import minimal_algorithms.{KeyPartitioner, StatisticsMinimalAlgorithm, StatisticsMinimalAlgorithmObject}
+import minimal_algorithms.{KeyPartitioner, StatisticsMinimalAlgorithm}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
