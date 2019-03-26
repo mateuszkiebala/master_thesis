@@ -5,7 +5,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
-class StatisticsMinimalAlgorithm[A <: StatisticsAggregator[A], T <: StatisticsMinimalAlgorithmObject[T, A] : ClassTag]
+class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -14,7 +14,7 @@ class StatisticsMinimalAlgorithm[A <: StatisticsAggregator[A], T <: StatisticsMi
     * @param aggFun Aggregation function
     * @return RDD of pairs (prefixSum, object)
     */
-  def computePrefix(implicit tag: ClassTag[A]): RDD[(A, T)] = computePrefix(this.objects)
+  def computePrefix: RDD[(StatisticsAggregator, T)] = computePrefix(this.objects)
 
   /**
     * Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
@@ -23,7 +23,7 @@ class StatisticsMinimalAlgorithm[A <: StatisticsAggregator[A], T <: StatisticsMi
     * @param aggFun Aggregation function
     * @return RDD of pairs (prefixValue, object)
     */
-  def computePrefix(rdd: RDD[T])(implicit tag: ClassTag[A]): RDD[(A, T)] = {
+  def computePrefix(rdd: RDD[T]): RDD[(StatisticsAggregator, T)] = {
     val sortedRdd = teraSorted(rdd).persist()
     val prefixPartitionsStatistics = sc.broadcast(getPrefixedPartitionStatistics(sortedRdd))
     sortedRdd.mapPartitionsWithIndex((index, partition) => {
@@ -44,7 +44,7 @@ class StatisticsMinimalAlgorithm[A <: StatisticsAggregator[A], T <: StatisticsMi
     })
   }
 
-  def getPrefixedPartitionStatistics(rdd: RDD[T])(implicit tag: ClassTag[A]): Array[A] = {
+  def getPrefixedPartitionStatistics(rdd: RDD[T]): Array[StatisticsAggregator] = {
     val elements = getPartitionsStatistics(rdd).collect()
     if (elements.isEmpty) {
       Array()
@@ -59,7 +59,7 @@ class StatisticsMinimalAlgorithm[A <: StatisticsAggregator[A], T <: StatisticsMi
     * @param aggFun Aggregation function
     * @return RDD[aggregated value for partition]
     */
-  def getPartitionsStatistics(rdd: RDD[T])(implicit tag: ClassTag[A]): RDD[A] = {
+  def getPartitionsStatistics(rdd: RDD[T]): RDD[StatisticsAggregator] = {
     rdd.mapPartitions(partition => {
       if (partition.isEmpty) {
         Iterator()

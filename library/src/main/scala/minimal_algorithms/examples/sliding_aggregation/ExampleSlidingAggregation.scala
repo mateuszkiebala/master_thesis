@@ -23,7 +23,7 @@ object ExampleSlidingAggregation {
       val p = line.split(' ')
       new SumSlidingSMAO(p(0).toInt, p(1).toDouble)})
 
-    val msa = new MinimalSlidingAggregation[SumAggregator, SumSlidingSMAO](spark, numOfPartitions)
+    val msa = new MinimalSlidingAggregation[SumSlidingSMAO](spark, numOfPartitions)
     //msa.sum(inputMapped, windowLen).map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath)
     //msa.execute(inputMapped, windowLen).collect().foreach(println)
     //msa.max(inputMapped, windowLen).collect().foreach(println)

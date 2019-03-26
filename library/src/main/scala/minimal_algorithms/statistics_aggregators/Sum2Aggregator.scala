@@ -1,21 +1,20 @@
 package minimal_algorithms.statistics_aggregators
 
-class SumAggregator(value: Double) extends StatisticsAggregator {
-  def getValue: Double = value
+class Sum2Aggregator(value: Double) extends SumAggregator(value) {
 
   override def merge(that: StatisticsAggregator): StatisticsAggregator = {
-    new SumAggregator(this.value + that.asInstanceOf[SumAggregator].getValue)
+    new Sum2Aggregator(this.value + that.asInstanceOf[Sum2Aggregator].getValue)
   }
 
   override def toString: String = {
     "SUM: " + this.value.toString
   }
 
-  def canEqual(a: Any): Boolean = a.isInstanceOf[SumAggregator]
+  override def canEqual(a: Any): Boolean = a.isInstanceOf[Sum2Aggregator]
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: SumAggregator => that.canEqual(this) && this.hashCode == that.hashCode
+      case that: Sum2Aggregator => that.canEqual(this) && this.hashCode == that.hashCode
       case _ => false
     }
 

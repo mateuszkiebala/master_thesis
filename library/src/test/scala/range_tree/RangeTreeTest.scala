@@ -4,28 +4,28 @@ import minimal_algorithms.RangeTree
 import minimal_algorithms.statistics_aggregators._
 
 class RangeTreeTest extends FunSuite {
-  def sumWrapInsert(elements: Array[(Double, Int)]): Array[(SumAggregator, Int)] = {
+  def sumWrapInsert(elements: Array[(Double, Int)]): Array[(StatisticsAggregator, Int)] = {
     elements.map{case(e, pos) => (new SumAggregator(e), pos)}
   }
 
-  def sumUnwrap(elements: Array[SumAggregator]): Array[Double] = {
-    elements.map{e => if (e == null) 0.0 else e.getValue}
+  def sumUnwrap(elements: Array[StatisticsAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) 0.0 else e.asInstanceOf[SumAggregator].getValue}
   }
 
-  def minWrapInsert(elements: Array[(Double, Int)]): Array[(MinAggregator, Int)] = {
+  def minWrapInsert(elements: Array[(Double, Int)]): Array[(StatisticsAggregator, Int)] = {
     elements.map{case(e, pos) => (new MinAggregator(e), pos)}
   }
 
-  def minUnwrap(elements: Array[MinAggregator]): Array[Double] = {
-    elements.map{e => if (e == null) Double.MaxValue else e.getValue}
+  def minUnwrap(elements: Array[StatisticsAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) Double.MaxValue else e.asInstanceOf[MinAggregator].getValue}
   }
 
-  def maxWrapInsert(elements: Array[(Double, Int)]): Array[(MaxAggregator, Int)] = {
+  def maxWrapInsert(elements: Array[(Double, Int)]): Array[(StatisticsAggregator, Int)] = {
     elements.map{case(e, pos) => (new MaxAggregator(e), pos)}
   }
 
-  def maxUnwrap(elements: Array[MaxAggregator]): Array[Double] = {
-    elements.map{e => if (e == null) Double.MinValue else e.getValue}
+  def maxUnwrap(elements: Array[StatisticsAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) Double.MinValue else e.asInstanceOf[MaxAggregator].getValue}
   }
 
   test("RangeTree.init one node tree") {
@@ -33,7 +33,7 @@ class RangeTreeTest extends FunSuite {
     val elements = sumWrapInsert(Array((1.0, 0)))
 
       // when
-    val rangeTree = new RangeTree[SumAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(1 == rangeTree.BASE)
@@ -46,7 +46,7 @@ class RangeTreeTest extends FunSuite {
 
       // when, then
     val caught = intercept[Exception] {
-        new RangeTree[SumAggregator](elements)
+        new RangeTree(elements)
       }
 
     assert(caught.getMessage == "Position out of range: 4")
@@ -57,7 +57,7 @@ class RangeTreeTest extends FunSuite {
     val elements = sumWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (3.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[SumAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     val caught = intercept[Exception] {
@@ -72,7 +72,7 @@ class RangeTreeTest extends FunSuite {
     val elements = sumWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (4.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[SumAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -84,7 +84,7 @@ class RangeTreeTest extends FunSuite {
     val elements = sumWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[SumAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(8 == rangeTree.BASE)
@@ -96,7 +96,7 @@ class RangeTreeTest extends FunSuite {
     val elements = sumWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[SumAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(new SumAggregator(3.0) == rangeTree.query(0, 0))
@@ -113,7 +113,7 @@ class RangeTreeTest extends FunSuite {
     val elements = minWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (4.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MinAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -125,7 +125,7 @@ class RangeTreeTest extends FunSuite {
     val elements = minWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (-4.0, 2), (10.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MinAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(8 == rangeTree.BASE)
@@ -137,7 +137,7 @@ class RangeTreeTest extends FunSuite {
     val elements = minWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MinAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(new MinAggregator(3.0) == rangeTree.query(0, 0))
@@ -154,7 +154,7 @@ class RangeTreeTest extends FunSuite {
     val elements = maxWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (4.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MaxAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -166,7 +166,7 @@ class RangeTreeTest extends FunSuite {
     val elements = maxWrapInsert(Array((-1.0, 0), (-2.0, 1), (-3.0, 2), (-4.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MaxAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(4 == rangeTree.BASE)
@@ -179,7 +179,7 @@ class RangeTreeTest extends FunSuite {
     val elements = maxWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MaxAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(8 == rangeTree.BASE)
@@ -191,7 +191,7 @@ class RangeTreeTest extends FunSuite {
     val elements = maxWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
 
       // when
-    val rangeTree = new RangeTree[MaxAggregator](elements)
+    val rangeTree = new RangeTree(elements)
 
       // then
     assert(new MaxAggregator(3.0) == rangeTree.query(0, 0))

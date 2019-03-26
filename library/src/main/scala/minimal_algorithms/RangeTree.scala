@@ -11,14 +11,14 @@ import scala.reflect.ClassTag
   * @param elements list of pairs (value, leaf position into which value will be insertedą)
   * @param aggFun aggregation function that will be applied on the tree (MAX, MIN, SUM)
   */
-class RangeTree[A <: StatisticsAggregator[A] : ClassTag](elements: Array[(A, Int)]) extends Serializable {
+class RangeTree(elements: Array[(StatisticsAggregator, Int)]) extends Serializable {
   val log2: Double => Double = (x: Double) => math.log10(x) / math.log10(2.0)
   val BASE: Int = math.pow(2.0, math.ceil(log2(elements.length.toDouble))).toInt
-  var tree: Array[A] = new Array[A](2 * BASE)
+  var tree: Array[StatisticsAggregator] = new Array[StatisticsAggregator](2 * BASE)
 
   this.elements.foreach{ case(element, pos) => this.insert(element, pos) }
 
-  private[this] def insert(element: A, start: Int): Unit = {
+  private[this] def insert(element: StatisticsAggregator, start: Int): Unit = {
     if (start >= BASE)
       throw new IndexOutOfBoundsException("Position out of range: " + start)
 
@@ -36,7 +36,7 @@ class RangeTree[A <: StatisticsAggregator[A] : ClassTag](elements: Array[(A, Int
     * @param end  [0 ... BASE - 1]
     * @return  Aggregated value in range.
     */
-  def query(start: Int, end: Int): A = {
+  def query(start: Int, end: Int): StatisticsAggregator = {
     if (start > end)
       throw new Exception("Start (" + start + ") greater than end (" + end + ")")
 
