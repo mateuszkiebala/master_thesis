@@ -14,10 +14,10 @@ import scala.reflect.ClassTag
   * @tparam T T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
   */
 
-class MinimalGroupBy[T <: GroupByObject[K] : ClassTag, K <: GroupByKey[K]]
-  (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[GroupByObject[K]](spark, numOfPartitions) {
+class MinimalGroupBy[T <: GroupByObject : ClassTag]
+  (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[GroupByObject](spark, numOfPartitions) {
 
-  def execute: RDD[(K, StatisticsAggregator)] = {
+  def execute: RDD[(GroupByKey, StatisticsAggregator)] = {
     val masterIndex = 0
     perfectSort.mapPartitionsWithIndex((pIndex, partition) => {
       if (partition.isEmpty) {
@@ -33,7 +33,7 @@ class MinimalGroupBy[T <: GroupByObject[K] : ClassTag, K <: GroupByKey[K]]
           } else {
             values.tail.foldLeft(values.head.getAggregator){(res, o) => safeMerge(res, o.getAggregator)}
           }
-          (destMachine, new GroupByObject[K](statsAggObject, key))
+          (destMachine, new GroupByObject(statsAggObject, key))
         }
         }(collection.breakOut).toIterator
       }

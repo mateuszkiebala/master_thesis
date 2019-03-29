@@ -2,9 +2,9 @@ package minimal_algorithms.examples.group_by
 
 import minimal_algorithms.group_by.GroupByKey
 
-class IntKey(value: Int) extends GroupByKey[IntKey] {
-  override def compareTo(that: IntKey): Int = {
-    this.value.compareTo(that.getValue)
+class IntKey(value: Int) extends GroupByKey {
+  override def compareTo(that: GroupByKey): Int = {
+    this.value.compareTo(that.asInstanceOf[IntKey].getValue)
   }
 
   override def equals(that: Any): Boolean =
