@@ -1,10 +1,18 @@
-//package minimal_algorithms.group_by
-/*
-import minimal_algorithms.MinimalAlgorithm
+package minimal_algorithms.group_by
+
+import minimal_algorithms.{MinimalAlgorithm, MinimalAlgorithmObject}
 import minimal_algorithms.examples.group_by.IntKey
-import minimal_algorithms.group_by.{GroupByObject, MinimalGroupBy}
-import minimal_algorithms.statistics_aggregators.{MinAggregator, SumAggregator}
+import minimal_algorithms.statistics_aggregators._
 import org.apache.spark.sql.SparkSession
+
+class MAOPair(key: Int, value: Double) extends MinimalAlgorithmObject[MAOPair] {
+  override def compareTo(o: MAOPair): Int = {
+    this.key.compareTo(o.getKey)
+  }
+
+  def getKey: Int = this.key
+  def getValue: Double = this.value
+}
 
 object ExampleGroupBy {
   def main(args: Array[String]) = {
@@ -14,24 +22,44 @@ object ExampleGroupBy {
     val inputPath = args(1)
     val outputPath = args(2)
     val input = spark.sparkContext.textFile(inputPath)
-    val inputMapped = input.map(line => {
+
+    val inputMappedSum = input.map(line => {
       val p = line.split(' ')
-      new GroupByObject[SumAggregator, IntKey](new SumAggregator(p(1).toDouble), new IntKey(p(0).toInt))
+      new GroupByObject(new SumAggregator(p(1).toDouble), new IntKey(p(0).toInt))
     })
+    val groupedSum = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedSum).execute.
+      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[SumAggregator].getValue))
+    var outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedSum)
+    outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_sum")
 
-    val minimalGroupBy = new MinimalGroupBy[GroupByObject[SumAggregator, IntKey], MinAggregator, IntKey](spark, numOfPartitions).importObjects(inputMapped)
-    var outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.sum.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
-    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_sum")
 
-    outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.min.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
-    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_min")
+    val inputMappedMin = input.map(line => {
+      val p = line.split(' ')
+      new GroupByObject(new MinAggregator(p(1).toDouble), new IntKey(p(0).toInt))
+    })
+    val groupedMin = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedMin).execute.
+      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[MinAggregator].getValue))
+    outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedMin)
+    outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_min")
 
-    outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.max.map(p => new ExampleMaoKey(p._1, p._2.toInt)))
-    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath + "/output_max")
+    val inputMappedMax = input.map(line => {
+      val p = line.split(' ')
+      new GroupByObject(new MaxAggregator(p(1).toDouble), new IntKey(p(0).toInt))
+    })
+    val groupedMax = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedMax).execute.
+      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[MaxAggregator].getValue))
+    outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedMax)
+    outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_max")
 
-    outputMA = new MinimalAlgorithm[ExampleMaoKey](spark, numOfPartitions).importObjects(minimalGroupBy.avg.map(p => new ExampleMaoKey(p._1, p._2)))
-    outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + "%.6f".format(res.getWeight)).saveAsTextFile(outputPath + "/output_avg")
+    val inputMappedAvg = input.map(line => {
+      val p = line.split(' ')
+      new GroupByObject(new AvgAggregator(p(1).toDouble, 1), new IntKey(p(0).toInt))
+    })
+    val groupedAvg = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedAvg).execute.
+      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[AvgAggregator].getValue))
+    outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedAvg)
+    outputMA.perfectSort.map(res => res.getKey.toString + " " + "%.6f".format(res.getValue)).saveAsTextFile(outputPath + "/output_avg")
 
     spark.stop()
   }
-}*/
+}
