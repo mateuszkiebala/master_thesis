@@ -1,7 +1,6 @@
 package minimal_algorithms
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
@@ -24,7 +23,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return this
     */
   def importObjects(rdd: RDD[T]): this.type = {
-    this.objects = rdd
+    this.objects = rdd.repartition(numOfPartitions)
     itemsCntByPartition = (rdd.count().toInt+this.numOfPartitions-1) / this.numOfPartitions
     this
   }
@@ -34,7 +33,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return this
     */
   def teraSort: this.type = {
-    this.objects = teraSorted(this.objects).persist()
+    this.objects = this.objects.sortBy(identity).persist()
     this
   }
 
@@ -43,10 +42,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return Sorted RDD.
     */
   def teraSorted(rdd: RDD[T]): RDD[T] = {
-    import spark.implicits._
-    val pairedObjects = rdd.map{mao => (mao, mao)}
-    pairedObjects.partitionBy(new RangePartitioner[T, T](numOfPartitions, pairedObjects))
-      .mapPartitions(partition => partition.map(p => p._2).toList.sorted.toIterator)
+    rdd.repartition(numOfPartitions).sortBy(identity)
   }
 
   /**
