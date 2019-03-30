@@ -112,13 +112,19 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
   }
 
+  def sendToMachines[K : ClassTag](rdd: RDD[(K, List[Int])]): RDD[K] = {
+    rdd.mapPartitionsWithIndex((pIndex, partition) => {
+      partition.flatMap { case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.map { i => (i, o) } }
+    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
+  }
+
   /**
     * Returns number of elements on each partition.
     * @param rdd  RDD with objects to process.
     * @tparam A Type of RDD's objects.
     * @return Number of elements on each partition
     */
-  def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
+  def getPartitionSizes[K : ClassTag](rdd: RDD[K]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.length))
   }
 }

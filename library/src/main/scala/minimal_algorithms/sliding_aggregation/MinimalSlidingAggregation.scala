@@ -6,9 +6,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
 import scala.reflect.ClassTag
-import scala.reflect.runtime.universe.TypeTag
 
-class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag : TypeTag]
+class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -35,31 +34,31 @@ class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : Class
   private[this] def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLength: Int): RDD[(Int, T)] = {
     val numOfPartitionsBroadcast = spark.sparkContext.broadcast(this.numOfPartitions).value
     val itemsCntByPartitionBroadcast = spark.sparkContext.broadcast(this.itemsCntByPartition).value
-    rdd.mapPartitionsWithIndex((pIndex, partition) => {
+    sendToMachines[(Int, T)](rdd.mapPartitionsWithIndex((pIndex, partition) => {
       if (windowLength <= itemsCntByPartitionBroadcast) {
-        partition.flatMap {rankMaoPair =>
+        partition.map {rankMaoPair =>
           if (pIndex+1 < numOfPartitionsBroadcast) {
-            List((pIndex, rankMaoPair), (pIndex+1, rankMaoPair))
+            (rankMaoPair, List(pIndex, pIndex+1))
           } else {
-            List((pIndex, rankMaoPair))
+            (rankMaoPair, List(pIndex))
           }
         }
       } else {
         val remRelM = (windowLength-1) / itemsCntByPartitionBroadcast
-        partition.flatMap {rankMaoPair =>
+        partition.map {rankMaoPair =>
           if (pIndex+remRelM+1 < numOfPartitionsBroadcast) {
-            List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair), (pIndex+remRelM+1, rankMaoPair))
+            (rankMaoPair, List(pIndex, pIndex+remRelM, pIndex+remRelM+1))
           } else if (pIndex+remRelM < numOfPartitionsBroadcast) {
-            List((pIndex, rankMaoPair), (pIndex+remRelM, rankMaoPair))
+            (rankMaoPair, List(pIndex, pIndex+remRelM))
           } else {
-            List((pIndex, rankMaoPair))
+            (rankMaoPair, List(pIndex))
           }
         }
       }
-    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
+    }))
   }
 
-  def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
+  private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
                           partitionsRangeTree: RangeTree): RDD[(T, StatisticsAggregator)]= {
     rdd.mapPartitionsWithIndex((index, partition) => {
       val pEleMinRank = index * itemsCntByPartition
