@@ -45,13 +45,13 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">GroupByObject</span><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">GroupByObject</span><span class="result"> extends <a href="../StatisticsMinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.StatisticsMinimalAlgorithmObject">StatisticsMinimalAlgorithmObject</a>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>]</span>
       </span>
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="../StatisticsMinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.StatisticsMinimalAlgorithmObject">StatisticsMinimalAlgorithmObject</a>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>], <a href="../MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>], <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="java.lang.Comparable">Comparable</span>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -69,7 +69,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="minimal_algorithms.group_by.GroupByObject"><span>GroupByObject</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="minimal_algorithms.group_by.GroupByObject"><span>GroupByObject</span></li><li class="in" name="minimal_algorithms.StatisticsMinimalAlgorithmObject"><span>StatisticsMinimalAlgorithmObject</span></li><li class="in" name="minimal_algorithms.MinimalAlgorithmObject"><span>MinimalAlgorithmObject</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="java.lang.Comparable"><span>Comparable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,7 +89,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="minimal_algorithms.group_by.GroupByObject#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(k:Int,v:Int,l:Int):minimal_algorithms.group_by.GroupByObject"></a>
+      <a id="&lt;init&gt;(aggregator:minimal_algorithms.statistics_aggregators.StatisticsAggregator,key:minimal_algorithms.group_by.GroupByKey):minimal_algorithms.group_by.GroupByObject"></a>
       <a id="&lt;init&gt;:GroupByObject"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -97,10 +97,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">GroupByObject</span><span class="params">(<span name="k">k: <span class="extype" name="scala.Int">Int</span></span>, <span name="v">v: <span class="extype" name="scala.Int">Int</span></span>, <span name="l">l: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="name">GroupByObject</span><span class="params">(<span name="aggregator">aggregator: <a href="../statistics_aggregators/StatisticsAggregator.html" class="extype" name="minimal_algorithms.statistics_aggregators.StatisticsAggregator">StatisticsAggregator</a></span>, <span name="key">key: <a href="GroupByKey.html" class="extype" name="minimal_algorithms.group_by.GroupByKey">GroupByKey</a></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@&lt;init&gt;(k:Int,v:Int,l:Int):minimal_algorithms.group_by.GroupByObject" title="Permalink" target="_top">
+      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@&lt;init&gt;(aggregator:minimal_algorithms.statistics_aggregators.StatisticsAggregator,key:minimal_algorithms.group_by.GroupByKey):minimal_algorithms.group_by.GroupByObject" title="Permalink" target="_top">
         <img src="../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -205,6 +205,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="minimal_algorithms.group_by.GroupByObject#compareTo" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="compareTo(that:minimal_algorithms.group_by.GroupByObject):Int"></a>
+      <a id="compareTo(GroupByObject):Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">compareTo</span><span class="params">(<span name="that">that: <a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@compareTo(that:minimal_algorithms.group_by.GroupByObject):Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a> → Comparable</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -262,6 +279,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="minimal_algorithms.group_by.GroupByObject#getAggregator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getAggregator:minimal_algorithms.statistics_aggregators.StatisticsAggregator"></a>
+      <a id="getAggregator:StatisticsAggregator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getAggregator</span><span class="result">: <a href="../statistics_aggregators/StatisticsAggregator.html" class="extype" name="minimal_algorithms.statistics_aggregators.StatisticsAggregator">StatisticsAggregator</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@getAggregator:minimal_algorithms.statistics_aggregators.StatisticsAggregator" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a> → <a href="../StatisticsMinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.StatisticsMinimalAlgorithmObject">StatisticsMinimalAlgorithmObject</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -279,6 +313,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="minimal_algorithms.group_by.GroupByObject#getKey" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="getKey:minimal_algorithms.group_by.GroupByKey"></a>
+      <a id="getKey:GroupByKey"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getKey</span><span class="result">: <a href="GroupByKey.html" class="extype" name="minimal_algorithms.group_by.GroupByKey">GroupByKey</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@getKey:minimal_algorithms.group_by.GroupByKey" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -313,40 +364,6 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="minimal_algorithms.group_by.GroupByObject#key" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="key:Int"></a>
-      <a id="key:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">key</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@key:Int" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="minimal_algorithms.group_by.GroupByObject#length" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="length:Int"></a>
-      <a id="length:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">length</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@length:Int" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -432,23 +449,6 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="minimal_algorithms.group_by.GroupByObject#value" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="value:Int"></a>
-      <a id="value:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">value</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../index.html#minimal_algorithms.group_by.GroupByObject@value:Int" title="Permalink" target="_top">
-        <img src="../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -527,10 +527,16 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.Serializable">
+        <div class="parent" name="minimal_algorithms.StatisticsMinimalAlgorithmObject">
+              <h3>Inherited from <a href="../StatisticsMinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.StatisticsMinimalAlgorithmObject">StatisticsMinimalAlgorithmObject</a>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>]</h3>
+            </div><div class="parent" name="minimal_algorithms.MinimalAlgorithmObject">
+              <h3>Inherited from <a href="../MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>]</h3>
+            </div><div class="parent" name="scala.Serializable">
               <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.lang.Comparable">
+              <h3>Inherited from <span class="extype" name="java.lang.Comparable">Comparable</span>[<a href="" class="extype" name="minimal_algorithms.group_by.GroupByObject">GroupByObject</a>]</h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

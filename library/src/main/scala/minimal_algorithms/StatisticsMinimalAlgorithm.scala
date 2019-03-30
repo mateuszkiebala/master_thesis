@@ -5,23 +5,27 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
+/**
+  * Class implementing base functions required to create a minimal algorithm with statistics computed on objects.
+  * @param spark  SparkSession object
+  * @param numOfPartitions  Number of partitions.
+  * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
+  */
 class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
-    * Applies prefix aggregation (SUM, MIN, MAX) function on imported objects. First orders elements and then computes prefixes.
+    * Applies prefix aggregation on imported objects. First orders elements and then computes prefixes.
     * Order for equal objects is picked randomly.
-    * @param aggFun Aggregation function
-    * @return RDD of pairs (prefixSum, object)
+    * @return RDD of pairs (prefixStatistics, object)
     */
   def computePrefix: RDD[(StatisticsAggregator, T)] = computePrefix(this.objects)
 
   /**
-    * Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
+    * Computes prefix aggregation on provided RDD. First orders elements and then computes prefixes.
     * Order for equal objects is picked randomly.
     * @param rdd  RDD with objects to process.
-    * @param aggFun Aggregation function
-    * @return RDD of pairs (prefixValue, object)
+    * @return RDD of pairs (prefixStatistics, object)
     */
   def computePrefix(rdd: RDD[T]): RDD[(StatisticsAggregator, T)] = {
     val sortedRdd = teraSorted(rdd).persist()
@@ -44,6 +48,11 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : Clas
     })
   }
 
+  /**
+    * Computes prefix values on partitions' statistics
+    * @param rdd  RDD of objects
+    * @return Array of prefix statistics for partitions
+    */
   def getPrefixedPartitionStatistics(rdd: RDD[T]): Array[StatisticsAggregator] = {
     val elements = getPartitionsStatistics(rdd).collect()
     if (elements.isEmpty) {
@@ -54,9 +63,8 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : Clas
   }
 
   /**
-    * Computes aggregated values (SUM, MIN, MAX) for each partition.
+    * Computes aggregated values for each partition.
     * @param rdd  Elements
-    * @param aggFun Aggregation function
     * @return RDD[aggregated value for partition]
     */
   def getPartitionsStatistics(rdd: RDD[T]): RDD[StatisticsAggregator] = {

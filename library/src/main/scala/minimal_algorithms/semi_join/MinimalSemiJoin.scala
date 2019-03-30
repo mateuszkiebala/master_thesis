@@ -10,6 +10,7 @@ import scala.reflect.ClassTag
   * Class implementing semi join algorithm.
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
+  * @tparam T T <: SemiJoinObject[T] : ClassTag
   */
 class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithm[T](spark, numOfPartitions) {
@@ -26,7 +27,7 @@ class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, nu
   }
 
   /**
-    * Applies semi join algorithm on imported data.
+    * Runs semi join algorithm on imported data.
     * @return RDD of objects that belong to set R and have a match in set T.
     */
   def execute: RDD[T] = {

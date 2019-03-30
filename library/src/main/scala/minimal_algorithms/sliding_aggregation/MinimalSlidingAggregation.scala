@@ -1,21 +1,26 @@
 package minimal_algorithms.sliding_aggregation
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
-import minimal_algorithms.{KeyPartitioner, RangeTree, StatisticsMinimalAlgorithm, StatisticsMinimalAlgorithmObject}
+import minimal_algorithms.{RangeTree, StatisticsMinimalAlgorithm, StatisticsMinimalAlgorithmObject}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
 import scala.reflect.ClassTag
 
+/**
+  * Class implementing sliding aggregation algorithm.
+  * @param spark  SparkSession
+  * @param numOfPartitions  Number of partitions
+  * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
+  */
 class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
-    * Computes sliding aggregation values for provided RDD and aggregation function.
+    * Executes sliding aggregation algorithm for provided RDD
     * @param input  Initial RDD with objects.
     * @param windowLength Window length
-    * @param aggFun  Aggregation function
-    * @return RDD of pairs (object's key, sliding aggregation value)
+    * @return RDD of pairs (object, sliding aggregation value)
     */
   def execute(input: RDD[T], windowLength: Int): RDD[(T, StatisticsAggregator)] = {
     val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()

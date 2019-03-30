@@ -8,12 +8,11 @@ import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
 import scala.reflect.ClassTag
 
 /**
-  * Class implementing aggregation functions.
+  * Class implementing group by algorithm.
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
-  * @tparam T T <: MinimalAlgorithmObjectWithKey[T] : ClassTag
+  * @tparam T T <: GroupByObject[T] : ClassTag
   */
-
 class MinimalGroupBy[T <: GroupByObject : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[GroupByObject](spark, numOfPartitions) {
 

@@ -2,7 +2,6 @@ package minimal_algorithms
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
-import scala.reflect.ClassTag
 
 /**
   * Fully binary tree. Enables searching for MAX, MIN, SUM on given range (start, end) in complexity O(n log n)

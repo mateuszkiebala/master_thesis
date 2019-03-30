@@ -50,7 +50,8 @@
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Fully binary tree. Enables searching for MAX, MIN, SUM on given range (start, end) in complexity O(n log n)
-where n is number of initial elements.</p></div><div class="toggleContainer block">
+where n is number of initial elements.
+</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -90,7 +91,7 @@ where n is number of initial elements.</p></div><div class="toggleContainer bloc
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="minimal_algorithms.RangeTree#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(elements:List[(Double,Int)],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):minimal_algorithms.RangeTree"></a>
+      <a id="&lt;init&gt;(elements:Array[(minimal_algorithms.statistics_aggregators.StatisticsAggregator,Int)]):minimal_algorithms.RangeTree"></a>
       <a id="&lt;init&gt;:RangeTree"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -98,14 +99,14 @@ where n is number of initial elements.</p></div><div class="toggleContainer bloc
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RangeTree</span><span class="params">(<span name="elements">elements: <span class="extype" name="scala.List">List</span>[(<span class="extype" name="scala.Double">Double</span>, <span class="extype" name="scala.Int">Int</span>)]</span>, <span name="aggFun">aggFun: <a href="aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span>
+        <span class="name">RangeTree</span><span class="params">(<span name="elements">elements: <span class="extype" name="scala.Array">Array</span>[(<a href="statistics_aggregators/StatisticsAggregator.html" class="extype" name="minimal_algorithms.statistics_aggregators.StatisticsAggregator">StatisticsAggregator</a>, <span class="extype" name="scala.Int">Int</span>)]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.RangeTree@&lt;init&gt;(elements:List[(Double,Int)],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):minimal_algorithms.RangeTree" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.RangeTree@&lt;init&gt;(elements:Array[(minimal_algorithms.statistics_aggregators.StatisticsAggregator,Int)]):minimal_algorithms.RangeTree" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">elements</dt><dd class="cmt"><p>list of pairs (value, leaf position into which value will be inserted)</p></dd><dt class="param">aggFun</dt><dd class="cmt"><p>aggregation function that will be applied on the tree (MAX, MIN, SUM)</p></dd></dl></div>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">elements</dt><dd class="cmt"><p>list of pairs (value, leaf position into which value will be insertedą)</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -400,18 +401,18 @@ where n is number of initial elements.</p></div><div class="toggleContainer bloc
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="minimal_algorithms.RangeTree#query" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="query(start:Int,end:Int):Double"></a>
-      <a id="query(Int,Int):Double"></a>
+      <a id="query(start:Int,end:Int):minimal_algorithms.statistics_aggregators.StatisticsAggregator"></a>
+      <a id="query(Int,Int):StatisticsAggregator"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">query</span><span class="params">(<span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+        <span class="name">query</span><span class="params">(<span name="start">start: <span class="extype" name="scala.Int">Int</span></span>, <span name="end">end: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="statistics_aggregators/StatisticsAggregator.html" class="extype" name="minimal_algorithms.statistics_aggregators.StatisticsAggregator">StatisticsAggregator</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.RangeTree@query(start:Int,end:Int):Double" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.RangeTree@query(start:Int,end:Int):minimal_algorithms.statistics_aggregators.StatisticsAggregator" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -451,18 +452,18 @@ where n is number of initial elements.</p></div><div class="toggleContainer bloc
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="minimal_algorithms.RangeTree#tree" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="tree:Array[Double]"></a>
-      <a id="tree:Array[Double]"></a>
+      <a id="tree:Array[minimal_algorithms.statistics_aggregators.StatisticsAggregator]"></a>
+      <a id="tree:Array[StatisticsAggregator]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">tree</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Double">Double</span>]</span>
+        <span class="name">tree</span><span class="result">: <span class="extype" name="scala.Array">Array</span>[<a href="statistics_aggregators/StatisticsAggregator.html" class="extype" name="minimal_algorithms.statistics_aggregators.StatisticsAggregator">StatisticsAggregator</a>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.RangeTree@tree:Array[Double]" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.RangeTree@tree:Array[minimal_algorithms.statistics_aggregators.StatisticsAggregator]" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
