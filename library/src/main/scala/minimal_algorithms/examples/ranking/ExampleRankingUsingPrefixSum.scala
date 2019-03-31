@@ -9,7 +9,7 @@ import org.apache.spark.sql.SparkSession
   * Simulate ranking algorithm with use of prefix sums.
   */
 
-class RankAsPrefixSMAO(key: Int, weight: Double) extends PrefixSMAO[RankAsPrefixSMAO, SumAggregator](weight) {
+class RankAsPrefixSMAO(key: Int, weight: Double) extends PrefixSMAO[RankAsPrefixSMAO](weight) {
   override def compareTo(that: RankAsPrefixSMAO): Int = {
     this.key.compareTo(that.getKey)
   }
@@ -32,7 +32,7 @@ object ExampleRankingUsingPrefixSum {
       val p = line.split(' ')
       new RankAsPrefixSMAO(p(1).toInt, 1.0)})
 
-    val minimalAlgorithm = new StatisticsMinimalAlgorithm[SumAggregator, RankAsPrefixSMAO](spark, 5)
+    val minimalAlgorithm = new StatisticsMinimalAlgorithm[RankAsPrefixSMAO](spark, 5)
     minimalAlgorithm.importObjects(inputMapped).computePrefix.collect().foreach(println)
     spark.stop()
   }

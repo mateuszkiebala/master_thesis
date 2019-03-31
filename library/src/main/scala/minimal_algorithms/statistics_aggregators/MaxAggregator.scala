@@ -1,10 +1,10 @@
 package minimal_algorithms.statistics_aggregators
 
-class MaxAggregator(value: Double) extends StatisticsAggregator[MaxAggregator] {
+class MaxAggregator(value: Double) extends StatisticsAggregator {
   def getValue: Double = value
 
-  override def merge(that: MaxAggregator): MaxAggregator = {
-    new MaxAggregator(math.max(this.value, that.getValue))
+  override def merge(that: StatisticsAggregator): StatisticsAggregator = {
+    new MaxAggregator(math.max(this.value, that.asInstanceOf[MaxAggregator].getValue))
   }
 
   def canEqual(a: Any): Boolean = a.isInstanceOf[MaxAggregator]

@@ -45,13 +45,13 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">MinimalSemiJoin</span><span class="result"> extends <a href="MinimalAlgorithmWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey">MinimalAlgorithmWithKey</a>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>
+        <span class="name">MinimalSemiJoin</span><span class="tparams">[<span name="T">T &lt;: <a href="semi_join/SemiJoinObject.html" class="extype" name="minimal_algorithms.semi_join.SemiJoinObject">SemiJoinObject</a>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>]</span><span class="result"> extends <a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Class implementing semi join algorithm.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Class implementing semi join algorithm.</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>T &lt;: SemiJoinObject[T] : ClassTag</p></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
-          <div class="superTypes hiddenContent"><a href="MinimalAlgorithmWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey">MinimalAlgorithmWithKey</a>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>], <a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -69,7 +69,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="minimal_algorithms.MinimalSemiJoin"><span>MinimalSemiJoin</span></li><li class="in" name="minimal_algorithms.MinimalAlgorithmWithKey"><span>MinimalAlgorithmWithKey</span></li><li class="in" name="minimal_algorithms.MinimalAlgorithm"><span>MinimalAlgorithm</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="minimal_algorithms.MinimalSemiJoin"><span>MinimalSemiJoin</span></li><li class="in" name="minimal_algorithms.MinimalAlgorithm"><span>MinimalAlgorithm</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -89,18 +89,18 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="minimal_algorithms.MinimalSemiJoin#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(spark:org.apache.spark.sql.SparkSession,numOfPartitions:Int):minimal_algorithms.MinimalSemiJoin"></a>
-      <a id="&lt;init&gt;:MinimalSemiJoin"></a>
+      <a id="&lt;init&gt;(spark:org.apache.spark.sql.SparkSession,numOfPartitions:Int)(implicitevidence$1:scala.reflect.ClassTag[T]):minimal_algorithms.MinimalSemiJoin[T]"></a>
+      <a id="&lt;init&gt;:MinimalSemiJoin[T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MinimalSemiJoin</span><span class="params">(<span name="spark">spark: <span class="extype" name="org.apache.spark.sql.SparkSession">SparkSession</span></span>, <span name="numOfPartitions">numOfPartitions: <span class="extype" name="scala.Int">Int</span></span>)</span>
+        <span class="name">MinimalSemiJoin</span><span class="params">(<span name="spark">spark: <span class="extype" name="org.apache.spark.sql.SparkSession">SparkSession</span></span>, <span name="numOfPartitions">numOfPartitions: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@&lt;init&gt;(spark:org.apache.spark.sql.SparkSession,numOfPartitions:Int):minimal_algorithms.MinimalSemiJoin" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@&lt;init&gt;(spark:org.apache.spark.sql.SparkSession,numOfPartitions:Int)(implicitevidence$1:scala.reflect.ClassTag[T]):minimal_algorithms.MinimalSemiJoin[T]" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -239,52 +239,16 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#computePrefix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computePrefix(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Double,T)]"></a>
-      <a id="computePrefix(RDD[SemiJoinType],AggregationFunction):RDD[(Double,SemiJoinType)]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">computePrefix</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>, <span name="aggFun">aggFun: <a href="aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Double">Double</span>, <a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>)]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@computePrefix(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Double,T)]" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Applies prefix aggregation (SUM, MIN, MAX) function on provided RDD. First orders elements and then computes prefixes.
-Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt class="param">aggFun</dt><dd class="cmt"><p>Aggregation function</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (prefixValue, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#computePrefix" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="computePrefix(aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Double,T)]"></a>
-      <a id="computePrefix(AggregationFunction):RDD[(Double,SemiJoinType)]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">computePrefix</span><span class="params">(<span name="aggFun">aggFun: <a href="aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Double">Double</span>, <a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>)]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@computePrefix(aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[(Double,T)]" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Applies prefix aggregation (SUM, MIN, MAX) function on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies prefix aggregation (SUM, MIN, MAX) function on imported objects. First orders elements and then computes prefixes.
-Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"><dt class="param">aggFun</dt><dd class="cmt"><p>Aggregation function</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (prefixSum, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#computeRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="computeRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="computeRanking(RDD[SemiJoinType]):RDD[(Int,SemiJoinType)]"></a>
+      <a id="computeRanking(RDD[T]):RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeRanking</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>)]</span>
+        <span class="name">computeRanking</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@computeRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
@@ -295,14 +259,14 @@ Order for equal objects is picked randomly.</p></div><dl class="paramcmts block"
 Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#computeRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="computeRanking:org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="computeRanking:RDD[(Int,SemiJoinType)]"></a>
+      <a id="computeRanking:RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">computeRanking</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>)]</span>
+        <span class="name">computeRanking</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@computeRanking:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
@@ -346,22 +310,22 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="minimal_algorithms.MinimalSemiJoin#execute" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="execute:org.apache.spark.rdd.RDD[minimal_algorithms.examples.SemiJoinType]"></a>
-      <a id="execute:RDD[SemiJoinType]"></a>
+      <a id="execute:org.apache.spark.rdd.RDD[T]"></a>
+      <a id="execute:RDD[T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">execute</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>
+        <span class="name">execute</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@execute:org.apache.spark.rdd.RDD[minimal_algorithms.examples.SemiJoinType]" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@execute:org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Applies semi join algorithm on imported data.</p><div class="fullcomment"><div class="comment cmt"><p>Applies semi join algorithm on imported data.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of objects that belong to set R and have a match in set T.</p></dd></dl></div>
+      <p class="shortcomment cmt">Runs semi join algorithm on imported data.</p><div class="fullcomment"><div class="comment cmt"><p>Runs semi join algorithm on imported data.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of objects that belong to set R and have a match in set T.</p></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <a id="finalize():Unit"></a>
@@ -403,39 +367,22 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#getPartitionSizes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="getPartitionSizes[A](rdd:org.apache.spark.rdd.RDD[A]):org.apache.spark.rdd.RDD[Int]"></a>
-      <a id="getPartitionSizes[A](RDD[A]):RDD[Int]"></a>
+      <a id="getPartitionSizes[K](rdd:org.apache.spark.rdd.RDD[K])(implicitevidence$3:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[Int]"></a>
+      <a id="getPartitionSizes[K](RDD[K])(ClassTag[K]):RDD[Int]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">getPartitionSizes</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.getPartitionSizes.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="scala.Int">Int</span>]</span>
+        <span class="name">getPartitionSizes</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.getPartitionSizes.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.getPartitionSizes.K">K</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="scala.Int">Int</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@getPartitionSizes[A](rdd:org.apache.spark.rdd.RDD[A]):org.apache.spark.rdd.RDD[Int]" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@getPartitionSizes[K](rdd:org.apache.spark.rdd.RDD[K])(implicitevidence$3:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[Int]" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Returns number of elements on each partition.</p><div class="fullcomment"><div class="comment cmt"><p>Returns number of elements on each partition.</p></div><dl class="paramcmts block"><dt class="tparam">A</dt><dd class="cmt"><p>Type of RDD's objects.</p></dd><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Number of elements on each partition</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
-    </li><li name="minimal_algorithms.MinimalAlgorithm#getPartitionsAggregatedWeights" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="getPartitionsAggregatedWeights(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[Double]"></a>
-      <a id="getPartitionsAggregatedWeights(RDD[SemiJoinType],AggregationFunction):RDD[Double]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">getPartitionsAggregatedWeights</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>, <span name="aggFun">aggFun: <a href="aggregation_function/AggregationFunction.html" class="extype" name="minimal_algorithms.aggregation_function.AggregationFunction">AggregationFunction</a></span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="scala.Double">Double</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@getPartitionsAggregatedWeights(rdd:org.apache.spark.rdd.RDD[T],aggFun:minimal_algorithms.aggregation_function.AggregationFunction):org.apache.spark.rdd.RDD[Double]" title="Permalink" target="_top">
-        <img src="../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Computes aggregated values (SUM, MIN, MAX) for each partition.</p><div class="fullcomment"><div class="comment cmt"><p>Computes aggregated values (SUM, MIN, MAX) for each partition.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>Elements</p></dd><dt class="param">aggFun</dt><dd class="cmt"><p>Aggregation function</p></dd><dt>returns</dt><dd class="cmt"><p>RDD[aggregated value for partition]</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+      <p class="shortcomment cmt">Returns number of elements on each partition.</p><div class="fullcomment"><div class="comment cmt"><p>Returns number of elements on each partition.</p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>Type of RDD's objects.</p></dd><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Number of elements on each partition</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <a id="hashCode():Int"></a>
@@ -454,32 +401,32 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="minimal_algorithms.MinimalSemiJoin#importObjects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="importObjects(rddR:org.apache.spark.rdd.RDD[minimal_algorithms.examples.SemiJoinType],rddT:org.apache.spark.rdd.RDD[minimal_algorithms.examples.SemiJoinType]):MinimalSemiJoin.this.type"></a>
-      <a id="importObjects(RDD[SemiJoinType],RDD[SemiJoinType]):MinimalSemiJoin.this.type"></a>
+      <a id="importObjects(rddR:org.apache.spark.rdd.RDD[T],rddT:org.apache.spark.rdd.RDD[T]):MinimalSemiJoin.this.type"></a>
+      <a id="importObjects(RDD[T],RDD[T]):MinimalSemiJoin.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">importObjects</span><span class="params">(<span name="rddR">rddR: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>, <span name="rddT">rddT: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>)</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalSemiJoin">MinimalSemiJoin</a>.this.type</span>
+        <span class="name">importObjects</span><span class="params">(<span name="rddR">rddR: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>, <span name="rddT">rddT: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalSemiJoin">MinimalSemiJoin</a>.this.type</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@importObjects(rddR:org.apache.spark.rdd.RDD[minimal_algorithms.examples.SemiJoinType],rddT:org.apache.spark.rdd.RDD[minimal_algorithms.examples.SemiJoinType]):MinimalSemiJoin.this.type" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@importObjects(rddR:org.apache.spark.rdd.RDD[T],rddT:org.apache.spark.rdd.RDD[T]):MinimalSemiJoin.this.type" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Imports two sets: R and T from the same domain.</p><div class="fullcomment"><div class="comment cmt"><p>Imports two sets: R and T from the same domain.</p></div><dl class="paramcmts block"><dt class="param">rddR</dt><dd class="cmt"><p>Set from which we report objects.</p></dd><dt class="param">rddT</dt><dd class="cmt"><p>Set in which we look for matches.</p></dd><dt>returns</dt><dd class="cmt"><p>this</p></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#importObjects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="importObjects(rdd:org.apache.spark.rdd.RDD[T]):MinimalAlgorithm.this.type"></a>
-      <a id="importObjects(RDD[SemiJoinType]):MinimalSemiJoin.this.type"></a>
+      <a id="importObjects(RDD[T]):MinimalSemiJoin.this.type"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">importObjects</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>)</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalSemiJoin">MinimalSemiJoin</a>.this.type</span>
+        <span class="name">importObjects</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalSemiJoin">MinimalSemiJoin</a>.this.type</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@importObjects(rdd:org.apache.spark.rdd.RDD[T]):MinimalAlgorithm.this.type" title="Permalink" target="_top">
@@ -574,14 +521,14 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#objects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="objects:org.apache.spark.rdd.RDD[T]"></a>
-      <a id="objects:RDD[SemiJoinType]"></a>
+      <a id="objects:RDD[T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">var</span>
       </span>
       <span class="symbol">
-        <span class="name">objects</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>
+        <span class="name">objects</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@objects:org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
@@ -590,32 +537,32 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#perfectSort" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="perfectSort:MinimalAlgorithm.this.type"></a>
-      <a id="perfectSort:MinimalSemiJoin.this.type"></a>
+      <a id="perfectSort:org.apache.spark.rdd.RDD[T]"></a>
+      <a id="perfectSort:RDD[T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">perfectSort</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalSemiJoin">MinimalSemiJoin</a>.this.type</span>
+        <span class="name">perfectSort</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@perfectSort:MinimalAlgorithm.this.type" title="Permalink" target="_top">
+      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@perfectSort:org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
         <img src="../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Sorts and perfectly balances imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances imported objects. Function affects imported objects.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>this</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#perfectlySorted" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="perfectlySorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]"></a>
-      <a id="perfectlySorted(RDD[SemiJoinType]):RDD[SemiJoinType]"></a>
+      <a id="perfectlySorted(RDD[T]):RDD[T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">perfectlySorted</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>
+        <span class="name">perfectlySorted</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@perfectlySorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
@@ -625,14 +572,14 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       <p class="shortcomment cmt">Sorts and perfectly balances provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances provided RDD.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Perfectly balanced RDD of objects</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#perfectlySortedWithRanks" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="perfectlySortedWithRanks(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="perfectlySortedWithRanks(RDD[SemiJoinType]):RDD[(Int,SemiJoinType)]"></a>
+      <a id="perfectlySortedWithRanks(RDD[T]):RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">perfectlySortedWithRanks</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>)]</span>
+        <span class="name">perfectlySortedWithRanks</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@perfectlySortedWithRanks(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
@@ -642,14 +589,14 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       <p class="shortcomment cmt">Sorts and perfectly balances provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances provided RDD.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Perfectly balanced RDD of pairs (ranking, object)</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#perfectlySortedWithRanks" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="perfectlySortedWithRanks:org.apache.spark.rdd.RDD[(Int,T)]"></a>
-      <a id="perfectlySortedWithRanks:RDD[(Int,SemiJoinType)]"></a>
+      <a id="perfectlySortedWithRanks:RDD[(Int,T)]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">perfectlySortedWithRanks</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>)]</span>
+        <span class="name">perfectlySortedWithRanks</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>)]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@perfectlySortedWithRanks:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
@@ -674,6 +621,23 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#sendToMachines" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sendToMachines[K](rdd:org.apache.spark.rdd.RDD[(K,List[Int])])(implicitevidence$2:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[K]"></a>
+      <a id="sendToMachines[K](RDD[(K,List[Int])])(ClassTag[K]):RDD[K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sendToMachines</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="minimal_algorithms.MinimalAlgorithm.sendToMachines.K">K</span>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Int">Int</span>])]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.sendToMachines.K">K</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.sendToMachines.K">K</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalSemiJoin@sendToMachines[K](rdd:org.apache.spark.rdd.RDD[(K,List[Int])])(implicitevidence$2:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[K]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Shuffles rdd objects by sending them to given machine indices.</p><div class="fullcomment"><div class="comment cmt"><p>Shuffles rdd objects by sending them to given machine indices.</p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>[K : ClassTag]</p></dd><dt class="param">rdd</dt><dd class="cmt"><p>RDD of pairs (object, List[destination machine index])</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of reshuffled objects</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
       <a id="synchronized[T0](⇒T0):T0"></a>
@@ -710,14 +674,14 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
       <p class="shortcomment cmt">Applies Tera Sort algorithm on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies Tera Sort algorithm on imported objects. Function affects imported objects.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>this</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a></dd></dl></div>
     </li><li name="minimal_algorithms.MinimalAlgorithm#teraSorted" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="teraSorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]"></a>
-      <a id="teraSorted(RDD[SemiJoinType]):RDD[SemiJoinType]"></a>
+      <a id="teraSorted(RDD[T]):RDD[T]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">teraSorted</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</span>
+        <span class="name">teraSorted</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</span>
       </span>
       </h4><span class="permalink">
       <a href="../index.html#minimal_algorithms.MinimalSemiJoin@teraSorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
@@ -820,10 +784,8 @@ Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class=
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="minimal_algorithms.MinimalAlgorithmWithKey">
-              <h3>Inherited from <a href="MinimalAlgorithmWithKey.html" class="extype" name="minimal_algorithms.MinimalAlgorithmWithKey">MinimalAlgorithmWithKey</a>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</h3>
-            </div><div class="parent" name="minimal_algorithms.MinimalAlgorithm">
-              <h3>Inherited from <a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<a href="examples/SemiJoinType.html" class="extype" name="minimal_algorithms.examples.SemiJoinType">SemiJoinType</a>]</h3>
+        <div class="parent" name="minimal_algorithms.MinimalAlgorithm">
+              <h3>Inherited from <a href="MinimalAlgorithm.html" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>[<span class="extype" name="minimal_algorithms.MinimalSemiJoin.T">T</span>]</h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

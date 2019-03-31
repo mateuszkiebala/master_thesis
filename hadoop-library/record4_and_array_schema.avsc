@@ -1,0 +1,22 @@
+[
+{"namespace": "sortavro.record",
+ "type": "record",
+ "name": "Record4Float",
+ "fields": [
+            {"name": "first", "type": "float"},
+            {"name": "second", "type": "float"},
+            {"name": "third", "type": "float"},
+            {"name": "fourth", "type": "float"}
+           ]
+},
+{"namespace": "sortavro.record",
+ "type": "record",
+ "name": "MultipleRecords4Float",
+ "fields": [
+            {"name": "arrayOfRecords",
+             "type": {"type": "array",
+                      "items": "Record4Float"}
+            }
+           ]
+}
+]

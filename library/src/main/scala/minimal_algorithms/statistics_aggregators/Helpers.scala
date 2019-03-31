@@ -1,7 +1,7 @@
 package minimal_algorithms.statistics_aggregators
 
 object Helpers {
-  def safeMerge[A <: StatisticsAggregator[A]](a: A, b: A): A = {
+  def safeMerge(a: StatisticsAggregator, b: StatisticsAggregator): StatisticsAggregator = {
     if (a == null) {
       b
     } else if (b == null) {

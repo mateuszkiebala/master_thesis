@@ -16,7 +16,7 @@ object ExamplePrefix {
       val p = line.split(' ')
       new SumPrefixSMAO(p(1).toDouble)})
 
-    val sma = new StatisticsMinimalAlgorithm[SumAggregator, SumPrefixSMAO](spark, numOfPartitions)
+    val sma = new StatisticsMinimalAlgorithm[SumPrefixSMAO](spark, numOfPartitions)
     sma.importObjects(inputMapped).computePrefix.saveAsTextFile(outputPath)
     spark.stop()
   }

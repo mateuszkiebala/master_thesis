@@ -1,7 +1,6 @@
 package minimal_algorithms
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.RangePartitioner
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
 
@@ -24,7 +23,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return this
     */
   def importObjects(rdd: RDD[T]): this.type = {
-    this.objects = rdd
+    this.objects = rdd.repartition(numOfPartitions)
     itemsCntByPartition = (rdd.count().toInt+this.numOfPartitions-1) / this.numOfPartitions
     this
   }
@@ -34,7 +33,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return this
     */
   def teraSort: this.type = {
-    this.objects = teraSorted(this.objects).persist()
+    this.objects = this.objects.sortBy(identity).persist()
     this
   }
 
@@ -43,10 +42,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return Sorted RDD.
     */
   def teraSorted(rdd: RDD[T]): RDD[T] = {
-    import spark.implicits._
-    val pairedObjects = rdd.map{mao => (mao, mao)}
-    pairedObjects.partitionBy(new RangePartitioner[T, T](numOfPartitions, pairedObjects))
-      .mapPartitions(partition => partition.map(p => p._2).toList.sorted.toIterator)
+    rdd.repartition(numOfPartitions).sortBy(identity)
   }
 
   /**
@@ -113,12 +109,24 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
   }
 
   /**
+    * Shuffles rdd objects by sending them to given machine indices.
+    * @param rdd  RDD of pairs (object, List[destination machine index])
+    * @tparam K [K : ClassTag]
+    * @return RDD of reshuffled objects
+    */
+  def sendToMachines[K : ClassTag](rdd: RDD[(K, List[Int])]): RDD[K] = {
+    rdd.mapPartitionsWithIndex((pIndex, partition) => {
+      partition.flatMap { case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.map { i => (i, o) } }
+    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
+  }
+
+  /**
     * Returns number of elements on each partition.
     * @param rdd  RDD with objects to process.
-    * @tparam A Type of RDD's objects.
+    * @tparam K Type of RDD's objects.
     * @return Number of elements on each partition
     */
-  def getPartitionSizes[A](rdd: RDD[A]): RDD[Int] = {
+  def getPartitionSizes[K : ClassTag](rdd: RDD[K]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.length))
   }
 }

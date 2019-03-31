@@ -1,10 +1,10 @@
 package minimal_algorithms.statistics_aggregators
 
-class SumAggregator(value: Double) extends StatisticsAggregator[SumAggregator] {
+class SumAggregator(value: Double) extends StatisticsAggregator {
   def getValue: Double = value
 
-  override def merge(that: SumAggregator): SumAggregator = {
-    new SumAggregator(this.value + that.getValue)
+  override def merge(that: StatisticsAggregator): StatisticsAggregator = {
+    new SumAggregator(this.value + that.asInstanceOf[SumAggregator].getValue)
   }
 
   override def toString: String = {
