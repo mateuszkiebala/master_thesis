@@ -18,5 +18,23 @@
                       "items": "Record4Float"}
             }
            ]
+},
+{"namespace": "sortavro.record",
+ "type": "record",
+ "name": "RankedRecords4Float",
+ "fields": [
+            {"name": "rank", "type": "int"},
+            {"name": "value", "type": "Record4Float"}
+           ]
+},
+{"namespace": "sortavro.record",
+ "type": "record",
+ "name": "MultiRankedRecords4Float",
+ "fields": [
+            {"name": "arrayOfRankedRecords",
+             "type": {"type": "array",
+                      "items": "RankedRecords4Float"}
+            }
+           ]
 }
 ]

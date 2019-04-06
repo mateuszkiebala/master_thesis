@@ -1,4 +1,4 @@
-    package sortavro;
+package sortavro;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +23,7 @@ public class SortAvroRecord extends Configured implements Tool {
 
     public static final String SAMPLING_SUPERDIR = "/1_sampling_output";
     public static final String SORTING_SUPERDIR = "/2_sorting_output";
+    public static final String RANKING_SUPERDIR = "/3_ranking_output";
     public static final String IS_LAST_DIMENSION_KEY = "is.last.dimension";
     public static final int NO_OF_DIMENSIONS = 4;
 
@@ -74,6 +75,7 @@ public class SortAvroRecord extends Configured implements Tool {
 
         Path samplingSuperdir = new Path(args[1] + SAMPLING_SUPERDIR);
         Path sortingSuperdir = new Path(args[1] + SORTING_SUPERDIR);
+        Path rankingSuperdir = new Path(args[1] + RANKING_SUPERDIR);
 
         //-------------------------------SAMPLING-------------------------------
         //input: avro file with RecordWithCount4
@@ -101,6 +103,7 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
+        PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
 
         System.out.println("n="+n);
         System.out.println("t="+t);
