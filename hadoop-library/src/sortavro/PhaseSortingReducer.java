@@ -105,7 +105,7 @@ public class PhaseSortingReducer {
             amos.write(COUNTS_TAG, avKey, aInt);
 
             //write group of values
-            avValueMultRecords.datum(new MultiRecords4Float(l, mainObjectSchema));
+            avValueMultRecords.datum(new MultiRecords4Float(l));
             amos.write(DATA_TAG, avKey, avValueMultRecords);            
         }
     }
@@ -137,8 +137,9 @@ public class PhaseSortingReducer {
         //AvroJob.setOutputKeySchema(job, RecordWithOffset.getClassSchema());//Schema.create(Schema.Type.STRING));
         //job.setOutputValueClass(NullWritable.class);
 
-        Schema mutliRecord4FloatSchema = new MultiRecords4Float(mainObjectSchema).getSchema();
-        AvroMultipleOutputs.addNamedOutput(job, PhaseSortingReducer.DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), mutliRecord4FloatSchema); // if Schema is specified as null then the default output schema is used
+        SchemaForwarder.setSchema(mainObjectSchema);
+        System.out.println(MultiRecords4Float.getClassSchema().toString());
+        AvroMultipleOutputs.addNamedOutput(job, PhaseSortingReducer.DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultiRecords4Float.getClassSchema()); // if Schema is specified as null then the default output schema is used
         AvroMultipleOutputs.addNamedOutput(job, PhaseSortingReducer.COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
         int ret = (job.waitForCompletion(true) ? 0 : 1);

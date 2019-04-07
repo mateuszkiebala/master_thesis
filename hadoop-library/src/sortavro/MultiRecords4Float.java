@@ -5,35 +5,22 @@ import org.apache.avro.generic.GenericRecord;
 import sortavro.record.Record4Float;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 
 public class MultiRecords4Float implements GenericRecord {
-    private Schema itemsSchema;
     private List<GenericRecord> records;
-    /*public static final Schema SCHEMA$ = SchemaBuilder
-            .record("MultiRecords4Float").namespace("sortavro")
-                    .fields()
-                    .name("records").type().array().items(Record4Float.getClassSchema()).noDefault()
-                    .endRecord();
-    public static Schema getClassSchema() { return SCHEMA$; }*/
+
+    public static Schema getClassSchema() {
+        return SchemaForwarder.getSchema();
+    }
+
     public Schema getSchema() {
-        // uwaga gdy schema pusta
-        return SchemaBuilder
-                .record("MultiGenericRecord").namespace("sortavro")
-                .fields()
-                .name("records").type().array().items(this.itemsSchema).noDefault()
-                .endRecord();
+        return SchemaForwarder.getSchema();
     }
 
     public MultiRecords4Float() {}
 
-    public MultiRecords4Float(Schema itemsSchema) {
-        this.itemsSchema = itemsSchema;
-    }
-
-    public MultiRecords4Float(List<GenericRecord> records, Schema itemsSchema) {
+    public MultiRecords4Float(List<GenericRecord> records) {
         this.records = records;
-        this.itemsSchema = itemsSchema;
     }
 
     public List<GenericRecord> getArrayOfRecords() {
