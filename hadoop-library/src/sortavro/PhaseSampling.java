@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
+import org.apache.avro.Schema;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapred.AvroValue;
 import org.apache.avro.mapreduce.AvroJob;
 import org.apache.avro.mapreduce.AvroKeyInputFormat;
 import org.apache.avro.mapreduce.AvroKeyOutputFormat;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificData;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
@@ -22,7 +24,6 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import sortavro.record.Record4Float;
 
 /**
  *
@@ -36,11 +37,11 @@ public class PhaseSampling {
     public static final int NO_OF_KEYS_DEFAULT = -1;
     public static final int NO_OF_VALUES_DEFAULT = -1;
 
-    public static class SamplerMapper extends Mapper<AvroKey<Record4Float>, NullWritable, NullWritable, AvroValue<Record4Float>> implements Configurable {
+    public static class SamplerMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, NullWritable, AvroValue<GenericRecord>> implements Configurable {
 
         private Configuration conf;
         private final Random random = new Random();
-        private final AvroValue<Record4Float> avVal = new AvroValue();
+        private final AvroValue<GenericRecord> avVal = new AvroValue();
         private int ratioForRandom;
 
         @Override
@@ -55,7 +56,7 @@ public class PhaseSampling {
         }
 
         @Override
-        public void map(AvroKey<Record4Float> record, NullWritable nV, Context context) throws IOException, InterruptedException {
+        public void map(AvroKey<GenericRecord> record, NullWritable nV, Context context) throws IOException, InterruptedException {
             if (random.nextInt(ratioForRandom) == 0) {
                 //Utils.copyRecordAndOffset(record.datum(), offset.get(), rwo);
                 //avVal.datum(rwo);
@@ -66,9 +67,10 @@ public class PhaseSampling {
         }
     }
 
-    public static class ComputeBoundsForSortingReducer extends Reducer<NullWritable, AvroValue<Record4Float>, AvroKey<Record4Float>, NullWritable> {
+    public static class ComputeBoundsForSortingReducer extends Reducer<NullWritable, AvroValue<GenericRecord>, AvroKey<GenericRecord>, NullWritable> {
 
-        private Comparator<Record4Float> cmp;
+        private Schema mainObjectSchema;
+        private Comparator<GenericRecord> cmp;
         private int noOfSplitPoints;
 
         @Override
@@ -76,20 +78,21 @@ public class PhaseSampling {
             super.setup(ctx);
             noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
+            mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(ctx.getConfiguration());
         }
         
         @Override
-        protected void reduce(NullWritable nV, Iterable<AvroValue<Record4Float>> values, Context context) throws IOException, InterruptedException {
-            ArrayList<Record4Float> l = new ArrayList<>();
+        protected void reduce(NullWritable nV, Iterable<AvroValue<GenericRecord>> values, Context context) throws IOException, InterruptedException {
+            ArrayList<GenericRecord> l = new ArrayList<>();
             //TODO tu sie moze dac posortowac przez secondary sort
-            for (AvroValue<Record4Float> t : values) {
-                l.add(SpecificData.get().deepCopy(Record4Float.getClassSchema(), t.datum()));//ten iterable zwraca za każdym razem ten sam obiekt tylko z podmienionymi wartościami; co więcej zanim się wszystkiego nie obejrzy nie wiadomo ile tego bedzie
+            for (AvroValue<GenericRecord> t : values) {
+                l.add(SpecificData.get().deepCopy(mainObjectSchema, t.datum()));//ten iterable zwraca za każdym razem ten sam obiekt tylko z podmienionymi wartościami; co więcej zanim się wszystkiego nie obejrzy nie wiadomo ile tego bedzie
             }
 
             java.util.Collections.sort(l, cmp);
             int step = l.size() / (noOfSplitPoints+1);
 
-            AvroKey<Record4Float> avKey = new AvroKey<>(null);
+            AvroKey<GenericRecord> avKey = new AvroKey<>(null);
             for (int i = 1; i <= noOfSplitPoints; i++) {
                 avKey.datum(l.get(i * step));
                 context.write(avKey, NullWritable.get());
@@ -99,6 +102,8 @@ public class PhaseSampling {
 
     public static int runSampling(Path input, Path output, Configuration conf) throws IOException, InterruptedException, ClassNotFoundException {
         SortAvroRecord.LOG.info("starting phase 1 sampling");
+        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+
         Job job = Job.getInstance(conf, "JOB: Phase one sampling");
         job.setJarByClass(PhaseSampling.class);
         job.setNumReduceTasks(1);
@@ -118,9 +123,9 @@ public class PhaseSampling {
         job.setOutputKeyClass(AvroKey.class);
         //job.setOutputValueClass(NullWritable.class);
 
-        AvroJob.setInputKeySchema(job, Record4Float.getClassSchema());
-        AvroJob.setMapOutputValueSchema(job, Record4Float.getClassSchema());
-        AvroJob.setOutputKeySchema(job, Record4Float.getClassSchema());//Schema.create(Schema.Type.STRING));
+        AvroJob.setInputKeySchema(job, mainObjectSchema);
+        AvroJob.setMapOutputValueSchema(job, mainObjectSchema);
+        AvroJob.setOutputKeySchema(job, mainObjectSchema);//Schema.create(Schema.Type.STRING));
 
         SortAvroRecord.LOG.info("waiting for phase 1 sampling");
         int ret = (job.waitForCompletion(true) ? 0 : 1);

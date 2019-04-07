@@ -40,7 +40,7 @@ import sortavro.record.MultiRankedRecords4Float;
  * @author mateuszkiebala
  */
 public class PhaseRanking {
-
+/*
     static final Log LOG = LogFactory.getLog(PhaseRanking.class);
     public static final String PARTITION_SIZES_FILE = "partition_sizes.avro";
     public static final String PARTITION_SIZES_CACHE = "partition_sizes.cache";
@@ -88,12 +88,12 @@ public class PhaseRanking {
         return records;
     }
 
-    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleRecords4Float>, AvroKey<Integer>, AvroValue<MultiRankedRecords4Float>> {
+    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultiRecords4Float>, AvroKey<Integer>, AvroValue<MultiRanked>> {
 
         private Integer[] prefixedPartitionSizes;
         private Configuration conf;
         private final AvroKey<Integer> avKey = new AvroKey<>();
-        private final AvroValue<MultiRankedRecords4Float> avVal = new AvroValue<>();
+        private final AvroValue<MultiRanked> avVal = new AvroValue<>();
 
         @Override
         public void setup(Context ctx) {
@@ -105,21 +105,21 @@ public class PhaseRanking {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleRecords4Float>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultiRecords4Float>> values, Context context) throws IOException, InterruptedException {
             int partitionIndex = key.datum();
-            ArrayList<RankedRecords4Float> result = new ArrayList<>();
-            for (AvroValue<MultipleRecords4Float> o : values) {
-                MultipleRecords4Float multiRecords = SpecificData.get().deepCopy(MultipleRecords4Float.getClassSchema(), o.datum());
+            ArrayList<Ranked> result = new ArrayList<>();
+            for (AvroValue<MultiRecords4Float> o : values) {
+                MultiRecords4Float multiRecords = SpecificData.get().deepCopy(MultiRecords4Float.getClassSchema(), o.datum());
                 int i = 0;
                 for (Record4Float record : multiRecords.getArrayOfRecords()) {
                     int rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
-                    result.add(new RankedRecords4Float(rank, record));
+                    result.add(new Ranked(rank, record));
                     i++;
                 }
             }
 
             avKey.datum(key.datum());
-            avVal.datum(new MultiRankedRecords4Float(result));
+            avVal.datum(new MultiRanked(result));
             context.write(avKey, avVal);
         }
     }
@@ -127,6 +127,8 @@ public class PhaseRanking {
     public static int run(Path input, Path output, Configuration conf) throws Exception {
         LOG.info("starting ranking");
         mergePartitionSizes(input, conf);
+        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+        Schema mutliRecord4FloatSchema = new MultiRecords4Float(mainObjectSchema).getSchema();
 
         Job job = Job.getInstance(conf, "JOB: Phase ranking");
         URI partitionCountsCache = new URI(input + "/" + PARTITION_SIZES_FILE + "#" + PARTITION_SIZES_CACHE);
@@ -139,21 +141,21 @@ public class PhaseRanking {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleRecords4Float.getClassSchema());
+        AvroJob.setInputValueSchema(job, mutliRecord4FloatSchema);
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, MultipleRecords4Float.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, mutliRecord4FloatSchema);
 
         job.setReducerClass(RankingReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultiRankedRecords4Float.getClassSchema());
+        AvroJob.setOutputValueSchema(job, MultiRanked.getClassSchema());
 
         int ret = (job.waitForCompletion(true) ? 0 : 1);
         return ret;
-    }
+    }*/
 }

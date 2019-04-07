@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import sortavro.record.RWC4Cmps;
+import sortavro.record.Record4Float;
 
 /**
  *
@@ -71,7 +72,7 @@ public class SortAvroRecord extends Configured implements Tool {
         //paths for files storing lo and hi borders; the last one was computed in this dimension; the missing ones were not yet computed
         Utils.storeInConfLoBoundsFilenamesComputedSoFar(conf);
         Utils.storeInConfHiBoundsFilenamesComputedSoFar(conf);
-
+        Utils.storeMainObjectSchemaInConf(conf, Record4Float.getClassSchema());
 
         Path samplingSuperdir = new Path(args[1] + SAMPLING_SUPERDIR);
         Path sortingSuperdir = new Path(args[1] + SORTING_SUPERDIR);
@@ -103,7 +104,7 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
-        PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
+        //PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
 
         System.out.println("n="+n);
         System.out.println("t="+t);

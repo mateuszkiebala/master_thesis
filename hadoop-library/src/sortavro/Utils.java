@@ -17,6 +17,7 @@ import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.file.FileReader;
 import org.apache.avro.file.SeekableInput;
+import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.hadoop.io.AvroKeyValue;
@@ -39,6 +40,7 @@ public class Utils {
     public static final String TREE_COMPARATORS_KEY = "tree.comparators.key";
     public static final String MAIN_COMPARATOR_KEY = "main.comparator.key";
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
+    public static final String MAIN_OBJECT_SCHEMA = "main.object.schema";
     public static final int NO_OF_REDUCE_TASKS_DEFAULT = 2;
 
     public static final Comparator retrieveComparatorFromConf(Configuration conf) {
@@ -94,6 +96,15 @@ public class Utils {
     public static void storeComparatorsInConf(Configuration conf, Comparator sortingCmp, Comparator... otherCmps) {
         conf.set(MAIN_COMPARATOR_KEY, sortingCmp.getClass().getName());
         Utils.createStringAndStoreComparators(otherCmps, conf);
+    }
+
+    public static void storeMainObjectSchemaInConf(Configuration conf, Schema schema) {
+        conf.set(MAIN_OBJECT_SCHEMA, schema.toString());
+    }
+
+    public static Schema retrieveMainObjectSchemaFromConf(Configuration conf) {
+        String schema = conf.get(MAIN_OBJECT_SCHEMA);
+        return new Schema.Parser().parse(schema);
     }
 
     //assumes that filenames have no semicolons ;
@@ -210,33 +221,15 @@ public class Utils {
         }
     }
 
-    public static Record4Float[] readRecordsFromLocalFileAvro(Configuration conf, String fileName) {
+    public static GenericRecord[] readRecordsFromLocalFileAvro(Configuration conf, String fileName) {
         int noOfStrips = getStripsCount(conf);
-        return readRecordsFromLocalFileAvro(noOfStrips, fileName);
-    }
-
-    public static Record4Float[] readRecordsFromLocalFileAvro(int noOfElts, String fileName) {
-        Record4Float[] records = new Record4Float[noOfElts - 1];
+        Schema mainObjectSchema = retrieveMainObjectSchemaFromConf(conf);
+        GenericRecord[] records = new GenericRecord[noOfStrips - 1];
 
         File f = new File(fileName);
-        try (DataFileReader<Record4Float> dataFileReader = new DataFileReader<>(f, new SpecificDatumReader<>(Record4Float.class))) {
-            for (int i = 0; i < noOfElts - 1; i++) {
+        try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(f, new SpecificData().createDatumReader(mainObjectSchema))){
+            for (int i = 0; i < noOfStrips - 1; i++) {
                 records[i] = dataFileReader.next();
-            }
-        } catch (IOException ie) {
-            throw new IllegalArgumentException("can't read local file " + fileName, ie);
-        }
-
-        return records;
-    }
-
-    public static ArrayList<Record4Float> readRecordsFromLocalFileAvro(String fileName) {
-        ArrayList<Record4Float> records = new ArrayList<>();
-
-        File f = new File(fileName);
-        try (DataFileReader<Record4Float> dataFileReader = new DataFileReader<>(f, new SpecificDatumReader<>(Record4Float.class))) {
-            while (dataFileReader.hasNext()) {
-                records.add(dataFileReader.next());
             }
         } catch (IOException ie) {
             throw new IllegalArgumentException("can't read local file " + fileName, ie);
