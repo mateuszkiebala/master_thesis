@@ -40,7 +40,7 @@ public class Utils {
     public static final String TREE_COMPARATORS_KEY = "tree.comparators.key";
     public static final String MAIN_COMPARATOR_KEY = "main.comparator.key";
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
-    public static final String MAIN_OBJECT_SCHEMA = "main.object.schema";
+    public static final String MAIN_OBJECT_SCHEMA_KEY = "main.object.schema";
     public static final int NO_OF_REDUCE_TASKS_DEFAULT = 2;
 
     public static final Comparator retrieveComparatorFromConf(Configuration conf) {
@@ -99,11 +99,19 @@ public class Utils {
     }
 
     public static void storeMainObjectSchemaInConf(Configuration conf, Schema schema) {
-        conf.set(MAIN_OBJECT_SCHEMA, schema.toString());
+        storeSchemaInConf(conf, schema, MAIN_OBJECT_SCHEMA_KEY);
+    }
+
+    public static void storeSchemaInConf(Configuration conf, Schema schema, String key) {
+        conf.set(key, schema.toString());
     }
 
     public static Schema retrieveMainObjectSchemaFromConf(Configuration conf) {
-        String schema = conf.get(MAIN_OBJECT_SCHEMA);
+        return retrieveSchemaFromConf(conf, MAIN_OBJECT_SCHEMA_KEY);
+    }
+
+    public static Schema retrieveSchemaFromConf(Configuration conf, String key) {
+        String schema = conf.get(key);
         return new Schema.Parser().parse(schema);
     }
 
@@ -221,13 +229,17 @@ public class Utils {
         }
     }
 
-    public static GenericRecord[] readRecordsFromLocalFileAvro(Configuration conf, String fileName) {
+    public static GenericRecord[] readMainObjectRecordsFromLocalFileAvro(Configuration conf, String fileName) {
+        return readRecordsFromLocalFileAvro(conf, fileName, MAIN_OBJECT_SCHEMA_KEY);
+    }
+
+    public static GenericRecord[] readRecordsFromLocalFileAvro(Configuration conf, String fileName, String schemaKey) {
         int noOfStrips = getStripsCount(conf);
-        Schema mainObjectSchema = retrieveMainObjectSchemaFromConf(conf);
+        Schema schema = retrieveSchemaFromConf(conf, schemaKey);
         GenericRecord[] records = new GenericRecord[noOfStrips - 1];
 
         File f = new File(fileName);
-        try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(f, new SpecificData().createDatumReader(mainObjectSchema))){
+        try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(f, new SpecificData().createDatumReader(schema))){
             for (int i = 0; i < noOfStrips - 1; i++) {
                 records[i] = dataFileReader.next();
             }

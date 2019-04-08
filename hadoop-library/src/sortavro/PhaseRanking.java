@@ -30,20 +30,25 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import sortavro.record.MultipleRecords4Float;
-import sortavro.record.Record4Float;
-import sortavro.record.RankedRecords4Float;
-import sortavro.record.MultiRankedRecords4Float;
+import sortavro.avro_types.ranking.*;
+import sortavro.avro_types.terasort.*;
 
 /**
  *
  * @author mateuszkiebala
  */
 public class PhaseRanking {
-/*
+
     static final Log LOG = LogFactory.getLog(PhaseRanking.class);
     public static final String PARTITION_SIZES_FILE = "partition_sizes.avro";
     public static final String PARTITION_SIZES_CACHE = "partition_sizes.cache";
+
+    private static void setSchemas(Configuration conf) {
+        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+        MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
+        RankWrapperSchemaCreator.setMainObjectSchema(mainObjectSchema);
+        MultipleRankWrappersSchemaCreator.setMainObjectSchema(RankWrapper.getClassSchema());
+    }
 
     private static void mergePartitionSizes(Path input, Configuration conf) {
         try {
@@ -88,16 +93,17 @@ public class PhaseRanking {
         return records;
     }
 
-    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultiRecords4Float>, AvroKey<Integer>, AvroValue<MultiRanked>> {
+    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
 
         private Integer[] prefixedPartitionSizes;
         private Configuration conf;
         private final AvroKey<Integer> avKey = new AvroKey<>();
-        private final AvroValue<MultiRanked> avVal = new AvroValue<>();
+        private final AvroValue<MultipleRankWrappers> avVal = new AvroValue<>();
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
+            setSchemas(conf);
             prefixedPartitionSizes = readPartitionSizes(conf);
             for (int i = 1; i < prefixedPartitionSizes.length; i++) {
                 prefixedPartitionSizes[i] = prefixedPartitionSizes[i - 1] + prefixedPartitionSizes[i];
@@ -105,21 +111,21 @@ public class PhaseRanking {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultiRecords4Float>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleMainObjects>> values, Context context) throws IOException, InterruptedException {
             int partitionIndex = key.datum();
-            ArrayList<Ranked> result = new ArrayList<>();
-            for (AvroValue<MultiRecords4Float> o : values) {
-                MultiRecords4Float multiRecords = SpecificData.get().deepCopy(MultiRecords4Float.getClassSchema(), o.datum());
+            ArrayList<RankWrapper> result = new ArrayList<>();
+            System.out.println(MultipleMainObjectsSchemaForwarder.getSchema());
+            for (AvroValue<MultipleMainObjects> o : values) {
+                MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), o.datum());
                 int i = 0;
-                for (Record4Float record : multiRecords.getArrayOfRecords()) {
+                for (GenericRecord record : mainObjects.getRecords()) {
                     int rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
-                    result.add(new Ranked(rank, record));
+                    result.add(new RankWrapper(rank, record));
                     i++;
                 }
             }
-
             avKey.datum(key.datum());
-            avVal.datum(new MultiRanked(result));
+            avVal.datum(new MultipleRankWrappers(result));
             context.write(avKey, avVal);
         }
     }
@@ -127,8 +133,7 @@ public class PhaseRanking {
     public static int run(Path input, Path output, Configuration conf) throws Exception {
         LOG.info("starting ranking");
         mergePartitionSizes(input, conf);
-        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        Schema mutliRecord4FloatSchema = new MultiRecords4Float(mainObjectSchema).getSchema();
+        setSchemas(conf);
 
         Job job = Job.getInstance(conf, "JOB: Phase ranking");
         URI partitionCountsCache = new URI(input + "/" + PARTITION_SIZES_FILE + "#" + PARTITION_SIZES_CACHE);
@@ -141,21 +146,21 @@ public class PhaseRanking {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, mutliRecord4FloatSchema);
+        AvroJob.setInputValueSchema(job, MultipleMainObjects.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, mutliRecord4FloatSchema);
+        AvroJob.setMapOutputValueSchema(job, MultipleMainObjects.getClassSchema());
 
         job.setReducerClass(RankingReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultiRanked.getClassSchema());
+        AvroJob.setOutputValueSchema(job, MultipleRankWrappers.getClassSchema());
 
         int ret = (job.waitForCompletion(true) ? 0 : 1);
         return ret;
-    }*/
+    }
 }

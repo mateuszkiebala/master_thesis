@@ -9,31 +9,31 @@
             {"name": "fourth", "type": "float"}
            ]
 },
-{"namespace": "sortavro.record",
+{"namespace": "sortavro.avro_types.terasort",
  "type": "record",
- "name": "MultipleRecords4Float",
+ "name": "MultipleMainObjects",
  "fields": [
-            {"name": "arrayOfRecords",
+            {"name": "records",
              "type": {"type": "array",
-                      "items": "Record4Float"}
+                      "items": "sortavro.record.Record4Float"}
             }
            ]
 },
-{"namespace": "sortavro.record",
+{"namespace": "sortavro.avro_types.ranking",
  "type": "record",
- "name": "RankedRecords4Float",
+ "name": "RankWrapper",
  "fields": [
             {"name": "rank", "type": "int"},
-            {"name": "value", "type": "Record4Float"}
+            {"name": "value", "type": "sortavro.record.Record4Float"}
            ]
 },
-{"namespace": "sortavro.record",
+{"namespace": "sortavro.avro_types.ranking",
  "type": "record",
- "name": "MultiRankedRecords4Float",
+ "name": "MultipleRankWrappers",
  "fields": [
-            {"name": "arrayOfRankedRecords",
+            {"name": "records",
              "type": {"type": "array",
-                      "items": "RankedRecords4Float"}
+                      "items": "RankWrapper"}
             }
            ]
 }
