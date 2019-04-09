@@ -193,6 +193,24 @@ public class Utils {
         return conf.getInt(NO_OF_REDUCE_TASKS_KEY, NO_OF_REDUCE_TASKS_DEFAULT);
     }
 
+    public static void writeRecordsToHDFSAvro(Configuration conf, String fileName, GenericRecord[] records, Schema schema) {
+        Path path = new Path(fileName);
+
+        try (FileSystem hdfs = FileSystem.get(conf);
+             OutputStream os = hdfs.create(path);
+             DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(new SpecificDatumWriter<>(schema))) {
+            dataFileWriter.create(schema, os);
+
+            for (GenericRecord rec : records) {
+                if (rec != null) {
+                    dataFileWriter.append(rec);
+                }
+            }
+        } catch (IOException ie) {
+            throw new IllegalArgumentException("can't write merged record file " + fileName, ie);
+        }
+    }
+
     public static Record4Float[] readRecordsFromHDFSAvro(Configuration conf, String fileName, int count) {
         Record4Float[] records = new Record4Float[count];
 
@@ -210,32 +228,17 @@ public class Utils {
         return records;
     }
 
-    public static void writeRecordsToHDFSAvro(Configuration conf, String fileName, Record4Float[] records) {
-        //write result
-        Path path = new Path(fileName);
-
-        try (FileSystem hdfs = FileSystem.get(conf);
-                OutputStream os = hdfs.create(path);
-                DataFileWriter<Record4Float> dataFileWriter = new DataFileWriter<>(new SpecificDatumWriter<>(Record4Float.class))) {
-            dataFileWriter.create(Record4Float.getClassSchema(), os);
-
-            for (Record4Float rec : records) {
-                if (rec != null) {
-                    dataFileWriter.append(rec);
-                }
-            }
-        } catch (IOException ie) {
-            throw new IllegalArgumentException("can't write merged record file " + fileName, ie);
-        }
-    }
-
     public static GenericRecord[] readMainObjectRecordsFromLocalFileAvro(Configuration conf, String fileName) {
         return readRecordsFromLocalFileAvro(conf, fileName, MAIN_OBJECT_SCHEMA_KEY);
     }
 
     public static GenericRecord[] readRecordsFromLocalFileAvro(Configuration conf, String fileName, String schemaKey) {
-        int noOfStrips = getStripsCount(conf);
         Schema schema = retrieveSchemaFromConf(conf, schemaKey);
+        return readRecordsFromLocalFileAvro(conf, fileName, schema);
+    }
+
+    public static GenericRecord[] readRecordsFromLocalFileAvro(Configuration conf, String fileName, Schema schema) {
+        int noOfStrips = getStripsCount(conf);
         GenericRecord[] records = new GenericRecord[noOfStrips - 1];
 
         File f = new File(fileName);
@@ -248,6 +251,21 @@ public class Utils {
         }
 
         return records;
+    }
+
+    public static void writeRecordsToLocalFileAvro(Configuration conf, String fileName, GenericRecord[] records, Schema schema) {
+        File f = new File(fileName);
+        try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(new SpecificDatumWriter<>(schema))) {
+            dataFileWriter.create(schema, f);
+
+            for (GenericRecord rec : records) {
+                if (rec != null) {
+                    dataFileWriter.append(rec);
+                }
+            }
+        } catch (IOException ie) {
+            throw new IllegalArgumentException("can't read local file " + fileName, ie);
+        }
     }
 
     public static int[] readIntsFromLocalFileNormal(Configuration conf, String mergedFilename, int count) {
@@ -335,6 +353,6 @@ public class Utils {
         }
 
         //write result
-        writeRecordsToHDFSAvro(conf, mergedFilename, values);
+        writeRecordsToHDFSAvro(conf, mergedFilename, values, Record4Float.getClassSchema());
     }
 }
