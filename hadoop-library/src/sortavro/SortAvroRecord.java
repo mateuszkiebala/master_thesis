@@ -26,6 +26,7 @@ public class SortAvroRecord extends Configured implements Tool {
     public static final String SORTING_SUPERDIR = "/2_sorting_output";
     public static final String RANKING_SUPERDIR = "/3_ranking_output";
     public static final String IS_LAST_DIMENSION_KEY = "is.last.dimension";
+    public static final String STATISTICER_SCHEMA = "statisticer.schema";
     public static final int NO_OF_DIMENSIONS = 4;
 
     private Path getSamplingSuperdir(String commonPrefix, String dimPrefix) {
@@ -73,6 +74,7 @@ public class SortAvroRecord extends Configured implements Tool {
         Utils.storeInConfLoBoundsFilenamesComputedSoFar(conf);
         Utils.storeInConfHiBoundsFilenamesComputedSoFar(conf);
         Utils.storeMainObjectSchemaInConf(conf, Record4Float.getClassSchema());
+        Utils.storeSchemaInConf(conf, SumStatisticer.getClassSchema());
 
         Path samplingSuperdir = new Path(args[1] + SAMPLING_SUPERDIR);
         Path sortingSuperdir = new Path(args[1] + SORTING_SUPERDIR);

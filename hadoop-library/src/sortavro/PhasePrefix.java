@@ -45,12 +45,41 @@ public class PhasePrefix {
 
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+        Schema statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+        StatisticsRecordSchemaCreator.setSchema(statisticerSchema, mainObjectSchema);
         MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
-        RankWrapperSchemaCreator.setMainObjectSchema(mainObjectSchema);
-        MultipleRankWrappersSchemaCreator.setMainObjectSchema(RankWrapper.getClassSchema());
     }
 
-    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
+    public static class PartitionPrefixMapper extends Mapper<AvroKey<MultipleMainObjects>, NullWritable, AvroKey<MultipleMainObjects>, NullWritable> {
+
+        private Configuration conf;
+        private Schema mainObjectSchema;
+        private Schema statisticerSchema;
+        private final AvroValue<GenericRecord> avVal = new AvroValue<>();
+        private final AvroKey<Integer> avKey = new AvroKey<>();
+
+        @Override
+        public void setup(Context ctx) {
+            this.conf = ctx.getConfiguration();
+            setSchemas(conf);
+            mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+            statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+        }
+
+        @Override
+        protected void map(AvroKey<MultipleMainObjects> key, NullWritable value, Context context) throws IOException, InterruptedException {
+            Statisticer result = SpecificData.getClass(statisticerSchema).newInstance();
+            for (GenericRecord record : key.getRecords()) {
+                Method getStatisticer = SpecificData.getClass(statisticerSchema).getMethod("get", SpecificData.getClass(mainObjectSchema));
+                Statisticer statisticer = getStatisticer.invoke(null, (Object) record);
+                result.merge(statisticer);
+            }
+            // write to avro file but it must be distributed filesystem not local -> and then we need to merge them, maybe generic method?
+            context.write(avKey, avVal);
+        }
+    }
+
+    public static class PrefixReducer extends Reducer<AvroKey<MultipleMainObjects>, NullWritable, AvroKey<StatisticsRecord>, NullWritable> {
 
         private Integer[] prefixedPartitionSizes;
         private Configuration conf;
@@ -95,25 +124,24 @@ public class PhasePrefix {
         Job job = Job.getInstance(conf, "JOB: Phase prefix");
         job.setJarByClass(PhasePrefix.class);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
+        job.setMapperClass(PartitionPrefixMapper.class);
 
         FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
         FileOutputFormat.setOutputPath(job, output);
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
-        AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setInputKeySchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setInputValueSchema(job, NullWritable.class);
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
-        AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setMapOutputKeySchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, NullWritable.class);
 
-        job.setReducerClass(RankingReducer.class);
-        job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
+        job.setReducerClass(PrefixReducer.class);
+        job.setOutputFormatClass(AvroKeyOutputFormat.class);
         job.setOutputKeyClass(AvroKey.class);
-        job.setOutputValueClass(AvroValue.class);
-        AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultipleRankWrappers.getClassSchema());
+        AvroJob.setOutputKeySchema(job, StatisticsRecord.getClassSchema());
 
         int ret = (job.waitForCompletion(true) ? 0 : 1);
         return ret;

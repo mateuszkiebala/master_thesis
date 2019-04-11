@@ -11,6 +11,10 @@ public class SumStatisticer extends StatisticsRecord {
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
+    public static Statisticer get(GenericRecord record) {
+        new SumStatisticer(((Record4Float) record).getFirst());
+    }
+
     private int sum;
 
     public SumStatisticer() {}
