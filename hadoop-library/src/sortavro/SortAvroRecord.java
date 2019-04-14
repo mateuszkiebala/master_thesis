@@ -14,6 +14,7 @@ import org.apache.hadoop.util.ToolRunner;
 import sortavro.record.RWC4Cmps;
 import sortavro.record.Record4Float;
 import sortavro.avro_types.statistics.*;
+import sortavro.avro_types.group_by.*;
 
 /**
  *
@@ -28,8 +29,11 @@ public class SortAvroRecord extends Configured implements Tool {
     public static final String RANKING_SUPERDIR = "/3_ranking_output";
     public static final String PARTITION_STATISTICS_SUPERDIR = "/4_partition_statistics_output";
     public static final String PREFIX_SUPERDIR = "/5_prefix_output";
+    public static final String GROUP_BY_SUPERDIR = "/6_group_by_output";
+
     public static final String IS_LAST_DIMENSION_KEY = "is.last.dimension";
     public static final String STATISTICER_SCHEMA = "statisticer.schema";
+    public static final String GROUP_BY_KEY_SCHEMA = "group_by_key.schema";
     public static final int NO_OF_DIMENSIONS = 4;
 
     private Path getSamplingSuperdir(String commonPrefix, String dimPrefix) {
@@ -78,12 +82,14 @@ public class SortAvroRecord extends Configured implements Tool {
         Utils.storeInConfHiBoundsFilenamesComputedSoFar(conf);
         Utils.storeMainObjectSchemaInConf(conf, Record4Float.getClassSchema());
         Utils.storeSchemaInConf(conf, SumStatisticer.getClassSchema(), STATISTICER_SCHEMA);
+        Utils.storeSchemaInConf(conf, IntKeyRecord4Float.getClassSchema(), GROUP_BY_KEY_SCHEMA);
 
         Path samplingSuperdir = new Path(args[1] + SAMPLING_SUPERDIR);
         Path sortingSuperdir = new Path(args[1] + SORTING_SUPERDIR);
         Path rankingSuperdir = new Path(args[1] + RANKING_SUPERDIR);
         Path prefixSuperdir = new Path(args[1] + PREFIX_SUPERDIR);
         Path partitionStatisticsSuperdir = new Path(args[1] + PARTITION_STATISTICS_SUPERDIR);
+        Path groupBySuperdir = new Path(args[1] + GROUP_BY_SUPERDIR);
 
         //-------------------------------SAMPLING-------------------------------
         //input: avro file with RecordWithCount4
@@ -95,10 +101,10 @@ public class SortAvroRecord extends Configured implements Tool {
         //         so that they divide the sample in such a way: ..., sp1, ..., sp2, ..., sp_noOfSplitPoints, ...
         //output: avro file with RecordWithCount4
         //        containing split points
-        PhaseSampling.runSampling(input, samplingSuperdir, conf);
+        //PhaseSampling.runSampling(input, samplingSuperdir, conf);
 
         //-------------------------------SORTING--------------------------------
-        URI samplingBoundsURI = new URI(samplingSuperdir + "/part-r-00000.avro" + "#" + PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);//po # jest nazwa pod ktora plik zostanie umieszczony w cache
+        //URI samplingBoundsURI = new URI(samplingSuperdir + "/part-r-00000.avro" + "#" + PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);//po # jest nazwa pod ktora plik zostanie umieszczony w cache
         //input: avro file with RecordWithCount4
         //       containing whole input
         //       and the path to the output of PhaseSampling which is cached in the cluster in the location after #
@@ -110,12 +116,13 @@ public class SortAvroRecord extends Configured implements Tool {
         //output:  avro files with pairs in AvroKeyValueOutputFormat
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
-        PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
-        PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
-        PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, conf);
-        URI partitionStatisticsURI = new URI(partitionStatisticsSuperdir + "/part-r-00000.avro" + "#" + PhasePartitionStatistics.PARTITION_STATISTICS_CACHE);
+        //PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
+        //PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
+        //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, conf);
+        //URI partitionStatisticsURI = new URI(partitionStatisticsSuperdir + "/part-r-00000.avro" + "#" + PhasePartitionStatistics.PARTITION_STATISTICS_CACHE);
+        //PhasePrefix.run(sortingSuperdir, prefixSuperdir, partitionStatisticsURI, conf);
 
-        PhasePrefix.run(sortingSuperdir, prefixSuperdir, partitionStatisticsURI, conf);
+        PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, conf);
 
         System.out.println("n="+n);
         System.out.println("t="+t);

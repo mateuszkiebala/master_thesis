@@ -1,23 +1,24 @@
-package sortavro.avro_types.statistics;
+package sortavro.avro_types.group_by;
 
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificData;
+import sortavro.avro_types.statistics.Statisticer;
+import sortavro.avro_types.utils.KeyRecord;
 
-public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-    public static final Schema SCHEMA$ = StatisticsRecordSchemaCreator.getSchema();
-
-    public static Schema getClassSchema() { return SCHEMA$; }
+public class GroupByRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+    public static final Schema SCHEMA$ = GroupByRecordSchemaCreator.getSchema();
 
     public Statisticer statisticer;
-    public GenericRecord mainObject;
+    public KeyRecord key;
 
-    public StatisticsRecord() {}
+    public GroupByRecord() {}
 
-    public StatisticsRecord(Statisticer statisticer, GenericRecord mainObject) {
+    public GroupByRecord(Statisticer statisticer, KeyRecord key) {
         this.statisticer = statisticer;
-        this.mainObject = mainObject;
+        this.key = key;
     }
+
+    public static Schema getClassSchema() { return SCHEMA$; }
 
     public Schema getSchema() { return SCHEMA$; }
 
@@ -25,7 +26,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     public Object get(int field$) {
         switch (field$) {
             case 0: return statisticer;
-            case 1: return mainObject;
+            case 1: return key;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
@@ -34,9 +35,17 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     public void put(int field$, Object value$) {
         switch (field$) {
             case 0: statisticer = (Statisticer)value$; break;
-            case 1: mainObject = (GenericRecord)value$; break;
+            case 1: key = (KeyRecord)value$; break;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
+    }
+
+    public KeyRecord getKey() {
+        return key;
+    }
+
+    public void setKey(KeyRecord key) {
+        this.key = key;
     }
 
     public Statisticer getStatisticer() {
@@ -45,14 +54,6 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
 
     public void setStatisticer(Statisticer statisticer) {
         this.statisticer = statisticer;
-    }
-
-    public GenericRecord getMainObject() {
-        return mainObject;
-    }
-
-    public void setMainObject(GenericRecord mainObject) {
-        this.mainObject = mainObject;
     }
 
     private static final org.apache.avro.io.DatumWriter
