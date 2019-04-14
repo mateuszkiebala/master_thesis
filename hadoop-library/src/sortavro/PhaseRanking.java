@@ -114,7 +114,6 @@ public class PhaseRanking {
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleMainObjects>> values, Context context) throws IOException, InterruptedException {
             int partitionIndex = key.datum();
             ArrayList<RankWrapper> result = new ArrayList<>();
-            System.out.println(MultipleMainObjectsSchemaForwarder.getSchema());
             for (AvroValue<MultipleMainObjects> o : values) {
                 MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), o.datum());
                 int i = 0;
