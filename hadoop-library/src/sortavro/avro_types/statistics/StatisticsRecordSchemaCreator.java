@@ -11,7 +11,7 @@ public class StatisticsRecordSchemaCreator {
     }
 
     static public void setSchema(Schema statisticerSchema, Schema mainObjectSchema) {
-        SchemaBuilder.record("StatisticsRecord")
+        StatisticsRecordSchemaCreator.schema = SchemaBuilder.record("StatisticsRecord")
                 .namespace("sortavro.avro_types.statistics")
                 .fields()
                 .name("statisticer").type(statisticerSchema).noDefault()

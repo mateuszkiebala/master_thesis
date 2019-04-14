@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.avro.tool.ConcatTool;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
@@ -26,6 +29,7 @@ import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import sortavro.record.Record4Float;
 
@@ -115,6 +119,15 @@ public class Utils {
         return new Schema.Parser().parse(schema);
     }
 
+    public static void storePathInConf(Configuration conf, Path path, String key) {
+        conf.set(key, path.toString());
+    }
+
+    public static Path retrievePathFromConf(Configuration conf, String key) {
+        String path = conf.get(key);
+        return new Path(path);
+    }
+
     //assumes that filenames have no semicolons ;
     //and that filenames are not empty strings
     private static String filenamesToString(String... filenames) {
@@ -166,7 +179,7 @@ public class Utils {
         int noOfStrips = Utils.getStripsCount(conf);
         for (int i = 0; i < fileNames.length; i++) {
             if (!fileNames[i].equals("")) {
-                    bounds[i] = readRecordsFromHDFSAvro(conf, fileNames[i], noOfStrips);
+                    bounds[i] = (Record4Float[]) readRecordsFromHDFSAvro(conf, fileNames[i], Record4Float.getClassSchema(), noOfStrips);
             } else {
                 bounds[i] = null;
             }
@@ -193,7 +206,7 @@ public class Utils {
         return conf.getInt(NO_OF_REDUCE_TASKS_KEY, NO_OF_REDUCE_TASKS_DEFAULT);
     }
 
-    public static void writeRecordsToHDFSAvro(Configuration conf, String fileName, GenericRecord[] records, Schema schema) {
+    public static void writeRecordsToHDFSAvro(Configuration conf, String fileName, List<GenericRecord> records, Schema schema) {
         Path path = new Path(fileName);
 
         try (FileSystem hdfs = FileSystem.get(conf);
@@ -211,21 +224,50 @@ public class Utils {
         }
     }
 
-    public static Record4Float[] readRecordsFromHDFSAvro(Configuration conf, String fileName, int count) {
-        Record4Float[] records = new Record4Float[count];
+    public static GenericRecord[] readRecordsFromHDFSAvro(Configuration conf, String fileName, Schema schema) {
+        int noOfStrips = Utils.getStripsCount(conf);
+        return readRecordsFromHDFSAvro(conf, fileName, schema, noOfStrips);
+    }
 
+    public static GenericRecord[] readRecordsFromHDFSAvro(Configuration conf, String fileName, Schema schema, int count) {
+        GenericRecord[] records = new GenericRecord[count];
         Path path = new Path(fileName);
-        try (SeekableInput sInput = new FsInput(path, conf);
-                FileReader<Record4Float> fileReader = DataFileReader.openReader(sInput, new SpecificDatumReader<>(Record4Float.class))) {
 
+        try (SeekableInput sInput = new FsInput(path, conf);
+             FileReader<GenericRecord> fileReader = DataFileReader.openReader(sInput, new GenericDatumReader<>(schema))) {
             for (int i = 0; i < count; i++) {
                 records[i] = fileReader.next();
             }
         } catch (IOException ex) {
             throw new IllegalArgumentException("can't read hdfs file " + fileName, ex);
         }
-
         return records;
+    }
+
+    public static void mergeHDFSAvro(Configuration conf, Path dirPath, String filePattern, String outFileName) {
+        System.out.println(dirPath.toString());
+        System.out.println(filePattern);
+        System.out.println(outFileName);
+        try {
+            List<String> merged = new ArrayList<>();
+            FileSystem hdfs = FileSystem.get(conf);
+            FileStatus[] statusList = hdfs.listStatus(dirPath);
+            if (statusList != null) {
+                for (FileStatus fileStatus : statusList) {
+                    String filename = fileStatus.getPath().getName();
+                    Pattern regex = Pattern.compile(filePattern);
+                    Matcher matcher = regex.matcher(filename);
+
+                    if (matcher.find()) {
+                        merged.add(dirPath.toString() + "/" + filename);
+                    }
+                }
+                merged.add(dirPath.toString() + "/" + outFileName);
+                new ConcatTool().run(System.in, System.out, System.err, merged);
+            }
+        } catch (Exception e) {
+            System.err.println("Cannot merge AVRO files: " + e.toString());
+        }
     }
 
     public static GenericRecord[] readMainObjectRecordsFromLocalFileAvro(Configuration conf, String fileName) {
@@ -328,7 +370,7 @@ public class Utils {
 //        }
     }
 
-    public static void mergeRecordFilesIntoAvro(String filesFormatter, String mergedFilename, Configuration conf, int stripsCount) {
+    /*public static void mergeRecordFilesIntoAvro(String filesFormatter, String mergedFilename, Configuration conf, int stripsCount) {
         int reducerTasksCount = getReduceTasksCount(conf);
         Record4Float[] values = new Record4Float[stripsCount];
 
@@ -354,5 +396,5 @@ public class Utils {
 
         //write result
         writeRecordsToHDFSAvro(conf, mergedFilename, values, Record4Float.getClassSchema());
-    }
+    }*/
 }
