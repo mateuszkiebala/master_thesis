@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.stream.Collectors;
+import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.avro.Schema;
@@ -38,6 +38,7 @@ import sortavro.avro_types.utils.KeyRecord;
 public class PhaseGroupBy {
 
     static final Log LOG = LogFactory.getLog(PhaseGroupBy.class);
+    static final Integer MASTER_MACHINE_INDEX = 0;
 
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
@@ -54,6 +55,7 @@ public class PhaseGroupBy {
         private Configuration conf;
         private Schema statisticerSchema;
         private Schema keyRecordSchema;
+        private Comparator<GenericRecord> cmp;
         private final AvroValue<MultipleGroupByRecords> avVal = new AvroValue<>();
         private final AvroKey<Integer> avKey = new AvroKey<>();
 
@@ -61,6 +63,7 @@ public class PhaseGroupBy {
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
+            cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
             keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
         }
@@ -96,8 +99,8 @@ public class PhaseGroupBy {
                         grouped.put(keyRecord, record.getStatisticer());
                     }
 
-                    minKey = minKey == null ? keyRecord : KeyRecord.min(minKey, keyRecord);
-                    maxKey = maxKey == null ? keyRecord : KeyRecord.max(maxKey, keyRecord);
+                    minKey = minKey == null ? keyRecord : KeyRecord.min(minKey, keyRecord, cmp);
+                    maxKey = maxKey == null ? keyRecord : KeyRecord.max(maxKey, keyRecord, cmp);
                 }
 
                 for (Map.Entry<KeyRecord, Statisticer> entry : grouped.entrySet()) {
@@ -115,57 +118,63 @@ public class PhaseGroupBy {
             avVal.datum(new MultipleGroupByRecords(thisResult));
             context.write(key, avVal);
 
-            Integer masterIndex = 0;
             avVal.datum(new MultipleGroupByRecords(masterResult));
-            avKey.datum(masterIndex);
+            avKey.datum(MASTER_MACHINE_INDEX);
             context.write(avKey, avVal);
         }
     }
-/*
+
     public static class GroupByReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleGroupByRecords>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
 
-        private Integer[] prefixedPartitionSizes;
         private Configuration conf;
         private final AvroKey<Integer> avKey = new AvroKey<>();
-        private final AvroValue<MultipleRankWrappers> avVal = new AvroValue<>();
+        private final AvroValue<MultipleGroupByRecords> avVal = new AvroValue<>();
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            prefixedPartitionSizes = readPartitionSizes(conf);
-            for (int i = 1; i < prefixedPartitionSizes.length; i++) {
-                prefixedPartitionSizes[i] = prefixedPartitionSizes[i - 1] + prefixedPartitionSizes[i];
-            }
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleMainObjects>> values, Context context) throws IOException, InterruptedException {
-            int partitionIndex = key.datum();
-            ArrayList<RankWrapper> result = new ArrayList<>();
-            for (AvroValue<MultipleMainObjects> o : values) {
-                MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), o.datum());
-                int i = 0;
-                for (GenericRecord record : mainObjects.getRecords()) {
-                    int rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
-                    result.add(new RankWrapper(rank, record));
-                    i++;
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleGroupByRecords>> values, Context context) throws IOException, InterruptedException {
+            if (key.datum().equals(MASTER_MACHINE_INDEX)) {
+                List<GroupByRecord> result = new ArrayList<>();
+                Map<KeyRecord, Statisticer> grouped = new HashMap<>();
+
+                for (AvroValue<MultipleGroupByRecords> o : values) {
+                    for (GenericRecord gr : o.datum().getRecords()) {
+                        GroupByRecord record = (GroupByRecord) SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), gr);
+                        KeyRecord keyRecord = record.getKey();
+
+                        if (grouped.containsKey(keyRecord)) {
+                            Statisticer mapStatisticer = grouped.get(keyRecord);
+                            grouped.put(keyRecord, mapStatisticer.merge(record.getStatisticer()));
+                        } else {
+                            grouped.put(keyRecord, record.getStatisticer());
+                        }
+                    }
                 }
+
+                for (Map.Entry<KeyRecord, Statisticer> entry : grouped.entrySet()) {
+                    result.add(new GroupByRecord(entry.getValue(), entry.getKey()));
+                }
+
+                avVal.datum(new MultipleGroupByRecords(result));
+            } else {
+                avVal.datum(values.iterator().next().datum());
             }
-            avKey.datum(key.datum());
-            avVal.datum(new MultipleRankWrappers(result));
-            context.write(avKey, avVal);
+            context.write(key, avVal);
         }
     }
-*/
+
     public static int run(Path input, Path output, Configuration conf) throws Exception {
         LOG.info("starting group_by");
         setSchemas(conf);
 
         Job job = Job.getInstance(conf, "JOB: PhaseGroupBy");
         job.setJarByClass(PhasePrefix.class);
-        //job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
-        job.setNumReduceTasks(0);
+        job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(GroupByMapper.class);
 
         FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
@@ -180,6 +189,7 @@ public class PhaseGroupBy {
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setMapOutputValueSchema(job, MultipleGroupByRecords.getClassSchema());
 
+        job.setReducerClass(GroupByReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);

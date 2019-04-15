@@ -1,18 +1,18 @@
 package sortavro.avro_types.utils;
 
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.GenericData;
+import java.util.Comparator;
 
-public abstract class KeyRecord<T extends KeyRecord> extends GenericData implements Comparable<T> {
-    public abstract void create(GenericRecord record);
+public abstract class KeyRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+    public abstract void create(GenericRecord objectRecord);
 
-    public static KeyRecord min(KeyRecord a, KeyRecord b) {
-        return (a.compareTo(b) <= 0) ? a : b;
+    public abstract GenericRecord getObjectRecord();
+
+    public static KeyRecord min(KeyRecord a, KeyRecord b, Comparator<GenericRecord> comparator) {
+        return comparator.compare(a.getObjectRecord(), b.getObjectRecord()) <= 0 ? a : b;
     }
 
-    public static KeyRecord max(KeyRecord a, KeyRecord b) {
-        return (a.compareTo(b) >= 1) ? a : b;
+    public static KeyRecord max(KeyRecord a, KeyRecord b, Comparator<GenericRecord> comparator) {
+        return comparator.compare(a.getObjectRecord(), b.getObjectRecord()) >= 1 ? a : b;
     }
-    
-    // Powinnismy przekazywac comparator - musi byc ten sam co przy tera sorcie.
 }
