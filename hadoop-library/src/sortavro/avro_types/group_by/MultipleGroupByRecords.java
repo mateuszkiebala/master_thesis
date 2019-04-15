@@ -1,58 +1,42 @@
-package sortavro.avro_types.statistics;
+package sortavro.avro_types.group_by;
 
+import java.util.List;
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificData;
 
-public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-    public static final Schema SCHEMA$ = StatisticsRecordSchemaCreator.getSchema();
-
+public class MultipleGroupByRecords extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+    public static final Schema SCHEMA$ = MultipleGroupByRecordsSchemaCreator.getSchema();
     public static Schema getClassSchema() { return SCHEMA$; }
+    @Deprecated public List<GroupByRecord> records;
 
-    public Statisticer statisticer;
-    public GenericRecord mainObject;
+    public MultipleGroupByRecords() {}
 
-    public StatisticsRecord() {}
-
-    public StatisticsRecord(Statisticer statisticer, GenericRecord mainObject) {
-        this.statisticer = statisticer;
-        this.mainObject = mainObject;
+    public MultipleGroupByRecords(List<GroupByRecord> records) {
+        this.records = records;
     }
 
     public Schema getSchema() { return SCHEMA$; }
 
-    @Override
     public Object get(int field$) {
         switch (field$) {
-            case 0: return statisticer;
-            case 1: return mainObject;
+            case 0: return records;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
 
-    @Override
     public void put(int field$, Object value$) {
         switch (field$) {
-            case 0: statisticer = (Statisticer)value$; break;
-            case 1: mainObject = (GenericRecord)value$; break;
+            case 0: records = (List<GroupByRecord>)value$; break;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
 
-    public Statisticer getStatisticer() {
-        return statisticer;
+    public List<GroupByRecord> getRecords() {
+        return records;
     }
 
-    public void setStatisticer(Statisticer statisticer) {
-        this.statisticer = statisticer;
-    }
-
-    public GenericRecord getMainObject() {
-        return mainObject;
-    }
-
-    public void setMainObject(GenericRecord mainObject) {
-        this.mainObject = mainObject;
+    public void setRecords(List<GroupByRecord> value) {
+        this.records = value;
     }
 
     private static final org.apache.avro.io.DatumWriter
@@ -70,4 +54,5 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
             throws java.io.IOException {
         READER$.read(this, SpecificData.getDecoder(in));
     }
+
 }

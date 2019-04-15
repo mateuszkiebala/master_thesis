@@ -9,9 +9,9 @@
             {"name": "fourth", "type": "float"}
            ]
 },
-{"namespace": "sortavro.record",
+{"namespace": "sortavro.avro_types.group_by",
  "type": "record",
- "name": "Simple",
+ "name": "IntKeyRecord4Float",
  "fields": [
             {"name": "value", "type": "int"}
            ]

@@ -28,7 +28,7 @@ public class SumStatisticer extends Statisticer {
     public Schema getSchema() { return SCHEMA$; }
 
     public void init(GenericRecord record) {
-        this.sum = Math.round(((Record4Float) record).getFirst());
+        this.sum = Math.round(((Record4Float) record).getSecond());
     }
 
     public Object get(int field$) {
