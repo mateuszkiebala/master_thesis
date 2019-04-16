@@ -117,10 +117,10 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
-        //PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
-        //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, conf);
-        //URI partitionStatisticsURI = new URI(partitionStatisticsSuperdir + "/part-r-00000.avro" + "#" + PhasePartitionStatistics.PARTITION_STATISTICS_CACHE);
-        //PhasePrefix.run(sortingSuperdir, prefixSuperdir, partitionStatisticsURI, conf);
+        PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
+        PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, conf);
+        URI partitionStatisticsURI = new URI(partitionStatisticsSuperdir + "/part-r-00000.avro" + "#" + PhasePartitionStatistics.PARTITION_STATISTICS_CACHE);
+        PhasePrefix.run(sortingSuperdir, prefixSuperdir, partitionStatisticsURI, conf);
 
         PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, conf);
 

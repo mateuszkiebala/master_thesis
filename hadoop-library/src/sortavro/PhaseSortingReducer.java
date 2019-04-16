@@ -38,7 +38,7 @@ public class PhaseSortingReducer {
     public static final String DATA_GLOB = "sortingDataTag-r-*.avro";
     public static final String COUNTS_MERGED_FILENAME = "sorting_counts_filename.txt";
     public static final String SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS = "sampling_split_points.cache";
-    
+
     public static class PartitioningMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, AvroKey<Integer>, AvroValue<GenericRecord>> {
 
         private GenericRecord[] splitPoints;
@@ -80,7 +80,7 @@ public class PhaseSortingReducer {
             amos = new AvroMultipleOutputs(ctx);
             cmp = Utils.retrieveComparatorFromConf(conf);
             mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-            MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
+            MultipleMainObjects.setSchema(mainObjectSchema);
         }
 
         public void cleanup(Context ctx) throws IOException {
@@ -115,7 +115,7 @@ public class PhaseSortingReducer {
     public static int runSorting(Path input, Path output, URI partitionsURI, Configuration conf) throws IOException, InterruptedException, ClassNotFoundException {
         SortAvroRecord.LOG.info("starting phase 2 sorting");
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
+        MultipleMainObjects.setSchema(mainObjectSchema);
 
         Job job = Job.getInstance(conf, "JOB: Phase two sorting");
         job.setJarByClass(PhaseSortingReducer.class);

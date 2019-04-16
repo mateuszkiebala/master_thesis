@@ -27,10 +27,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import sortavro.avro_types.statistics.*;
 import sortavro.avro_types.terasort.*;
 
-/**
- *
- * @author mateuszkiebala
- */
 public class PhasePartitionStatistics {
 
     static final Log LOG = LogFactory.getLog(PhasePartitionStatistics.class);
@@ -38,7 +34,7 @@ public class PhasePartitionStatistics {
 
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
+        MultipleMainObjects.setSchema(mainObjectSchema);
     }
 
     public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<Statisticer>> {

@@ -26,10 +26,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import sortavro.avro_types.statistics.*;
 import sortavro.avro_types.terasort.*;
 
-/**
- *
- * @author mateuszkiebala
- */
 public class PhasePrefix {
 
     static final Log LOG = LogFactory.getLog(PhasePrefix.class);
@@ -38,9 +34,9 @@ public class PhasePrefix {
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
         Schema statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
-        StatisticsRecordSchemaCreator.setSchema(statisticerSchema, mainObjectSchema);
-        MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
-        MultipleStatisticRecordsSchemaCreator.setSchema(StatisticsRecord.getClassSchema());
+        StatisticsRecord.setSchema(statisticerSchema, mainObjectSchema);
+        MultipleMainObjects.setSchema(mainObjectSchema);
+        MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
     }
 
     public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {

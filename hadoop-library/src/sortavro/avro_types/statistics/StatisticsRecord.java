@@ -1,16 +1,26 @@
 package sortavro.avro_types.statistics;
 
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificData;
 
 public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-    public static final Schema SCHEMA$ = StatisticsRecordSchemaCreator.getSchema();
+    public static Schema SCHEMA$;
+
+    public static void setSchema(Schema statisticerSchema, Schema mainObjectSchema) {
+        SCHEMA$ = SchemaBuilder.record("StatisticsRecord")
+                .namespace("sortavro.avro_types.statistics")
+                .fields()
+                .name("statisticer").type(statisticerSchema).noDefault()
+                .name("mainObject").type(mainObjectSchema).noDefault()
+                .endRecord();
+    }
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
-    public Statisticer statisticer;
-    public GenericRecord mainObject;
+    private Statisticer statisticer;
+    private GenericRecord mainObject;
 
     public StatisticsRecord() {}
 
@@ -53,21 +63,5 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
 
     public void setMainObject(GenericRecord mainObject) {
         this.mainObject = mainObject;
-    }
-
-    private static final org.apache.avro.io.DatumWriter
-            WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);
-
-    @Override public void writeExternal(java.io.ObjectOutput out)
-            throws java.io.IOException {
-        WRITER$.write(this, SpecificData.getEncoder(out));
-    }
-
-    private static final org.apache.avro.io.DatumReader
-            READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);
-
-    @Override public void readExternal(java.io.ObjectInput in)
-            throws java.io.IOException {
-        READER$.read(this, SpecificData.getDecoder(in));
     }
 }

@@ -13,7 +13,7 @@ public class IntKeyRecord4Float extends KeyRecord {
   public static Schema getClassSchema() { return SCHEMA$; }
 
   private GenericRecord objectRecord;
-  public int value;
+  private int value;
 
   public IntKeyRecord4Float() {}
 
@@ -75,21 +75,5 @@ public class IntKeyRecord4Float extends KeyRecord {
 
   public void setValue(int value) {
     this.value = value;
-  }
-
-  private static final org.apache.avro.io.DatumWriter
-          WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);
-
-  @Override public void writeExternal(java.io.ObjectOutput out)
-          throws java.io.IOException {
-    WRITER$.write(this, SpecificData.getEncoder(out));
-  }
-
-  private static final org.apache.avro.io.DatumReader
-          READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);
-
-  @Override public void readExternal(java.io.ObjectInput in)
-          throws java.io.IOException {
-    READER$.read(this, SpecificData.getDecoder(in));
   }
 }

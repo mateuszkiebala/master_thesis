@@ -31,10 +31,6 @@ import sortavro.avro_types.terasort.*;
 import sortavro.avro_types.group_by.*;
 import sortavro.avro_types.utils.KeyRecord;
 
-/**
- *
- * @author mateuszkiebala
- */
 public class PhaseGroupBy {
 
     static final Log LOG = LogFactory.getLog(PhaseGroupBy.class);
@@ -45,9 +41,9 @@ public class PhaseGroupBy {
         Schema statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
         Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
 
-        GroupByRecordSchemaCreator.setSchema(statisticerSchema, keyRecordSchema);
-        MultipleGroupByRecordsSchemaCreator.setSchema(GroupByRecord.getClassSchema());
-        MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
+        GroupByRecord.setSchema(statisticerSchema, keyRecordSchema);
+        MultipleGroupByRecords.setSchema(GroupByRecord.getClassSchema());
+        MultipleMainObjects.setSchema(mainObjectSchema);
     }
 
     public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {

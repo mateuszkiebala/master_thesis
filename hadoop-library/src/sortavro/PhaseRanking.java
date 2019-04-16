@@ -33,10 +33,6 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import sortavro.avro_types.ranking.*;
 import sortavro.avro_types.terasort.*;
 
-/**
- *
- * @author mateuszkiebala
- */
 public class PhaseRanking {
 
     static final Log LOG = LogFactory.getLog(PhaseRanking.class);
@@ -45,9 +41,9 @@ public class PhaseRanking {
 
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        MultipleMainObjectsSchemaCreator.setMainObjectSchema(mainObjectSchema);
-        RankWrapperSchemaCreator.setMainObjectSchema(mainObjectSchema);
-        MultipleRankWrappersSchemaCreator.setMainObjectSchema(RankWrapper.getClassSchema());
+        MultipleMainObjects.setSchema(mainObjectSchema);
+        RankWrapper.setSchema(mainObjectSchema);
+        MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
     }
 
     private static void mergePartitionSizes(Path input, Configuration conf) {
