@@ -115,9 +115,29 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @return RDD of reshuffled objects
     */
   def sendToMachines[K : ClassTag](rdd: RDD[(K, List[Int])]): RDD[K] = {
-    rdd.mapPartitionsWithIndex((pIndex, partition) => {
-      partition.flatMap { case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.map { i => (i, o) } }
-    }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
+    partitionByKey[K](rdd.mapPartitionsWithIndex((pIndex, partition) => {
+      partition.flatMap{case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.map{i => (i, o)}}
+    }))
+  }
+
+  def sendToAllHigherMachines[K : ClassTag](arr: Array[(K, Int)]): RDD[K] = {
+    partitionByKey(sc.parallelize(arr.flatMap{case (o, lowerBound) => List.range(lowerBound, this.numOfPartitions).map{i => (i, o)}}))
+  }
+
+  def sendToAllHigherMachines[K : ClassTag](rdd: RDD[(K, Int)]): RDD[K] = {
+    partitionByKey(rdd.mapPartitions(partition => {
+      partition.flatMap{case (o, lowerBound) => List.range(lowerBound, this.numOfPartitions).map{i => (i, o)}}
+    }))
+  }
+
+  def sendToAllLowerMachines[K : ClassTag](rdd: RDD[(K, Int)]): RDD[K] = {
+    partitionByKey[K](rdd.mapPartitions(partition => {
+      partition.flatMap{case (o, upperBound) => List.range(0, upperBound).map{i => (i, o)}}
+    }))
+  }
+
+  def partitionByKey[K : ClassTag](rdd: RDD[(Int, K)]): RDD[K] = {
+    rdd.partitionBy(new KeyPartitioner(this.numOfPartitions)).map(x => x._2)
   }
 
   /**

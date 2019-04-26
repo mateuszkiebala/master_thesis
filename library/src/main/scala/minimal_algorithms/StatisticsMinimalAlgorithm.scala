@@ -48,6 +48,28 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : Clas
     })
   }
 
+  def prefix: RDD[(StatisticsAggregator, T)] = prefix(this.objects)
+
+  def prefix(rdd: RDD[T]): RDD[(StatisticsAggregator, T)] = {
+    val sortedRdd = teraSorted(rdd).persist()
+    val prefixPartitionsStatistics = sendToAllHigherMachines(getPrefixedPartitionStatistics(sortedRdd).zip(List.range(1, this.numOfPartitions)))
+
+    sortedRdd.zipPartitions(prefixPartitionsStatistics){(partitionIt, partitionPrefixIt) => {
+      if (partitionIt.hasNext) {
+        val elements = partitionIt.toList
+        val prefixes = if (partitionPrefixIt.hasNext) {
+          val partitionPrefix = partitionPrefixIt.next
+          elements.map(e => e.getAggregator).scanLeft(partitionPrefix)((res, a) => res.merge(a)).tail
+        } else {
+          elements.tail.scanLeft(elements.head.getAggregator){(res, a) => res.merge(a.getAggregator)}
+        }
+        prefixes.zip(elements).iterator
+      } else {
+        Iterator()
+      }
+    }}
+  }
+
   /**
     * Computes prefix values on partitions' statistics
     * @param rdd  RDD of objects
