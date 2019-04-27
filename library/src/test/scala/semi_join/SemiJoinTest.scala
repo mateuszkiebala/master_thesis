@@ -16,7 +16,7 @@ class SemiJoinTest extends FunSuite with SharedSparkContext with Matchers {
 
       // when
     val minimalSemiJoin = new MinimalSemiJoin[SemiJoinType](spark, 2).importObjects(rddR, rddT)
-    val result = minimalSemiJoin.execute.collect
+    val result = minimalSemiJoin.execute(SemiJoinType.cmpKey).collect
 
       // then
     val expected = Set(setR(0), setR(1), setR(3), setR(5))

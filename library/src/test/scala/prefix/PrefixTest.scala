@@ -13,7 +13,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
       // when
     val minimalAlgorithm = new StatisticsMinimalAlgorithm[SumPrefixSMAO](spark, 2)
     val rdd = spark.sparkContext.parallelize(elements.map{e => new SumPrefixSMAO(e)})
-    val result = minimalAlgorithm.importObjects(rdd).prefix.collect()
+    val result = minimalAlgorithm.importObjects(rdd).prefix(SumPrefixSMAO.cmpKey).collect()
 
       // then
     val expected = Array(-10, -17, -16, -15, -14, -12, -10, -5, 5, 17)
@@ -24,7 +24,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
       // when
     val minimalAlgorithm = new StatisticsMinimalAlgorithm[MinPrefixSMAO](spark, 2)
     val rdd = spark.sparkContext.parallelize(elements.map{e => new MinPrefixSMAO(e)})
-    val result = minimalAlgorithm.importObjects(rdd).prefix.collect()
+    val result = minimalAlgorithm.importObjects(rdd).prefix(MinPrefixSMAO.cmpKey).collect()
 
       // then
     val expected = Array(-10, -10, -10, -10, -10, -10, -10, -10, -10, -10)
@@ -35,7 +35,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
       // when
     val minimalAlgorithm = new StatisticsMinimalAlgorithm[MaxPrefixSMAO](spark, 2)
     val rdd = spark.sparkContext.parallelize(elements.map{e => new MaxPrefixSMAO(e)})
-    val result = minimalAlgorithm.importObjects(rdd).prefix.collect()
+    val result = minimalAlgorithm.importObjects(rdd).prefix(MaxPrefixSMAO.cmpKey).collect()
 
       // then
     val expected = Array(-10, -7, 1, 1, 1, 2, 2, 5, 10, 12)

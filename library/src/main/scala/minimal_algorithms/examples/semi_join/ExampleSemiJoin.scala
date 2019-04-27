@@ -23,8 +23,8 @@ object ExampleSemiJoin {
       new SemiJoinType(p(0).toInt, p(1).toDouble, SemiJoinSetTypeEnum.TType)})
 
     val minimalSemiJoin = new MinimalSemiJoin(spark, numOfPartitions).importObjects(inputMappedR, inputMappedT)
-    val outputMA = new MinimalAlgorithm[SemiJoinType](spark, numOfPartitions).importObjects(minimalSemiJoin.execute)
-    //outputMA.perfectSort.objects.map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath)
+    val outputMA = new MinimalAlgorithm[SemiJoinType](spark, numOfPartitions).importObjects(minimalSemiJoin.execute(SemiJoinType.cmpKey))
+    outputMA.perfectSort(SemiJoinType.cmpKey).map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

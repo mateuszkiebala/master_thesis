@@ -1,5 +1,5 @@
 package minimal_algorithms.group_by
-
+/*
 import minimal_algorithms.{MinimalAlgorithm, MinimalAlgorithmObject}
 import minimal_algorithms.examples.group_by.IntKey
 import minimal_algorithms.statistics_aggregators._
@@ -63,3 +63,4 @@ object ExampleGroupBy {
     spark.stop()
   }
 }
+*/

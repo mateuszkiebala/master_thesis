@@ -12,10 +12,10 @@ object ExampleRanking {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new RankingMAO(p(0).toInt, p(1).toDouble)})
+      new RankingObject(p(0).toInt, p(1).toDouble)})
 
-    val minimalAlgorithm = new MinimalAlgorithm[RankingMAO](spark, numOfPartitions)
-    minimalAlgorithm.importObjects(inputMapped).computeRanking.saveAsTextFile(outputPath)
+    val minimalAlgorithm = new MinimalAlgorithm[RankingObject](spark, numOfPartitions)
+    minimalAlgorithm.importObjects(inputMapped).computeRanking(RankingObject.cmpKey).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

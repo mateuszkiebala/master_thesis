@@ -11,7 +11,7 @@ import scala.reflect.ClassTag
   * @param numOfPartitions  Number of partitions.
   * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
   */
-class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag]
+class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -19,7 +19,7 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : Clas
     * Order for equal objects is picked randomly.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def computePrefix: RDD[(StatisticsAggregator, T)] = computePrefix(this.objects)
+  def prefix[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = prefix(this.objects, cmpKey)
 
   /**
     * Computes prefix aggregation on provided RDD. First orders elements and then computes prefixes.
@@ -27,31 +27,8 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject[T] : Clas
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def computePrefix(rdd: RDD[T]): RDD[(StatisticsAggregator, T)] = {
-    val sortedRdd = teraSorted(rdd).persist()
-    val prefixPartitionsStatistics = sc.broadcast(getPrefixedPartitionStatistics(sortedRdd))
-    sortedRdd.mapPartitionsWithIndex((index, partition) => {
-      if (partition.isEmpty) {
-        Iterator()
-      } else {
-        val smaoObjects = partition.toList
-        val prefix = if (index == 0) {
-          smaoObjects.tail.scanLeft(smaoObjects.head.getAggregator){(res, a) => res.merge(a.getAggregator)}
-        } else {
-          smaoObjects.map(smao => smao.getAggregator).scanLeft(prefixPartitionsStatistics.value(index-1))((res, a) => res.merge(a)).tail
-        }
-        smaoObjects.zipWithIndex.map{
-          case (smao, i) => (prefix(i), smao)
-          case _         => throw new Exception("Error while creating prefix values")
-        }.toIterator
-      }
-    })
-  }
-
-  def prefix: RDD[(StatisticsAggregator, T)] = prefix(this.objects)
-
-  def prefix(rdd: RDD[T]): RDD[(StatisticsAggregator, T)] = {
-    val sortedRdd = teraSorted(rdd).persist()
+  def prefix[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = {
+    val sortedRdd = teraSorted(rdd, cmpKey).persist()
     val prefixPartitionsStatistics = sendToAllHigherMachines(getPrefixedPartitionStatistics(sortedRdd).zip(List.range(1, this.numOfPartitions)))
 
     sortedRdd.zipPartitions(prefixPartitionsStatistics){(partitionIt, partitionPrefixIt) => {

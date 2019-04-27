@@ -8,9 +8,8 @@ import scala.reflect.ClassTag
   * Class implementing base functions required to create a minimal algorithm.
   * @param spark  SparkSession object
   * @param numOfPartitions  Number of partitions.
-  * @tparam T T <: MinimalAlgorithmObject[T] : ClassTag
   */
-class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int) {
+class MinimalAlgorithm[T <: Serializable : ClassTag](spark: SparkSession, numOfPartitions: Int) {
   protected val sc = spark.sparkContext
   var objects: RDD[T] = sc.emptyRDD
   var itemsCntByPartition: Int = 0
@@ -32,8 +31,8 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Applies Tera Sort algorithm on imported objects. Function affects imported objects.
     * @return this
     */
-  def teraSort: this.type = {
-    this.objects = this.objects.sortBy(identity).persist()
+  def teraSort[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): this.type = {
+    this.objects = this.objects.sortBy(cmpKey).persist()
     this
   }
 
@@ -41,8 +40,8 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param rdd  RDD on which Tera Sort will be performed.
     * @return Sorted RDD.
     */
-  def teraSorted(rdd: RDD[T]): RDD[T] = {
-    rdd.repartition(numOfPartitions).sortBy(identity)
+  def teraSorted[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[T] = {
+    rdd.repartition(numOfPartitions).sortBy(cmpKey)
   }
 
   /**
@@ -50,7 +49,7 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Each object has unique ranking. Ranking starts from 0 index.
     * @return RDD of pairs (ranking, object)
     */
-  def computeRanking: RDD[(Int, T)] = computeRanking(this.objects)
+  def computeRanking[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(Int, T)] = computeRanking(this.objects, cmpKey)
 
   /**
     * Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
@@ -58,8 +57,8 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (ranking, object)
     */
-  def computeRanking(rdd: RDD[T]): RDD[(Int, T)] = {
-    val sortedRdd = teraSorted(rdd).persist()
+  def computeRanking[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(Int, T)] = {
+    val sortedRdd = teraSorted(rdd, cmpKey).persist()
     val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(sortedRdd).collect().scanLeft(0)(_+_))
     sortedRdd.mapPartitionsWithIndex((index, partition) => {
       val offset = prefixSumsOfPartitionSizes.value(index)
@@ -77,8 +76,8 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * Sorts and perfectly balances imported objects. Function affects imported objects.
     * @return this
     */
-  def perfectSort: RDD[T] = {
-    this.objects = perfectlySortedWithRanks(this.objects).map(o => o._2).persist()
+  def perfectSort[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[T] = {
+    this.objects = perfectlySortedWithRanks(this.objects, cmpKey).map(o => o._2).persist()
     this.objects
   }
 
@@ -87,16 +86,16 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param rdd  RDD with objects to process.
     * @return Perfectly balanced RDD of objects
     */
-  def perfectlySorted(rdd: RDD[T]): RDD[T] = {
-    perfectlySortedWithRanks(rdd).map(o => o._2)
+  def perfectlySorted[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[T] = {
+    perfectlySortedWithRanks(rdd, cmpKey).map(o => o._2)
   }
 
   /**
     * Sorts and perfectly balances imported objects.
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
-  def perfectlySortedWithRanks: RDD[(Int, T)] = {
-    perfectlySortedWithRanks(this.objects)
+  def perfectlySortedWithRanks[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(Int, T)] = {
+    perfectlySortedWithRanks(this.objects, cmpKey)
   }
 
   /**
@@ -104,8 +103,8 @@ class MinimalAlgorithm[T <: MinimalAlgorithmObject[T] : ClassTag](spark: SparkSe
     * @param rdd  RDD with objects to process.
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
-  def perfectlySortedWithRanks(rdd: RDD[T]): RDD[(Int, T)] = {
-    computeRanking(rdd).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+  def perfectlySortedWithRanks[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(Int, T)] = {
+    computeRanking(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
   }
 
   /**

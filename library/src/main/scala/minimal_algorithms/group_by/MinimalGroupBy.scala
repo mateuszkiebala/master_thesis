@@ -18,7 +18,7 @@ class MinimalGroupBy[T <: GroupByObject : ClassTag]
 
   def execute: RDD[(GroupByKey, StatisticsAggregator)] = {
     val masterIndex = 0
-    perfectSort.mapPartitionsWithIndex((pIndex, partition) => {
+    perfectSort(GroupByObject.cmpKey).mapPartitionsWithIndex((pIndex, partition) => {
       if (partition.isEmpty) {
         Iterator()
       } else {

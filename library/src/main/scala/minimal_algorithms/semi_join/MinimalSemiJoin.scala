@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
   * @param numOfPartitions  Number of partitions
   * @tparam T T <: SemiJoinObject[T] : ClassTag
   */
-class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, numOfPartitions: Int)
+class MinimalSemiJoin[T <: SemiJoinObject : ClassTag](spark: SparkSession, numOfPartitions: Int)
   extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -30,11 +30,11 @@ class MinimalSemiJoin[T <: SemiJoinObject[T] : ClassTag](spark: SparkSession, nu
     * Runs semi join algorithm on imported data.
     * @return RDD of objects that belong to set R and have a match in set T.
     */
-  def execute: RDD[T] = {
-    val rdd = perfectlySorted(this.objects)
+  def execute[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[T] = {
+    val rdd = perfectlySorted(this.objects, cmpKey)
     val TBounds = sc.broadcast(rdd.mapPartitions(partition => {
       val tObjects = partition.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
-      if (tObjects.nonEmpty) Iterator(tObjects.min.getKey, tObjects.max.getKey) else Iterator.empty
+      if (tObjects.nonEmpty) Iterator(tObjects.head.getKey, tObjects.last.getKey) else Iterator.empty
     }).collect().toSet)
 
     rdd.mapPartitions(partition => {

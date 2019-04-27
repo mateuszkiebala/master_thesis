@@ -1,5 +1,6 @@
 package minimal_algorithms.sliding_aggregation
 
+
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 import minimal_algorithms.{RangeTree, StatisticsMinimalAlgorithm, StatisticsMinimalAlgorithmObject}
 import org.apache.spark.rdd.RDD
@@ -13,7 +14,7 @@ import scala.reflect.ClassTag
   * @param numOfPartitions  Number of partitions
   * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
   */
-class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : ClassTag]
+class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -22,8 +23,8 @@ class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : Class
     * @param windowLength Window length
     * @return RDD of pairs (object, sliding aggregation value)
     */
-  def execute(input: RDD[T], windowLength: Int): RDD[(T, StatisticsAggregator)] = {
-    val dataWithRanks = importObjects(input).perfectlySortedWithRanks.persist()
+  def execute[K](input: RDD[T], windowLength: Int, cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(T, StatisticsAggregator)] = {
+    val dataWithRanks = importObjects(input).perfectlySortedWithRanks(cmpKey).persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
     val elements = getPartitionsStatistics(dataWithRanks.map{e => e._2}).collect().zipWithIndex
     val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements)).value
@@ -68,7 +69,7 @@ class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject[T] : Class
     rdd.mapPartitionsWithIndex((index, partition) => {
       val pEleMinRank = index * itemsCntByPartition
       val pEleMaxRank = (index + 1) * itemsCntByPartition - 1
-      val partitionObjects = partition.toList.sorted
+      val partitionObjects = partition.toList
 
       val baseObjects = partitionObjects.filter{case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
       val rankToIndex = partitionObjects.map{case (rank, _) => rank}.zipWithIndex.toMap
