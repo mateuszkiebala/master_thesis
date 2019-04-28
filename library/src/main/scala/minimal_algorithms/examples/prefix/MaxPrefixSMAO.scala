@@ -12,6 +12,10 @@ object MaxPrefixSMAO {
   def cmpKey(o: MaxPrefixSMAO): MaxPrefixComparator = {
     new MaxPrefixComparator(o)
   }
+
+  def statsAgg(o: MaxPrefixSMAO): MaxAggregator = {
+    new MaxAggregator(o.getWeight)
+  }
 }
 
 class MaxPrefixComparator(prefixObject: MaxPrefixSMAO) extends Comparable[MaxPrefixComparator] with Serializable {

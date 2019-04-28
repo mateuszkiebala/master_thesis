@@ -10,6 +10,10 @@ object SumSlidingSMAO {
   def cmpKey(o: SumSlidingSMAO): SumSlidingComparator = {
     new SumSlidingComparator(o)
   }
+
+  def statsAgg(o: SumSlidingSMAO): SumAggregator = {
+    new SumAggregator(o.getWeight)
+  }
 }
 
 class SumSlidingComparator(slidingObject: SumSlidingSMAO) extends Comparable[SumSlidingComparator] with Serializable {

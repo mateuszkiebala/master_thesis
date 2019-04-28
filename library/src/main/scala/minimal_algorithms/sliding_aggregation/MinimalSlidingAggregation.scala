@@ -14,7 +14,8 @@ import scala.reflect.ClassTag
   * @param numOfPartitions  Number of partitions
   * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
   */
-class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject : ClassTag]
+
+class MinimalSlidingAggregation[T <: Serializable : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -23,12 +24,13 @@ class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject : ClassTag
     * @param windowLength Window length
     * @return RDD of pairs (object, sliding aggregation value)
     */
-  def execute[K](input: RDD[T], windowLength: Int, cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(T, StatisticsAggregator)] = {
+  def execute[K](input: RDD[T], windowLength: Int, cmpKey: T => K, statsAgg: T => StatisticsAggregator)
+                (implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(T, StatisticsAggregator)] = {
     val dataWithRanks = importObjects(input).perfectlySortedWithRanks(cmpKey).persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
-    val elements = getPartitionsStatistics(dataWithRanks.map{e => e._2}).collect().zipWithIndex
+    val elements = getPartitionsStatistics(dataWithRanks.map{e => e._2}, statsAgg).collect().zipWithIndex
     val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements)).value
-    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree)
+    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, statsAgg)
   }
 
   /**
@@ -65,7 +67,7 @@ class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject : ClassTag
   }
 
   private[this] def computeWindowValues(rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int,
-                          partitionsRangeTree: RangeTree): RDD[(T, StatisticsAggregator)]= {
+                          partitionsRangeTree: RangeTree, statsAgg: T => StatisticsAggregator): RDD[(T, StatisticsAggregator)]= {
     rdd.mapPartitionsWithIndex((index, partition) => {
       val pEleMinRank = index * itemsCntByPartition
       val pEleMaxRank = (index + 1) * itemsCntByPartition - 1
@@ -73,7 +75,7 @@ class MinimalSlidingAggregation[T <: StatisticsMinimalAlgorithmObject : ClassTag
 
       val baseObjects = partitionObjects.filter{case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
       val rankToIndex = partitionObjects.map{case (rank, _) => rank}.zipWithIndex.toMap
-      val rangeTree = new RangeTree(partitionObjects.map{case (rank, o) => (o.getAggregator, rankToIndex(rank))}.toArray)
+      val rangeTree = new RangeTree(partitionObjects.map{case (rank, o) => (statsAgg(o), rankToIndex(rank))}.toArray)
 
       baseObjects.map{case (rank, smao) => {
         val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1

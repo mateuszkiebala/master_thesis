@@ -17,7 +17,7 @@ object ExamplePrefix {
       new SumPrefixSMAO(p(1).toDouble)})
 
     val sma = new StatisticsMinimalAlgorithm[SumPrefixSMAO](spark, numOfPartitions)
-    sma.importObjects(inputMapped).prefix(SumPrefixSMAO.cmpKey).saveAsTextFile(outputPath)
+    sma.importObjects(inputMapped).prefix(SumPrefixSMAO.cmpKey, SumPrefixSMAO.statsAgg).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

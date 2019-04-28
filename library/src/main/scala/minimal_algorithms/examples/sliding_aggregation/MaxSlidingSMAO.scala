@@ -10,6 +10,10 @@ object MaxSlidingSMAO {
   def cmpKey(o: MaxSlidingSMAO): MaxSlidingComparator = {
     new MaxSlidingComparator(o)
   }
+
+  def statsAgg(o: MaxSlidingSMAO): MaxAggregator = {
+    new MaxAggregator(o.getWeight)
+  }
 }
 
 class MaxSlidingComparator(slidingObject: MaxSlidingSMAO) extends Comparable[MaxSlidingComparator] with Serializable {

@@ -10,6 +10,10 @@ object MinSlidingSMAO {
   def cmpKey(o: MinSlidingSMAO): MinSlidingComparator = {
     new MinSlidingComparator(o)
   }
+
+  def statsAgg(o: MinSlidingSMAO): MinAggregator = {
+    new MinAggregator(o.getWeight)
+  }
 }
 
 class MinSlidingComparator(slidingObject: MinSlidingSMAO) extends Comparable[MinSlidingComparator] with Serializable {

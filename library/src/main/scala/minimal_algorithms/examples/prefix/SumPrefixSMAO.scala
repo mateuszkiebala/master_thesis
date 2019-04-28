@@ -12,6 +12,10 @@ object SumPrefixSMAO {
   def cmpKey(o: SumPrefixSMAO): SumPrefixComparator = {
     new SumPrefixComparator(o)
   }
+
+  def statsAgg(o: SumPrefixSMAO): SumAggregator = {
+    new SumAggregator(o.getWeight)
+  }
 }
 
 class SumPrefixComparator(prefixObject: SumPrefixSMAO) extends Comparable[SumPrefixComparator] with Serializable {

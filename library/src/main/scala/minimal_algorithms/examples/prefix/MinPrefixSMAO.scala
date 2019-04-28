@@ -12,6 +12,10 @@ object MinPrefixSMAO {
   def cmpKey(o: MinPrefixSMAO): MinPrefixComparator = {
     new MinPrefixComparator(o)
   }
+
+  def statsAgg(o: MinPrefixSMAO): MinAggregator = {
+    new MinAggregator(o.getWeight)
+  }
 }
 
 class MinPrefixComparator(prefixObject: MinPrefixSMAO) extends Comparable[MinPrefixComparator] with Serializable {

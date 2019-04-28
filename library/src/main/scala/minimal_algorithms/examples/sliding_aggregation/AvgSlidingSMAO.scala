@@ -10,6 +10,10 @@ object AvgSlidingSMAO {
   def cmpKey(o: AvgSlidingSMAO): AvgSlidingComparator = {
     new AvgSlidingComparator(o)
   }
+
+  def statsAgg(o: AvgSlidingSMAO): AvgAggregator = {
+    new AvgAggregator(o.getWeight, 1)
+  }
 }
 
 class AvgSlidingComparator(slidingObject: AvgSlidingSMAO) extends Comparable[AvgSlidingComparator] with Serializable {

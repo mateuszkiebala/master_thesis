@@ -9,9 +9,8 @@ import scala.reflect.ClassTag
   * Class implementing base functions required to create a minimal algorithm with statistics computed on objects.
   * @param spark  SparkSession object
   * @param numOfPartitions  Number of partitions.
-  * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
   */
-class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject : ClassTag]
+class StatisticsMinimalAlgorithm[T <: Serializable : ClassTag]
   (spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
@@ -19,7 +18,8 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject : ClassTa
     * Order for equal objects is picked randomly.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def prefix[K](cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = prefix(this.objects, cmpKey)
+  def prefix[K](cmpKey: T => K, statsAgg: T => StatisticsAggregator)
+               (implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = prefix(this.objects, cmpKey, statsAgg)
 
   /**
     * Computes prefix aggregation on provided RDD. First orders elements and then computes prefixes.
@@ -27,18 +27,19 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject : ClassTa
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def prefix[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = {
+  def prefix[K](rdd: RDD[T], cmpKey: T => K, statsAgg: T => StatisticsAggregator)
+               (implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
-    val prefixPartitionsStatistics = sendToAllHigherMachines(getPrefixedPartitionStatistics(sortedRdd).zip(List.range(1, this.numOfPartitions)))
+    val prefixPartitionsStatistics = sendToAllHigherMachines(getPrefixedPartitionStatistics(sortedRdd, statsAgg).zip(List.range(1, this.numOfPartitions)))
 
     sortedRdd.zipPartitions(prefixPartitionsStatistics){(partitionIt, partitionPrefixIt) => {
       if (partitionIt.hasNext) {
         val elements = partitionIt.toList
         val prefixes = if (partitionPrefixIt.hasNext) {
           val partitionPrefix = partitionPrefixIt.next
-          elements.map(e => e.getAggregator).scanLeft(partitionPrefix)((res, a) => res.merge(a)).tail
+          elements.map(e => statsAgg(e)).scanLeft(partitionPrefix)((res, a) => res.merge(a)).tail
         } else {
-          elements.tail.scanLeft(elements.head.getAggregator){(res, a) => res.merge(a.getAggregator)}
+          elements.tail.scanLeft(statsAgg(elements.head)){(res, a) => res.merge(statsAgg(a))}
         }
         prefixes.zip(elements).iterator
       } else {
@@ -52,8 +53,8 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject : ClassTa
     * @param rdd  RDD of objects
     * @return Array of prefix statistics for partitions
     */
-  def getPrefixedPartitionStatistics(rdd: RDD[T]): Array[StatisticsAggregator] = {
-    val elements = getPartitionsStatistics(rdd).collect()
+  def getPrefixedPartitionStatistics(rdd: RDD[T], statsAgg: T => StatisticsAggregator): Array[StatisticsAggregator] = {
+    val elements = getPartitionsStatistics(rdd, statsAgg).collect()
     if (elements.isEmpty) {
       Array()
     } else {
@@ -66,13 +67,13 @@ class StatisticsMinimalAlgorithm[T <: StatisticsMinimalAlgorithmObject : ClassTa
     * @param rdd  Elements
     * @return RDD[aggregated value for partition]
     */
-  def getPartitionsStatistics(rdd: RDD[T]): RDD[StatisticsAggregator] = {
+  def getPartitionsStatistics(rdd: RDD[T], statsAgg: T => StatisticsAggregator): RDD[StatisticsAggregator] = {
     rdd.mapPartitions(partition => {
       if (partition.isEmpty) {
         Iterator()
       } else {
         val elements = partition.toList
-        Iterator(elements.tail.foldLeft(elements.head.getAggregator){(acc, o) => acc.merge(o.getAggregator)})
+        Iterator(elements.tail.foldLeft(statsAgg(elements.head)){(acc, o) => acc.merge(statsAgg(o))})
       }
     })
   }
