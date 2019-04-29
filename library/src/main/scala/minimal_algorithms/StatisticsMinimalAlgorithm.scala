@@ -10,16 +10,16 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession object
   * @param numOfPartitions  Number of partitions.
   */
-class StatisticsMinimalAlgorithm[T <: Serializable : ClassTag]
-  (spark: SparkSession, numOfPartitions: Int) extends MinimalAlgorithm[T](spark, numOfPartitions) {
+class StatisticsMinimalAlgorithm[T <: Serializable]
+  (spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T]) extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
     * Applies prefix aggregation on imported objects. First orders elements and then computes prefixes.
     * Order for equal objects is picked randomly.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def prefix[K](cmpKey: T => K, statsAgg: T => StatisticsAggregator)
-               (implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = prefix(this.objects, cmpKey, statsAgg)
+  def prefix[K, S <: StatisticsAggregator[S]](cmpKey: T => K, statsAgg: T => S)
+               (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = prefix(this.objects, cmpKey, statsAgg)
 
   /**
     * Computes prefix aggregation on provided RDD. First orders elements and then computes prefixes.
@@ -27,8 +27,8 @@ class StatisticsMinimalAlgorithm[T <: Serializable : ClassTag]
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def prefix[K](rdd: RDD[T], cmpKey: T => K, statsAgg: T => StatisticsAggregator)
-               (implicit ord: Ordering[K], ctag: ClassTag[K]): RDD[(StatisticsAggregator, T)] = {
+  def prefix[K, S <: StatisticsAggregator[S]](rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)
+               (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
     val prefixPartitionsStatistics = sendToAllHigherMachines(getPrefixedPartitionStatistics(sortedRdd, statsAgg).zip(List.range(1, this.numOfPartitions)))
 
@@ -53,10 +53,10 @@ class StatisticsMinimalAlgorithm[T <: Serializable : ClassTag]
     * @param rdd  RDD of objects
     * @return Array of prefix statistics for partitions
     */
-  def getPrefixedPartitionStatistics(rdd: RDD[T], statsAgg: T => StatisticsAggregator): Array[StatisticsAggregator] = {
+  def getPrefixedPartitionStatistics[S <: StatisticsAggregator[S]](rdd: RDD[T], statsAgg: T => S)(implicit stag: ClassTag[S]): Array[S] = {
     val elements = getPartitionsStatistics(rdd, statsAgg).collect()
     if (elements.isEmpty) {
-      Array()
+      Array[S]()
     } else {
       elements.tail.scanLeft(elements.head){(res, a) => res.merge(a)}
     }
@@ -67,7 +67,7 @@ class StatisticsMinimalAlgorithm[T <: Serializable : ClassTag]
     * @param rdd  Elements
     * @return RDD[aggregated value for partition]
     */
-  def getPartitionsStatistics(rdd: RDD[T], statsAgg: T => StatisticsAggregator): RDD[StatisticsAggregator] = {
+  def getPartitionsStatistics[S <: StatisticsAggregator[S]](rdd: RDD[T], statsAgg: T => S)(implicit stag: ClassTag[S]): RDD[S] = {
     rdd.mapPartitions(partition => {
       if (partition.isEmpty) {
         Iterator()

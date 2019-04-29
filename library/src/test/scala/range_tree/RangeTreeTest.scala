@@ -4,28 +4,28 @@ import minimal_algorithms.RangeTree
 import minimal_algorithms.statistics_aggregators._
 
 class RangeTreeTest extends FunSuite {
-  def sumWrapInsert(elements: Array[(Double, Int)]): Array[(StatisticsAggregator, Int)] = {
+  def sumWrapInsert(elements: Array[(Double, Int)]): Array[(SumAggregator, Int)] = {
     elements.map{case(e, pos) => (new SumAggregator(e), pos)}
   }
 
-  def sumUnwrap(elements: Array[StatisticsAggregator]): Array[Double] = {
-    elements.map{e => if (e == null) 0.0 else e.asInstanceOf[SumAggregator].getValue}
+  def sumUnwrap(elements: Array[SumAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) 0.0 else e.getValue}
   }
 
-  def minWrapInsert(elements: Array[(Double, Int)]): Array[(StatisticsAggregator, Int)] = {
+  def minWrapInsert(elements: Array[(Double, Int)]): Array[(MinAggregator, Int)] = {
     elements.map{case(e, pos) => (new MinAggregator(e), pos)}
   }
 
-  def minUnwrap(elements: Array[StatisticsAggregator]): Array[Double] = {
-    elements.map{e => if (e == null) Double.MaxValue else e.asInstanceOf[MinAggregator].getValue}
+  def minUnwrap(elements: Array[MinAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) Double.MaxValue else e.getValue}
   }
 
-  def maxWrapInsert(elements: Array[(Double, Int)]): Array[(StatisticsAggregator, Int)] = {
+  def maxWrapInsert(elements: Array[(Double, Int)]): Array[(MaxAggregator, Int)] = {
     elements.map{case(e, pos) => (new MaxAggregator(e), pos)}
   }
 
-  def maxUnwrap(elements: Array[StatisticsAggregator]): Array[Double] = {
-    elements.map{e => if (e == null) Double.MinValue else e.asInstanceOf[MaxAggregator].getValue}
+  def maxUnwrap(elements: Array[MaxAggregator]): Array[Double] = {
+    elements.map{e => if (e == null) Double.MinValue else e.getValue}
   }
 
   test("RangeTree.init one node tree") {

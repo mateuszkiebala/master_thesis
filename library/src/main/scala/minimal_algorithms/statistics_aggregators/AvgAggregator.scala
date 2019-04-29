@@ -1,12 +1,11 @@
 package minimal_algorithms.statistics_aggregators
 
-class AvgAggregator(sum: Double, count: Int) extends StatisticsAggregator {
+class AvgAggregator(sum: Double, count: Int) extends StatisticsAggregator[AvgAggregator] {
   def getSum: Double = sum
   def getCount: Int = count
 
-  override def merge(that: StatisticsAggregator): StatisticsAggregator = {
-    val o = that.asInstanceOf[AvgAggregator]
-    new AvgAggregator(this.sum + o.getSum, this.count + o.getCount)
+  override def merge(that: AvgAggregator): AvgAggregator = {
+    new AvgAggregator(this.sum + that.getSum, this.count + that.getCount)
   }
 
   def canEqual(a: Any): Boolean = a.isInstanceOf[AvgAggregator]

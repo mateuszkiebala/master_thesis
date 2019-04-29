@@ -2,18 +2,25 @@ package prefix
 
 import minimal_algorithms.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.StatisticsMinimalAlgorithm
-import minimal_algorithms.examples.prefix.{MaxPrefixSMAO, MinPrefixSMAO, SumPrefixSMAO}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
 
+class TestPrefixObject(weight: Double) extends Serializable {
+  override def toString: String = "Weight: " + this.weight
+  def getWeight: Double = this.weight
+}
+
 class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
-  val elements = Seq(1, 5, -10, 1, 2, 1, 12, 10, -7, 2)
+  val rdd = spark.sparkContext.parallelize(Seq(1, 5, -10, 1, 2, 1, 12, 10, -7, 2).map{e => new TestPrefixObject(e)})
+  val minimalAlgorithm = new StatisticsMinimalAlgorithm[TestPrefixObject](spark, 2).importObjects(rdd)
+  val cmpKey = (o: TestPrefixObject) => o.getWeight
 
   test("Prefix sum") {
+      // given
+    val statsAgg = (o: TestPrefixObject) => new SumAggregator(o.getWeight)
+
       // when
-    val minimalAlgorithm = new StatisticsMinimalAlgorithm[SumPrefixSMAO](spark, 2)
-    val rdd = spark.sparkContext.parallelize(elements.map{e => new SumPrefixSMAO(e)})
-    val result = minimalAlgorithm.importObjects(rdd).prefix(SumPrefixSMAO.cmpKey, SumPrefixSMAO.statsAgg).collect()
+    val result = minimalAlgorithm.prefix(cmpKey, statsAgg).collect()
 
       // then
     val expected = Array(-10, -17, -16, -15, -14, -12, -10, -5, 5, 17)
@@ -21,10 +28,11 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   }
 
   test("Prefix min") {
+      // given
+    val statsAgg = (o: TestPrefixObject) => new MinAggregator(o.getWeight)
+
       // when
-    val minimalAlgorithm = new StatisticsMinimalAlgorithm[MinPrefixSMAO](spark, 2)
-    val rdd = spark.sparkContext.parallelize(elements.map{e => new MinPrefixSMAO(e)})
-    val result = minimalAlgorithm.importObjects(rdd).prefix(MinPrefixSMAO.cmpKey, MinPrefixSMAO.statsAgg).collect()
+    val result = minimalAlgorithm.prefix(cmpKey, statsAgg).collect()
 
       // then
     val expected = Array(-10, -10, -10, -10, -10, -10, -10, -10, -10, -10)
@@ -32,10 +40,11 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   }
 
   test("Prefix max") {
+      // given
+    val statsAgg = (o: TestPrefixObject) => new MaxAggregator(o.getWeight)
+
       // when
-    val minimalAlgorithm = new StatisticsMinimalAlgorithm[MaxPrefixSMAO](spark, 2)
-    val rdd = spark.sparkContext.parallelize(elements.map{e => new MaxPrefixSMAO(e)})
-    val result = minimalAlgorithm.importObjects(rdd).prefix(MaxPrefixSMAO.cmpKey, MaxPrefixSMAO.statsAgg).collect()
+    val result = minimalAlgorithm.prefix(cmpKey, statsAgg).collect()
 
       // then
     val expected = Array(-10, -7, 1, 1, 1, 2, 2, 5, 10, 12)

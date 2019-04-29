@@ -3,7 +3,7 @@ package minimal_algorithms.examples.prefix
 import minimal_algorithms.StatisticsMinimalAlgorithm
 import minimal_algorithms.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
-
+/*
 object ExamplePrefix {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("ExamplePrefix").master("local").getOrCreate()
@@ -21,3 +21,4 @@ object ExamplePrefix {
     spark.stop()
   }
 }
+*/

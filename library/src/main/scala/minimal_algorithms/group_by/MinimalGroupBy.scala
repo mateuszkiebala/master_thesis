@@ -11,26 +11,26 @@ import scala.reflect.ClassTag
   * Class implementing group by algorithm.
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
-  * @tparam T T <: GroupByObject[T] : ClassTag
   */
-class MinimalGroupBy[T <: GroupByObject : ClassTag]
-  (spark: SparkSession, numOfPartitions: Int) extends StatisticsMinimalAlgorithm[GroupByObject](spark, numOfPartitions) {
+class MinimalGroupBy[T <: Serializable](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T])
+  extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
-  def execute: RDD[(GroupByKey, StatisticsAggregator)] = {
+  def execute[K, S <: StatisticsAggregator[S]](cmpKey: T => K, statsAgg: T => S)
+                (implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
     val masterIndex = 0
-    perfectSort(GroupByObject.cmpKey).mapPartitionsWithIndex((pIndex, partition) => {
+    perfectSort(cmpKey).mapPartitionsWithIndex((pIndex, partition) => {
       if (partition.isEmpty) {
         Iterator()
       } else {
-        val grouped = partition.toList.groupBy(o => o.getKey)
+        val grouped = partition.toList.groupBy(cmpKey)
         val minKey = grouped.keys.min
         val maxKey = grouped.keys.max
         grouped.map{ case (key, values) => {
           val destMachine = if (key == minKey || key == maxKey) masterIndex else pIndex
           val statsAggObject = if (values.isEmpty) {
-            null.asInstanceOf[StatisticsAggregator]
+            null.asInstanceOf[S]
           } else {
-            values.tail.foldLeft(values.head.getAggregator){(res, o) => safeMerge(res, o.getAggregator)}
+            values.tail.foldLeft(statsAgg(values.head)){(res, o) => safeMerge(res, statsAgg(o))}
           }
           (destMachine, new GroupByObject(statsAggObject, key))
         }
@@ -43,7 +43,7 @@ class MinimalGroupBy[T <: GroupByObject : ClassTag]
             .groupBy{o => o.getKey}
             .map{ case (key, values) => {
               val resultStatsAgg = if (values.isEmpty) {
-                null.asInstanceOf[StatisticsAggregator]
+                null.asInstanceOf[S]
               } else {
                 values.tail.foldLeft(values.head.getAggregator){(res, o) => safeMerge(res, o.getAggregator)}
               }
@@ -55,4 +55,9 @@ class MinimalGroupBy[T <: GroupByObject : ClassTag]
         }
       }).persist()
   }
+}
+
+class GroupByObject[K, S <: StatisticsAggregator[S]](aggregator: S, key: K) extends Serializable {
+  def getAggregator: S = this.aggregator
+  def getKey: K = this.key
 }

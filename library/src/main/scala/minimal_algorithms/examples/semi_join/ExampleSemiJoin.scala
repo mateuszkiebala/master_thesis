@@ -3,7 +3,7 @@ package minimal_algorithms.examples.semi_join
 import minimal_algorithms.{MinimalAlgorithm, MinimalSemiJoin}
 import minimal_algorithms.semi_join.SemiJoinSetTypeEnum
 import org.apache.spark.sql.SparkSession
-
+/*
 object ExampleSemiJoin {
   def main(args: Array[String]) = {
     val spark = SparkSession.builder().appName("ExampleSemiJoin").master("local").getOrCreate()
@@ -22,9 +22,10 @@ object ExampleSemiJoin {
       val p = line.split(' ')
       new SemiJoinType(p(0).toInt, p(1).toDouble, SemiJoinSetTypeEnum.TType)})
 
-    val minimalSemiJoin = new MinimalSemiJoin(spark, numOfPartitions).importObjects(inputMappedR, inputMappedT)
+    val minimalSemiJoin = new MinimalSemiJoin(spark, numOfPartitions, SemiJoinType.retrieveSetType).importObjects(inputMappedR, inputMappedT)
     val outputMA = new MinimalAlgorithm[SemiJoinType](spark, numOfPartitions).importObjects(minimalSemiJoin.execute(SemiJoinType.cmpKey))
     outputMA.perfectSort(SemiJoinType.cmpKey).map(res => res.getKey.toString + " " + res.getWeight.toInt.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
 }
+*/
