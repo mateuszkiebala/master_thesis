@@ -1,6 +1,7 @@
 package minimal_algorithms
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
+import minimal_algorithms.statistics_aggregators.StatisticsHelper._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
@@ -36,12 +37,11 @@ class StatisticsMinimalAlgorithm[T <: Serializable]
     sortedRdd.zipPartitions(partitionStatistics){(partitionIt, partitionStatisticsIt) => {
       if (partitionIt.hasNext) {
         val elements = partitionIt.toList
+        val statistics = elements.map{e => statsAgg(e)}
         val prefixes = if (partitionStatisticsIt.hasNext) {
-          val start = partitionStatisticsIt.next
-          val partitionStatisticsValue = partitionStatisticsIt.foldLeft(start){(res, a) => res.merge(a)}
-          elements.map(e => statsAgg(e)).scanLeft(partitionStatisticsValue)((res, a) => res.merge(a)).tail
+          scanLeft(statistics, foldLeft(partitionStatisticsIt)).drop(1)
         } else {
-          elements.tail.scanLeft(statsAgg(elements.head)){(res, a) => res.merge(statsAgg(a))}
+          scanLeft(statistics)
         }
         prefixes.zip(elements).iterator
       } else {
@@ -55,13 +55,9 @@ class StatisticsMinimalAlgorithm[T <: Serializable]
     * @param rdd  RDD of objects
     * @return Array of prefix statistics for partitions
     */
-  def prefixedPartitionStatistics[S <: StatisticsAggregator[S]](rdd: RDD[T], statsAgg: T => S)(implicit stag: ClassTag[S]): Array[S] = {
+  def prefixedPartitionStatistics[S <: StatisticsAggregator[S]](rdd: RDD[T], statsAgg: T => S)(implicit stag: ClassTag[S]): Seq[S] = {
     val elements = partitionsStatistics(rdd, statsAgg).collect()
-    if (elements.isEmpty) {
-      Array[S]()
-    } else {
-      elements.tail.scanLeft(elements.head){(res, a) => res.merge(a)}
-    }
+    if (elements.isEmpty) Seq[S]() else scanLeft(elements)
   }
 
   /**
@@ -74,8 +70,8 @@ class StatisticsMinimalAlgorithm[T <: Serializable]
       if (partition.isEmpty) {
         Iterator()
       } else {
-        val elements = partition.toList
-        Iterator(elements.tail.foldLeft(statsAgg(elements.head)){(acc, o) => acc.merge(statsAgg(o))})
+        val start = partition.next
+        Iterator(partition.foldLeft(statsAgg(start)){(acc, o) => acc.merge(statsAgg(o))})
       }
     })
   }

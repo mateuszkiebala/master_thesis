@@ -5,7 +5,7 @@ import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 import minimal_algorithms.{RangeTree, StatisticsMinimalAlgorithm}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
+import minimal_algorithms.statistics_aggregators.StatisticsHelper.safeMerge
 import scala.reflect.ClassTag
 
 /**

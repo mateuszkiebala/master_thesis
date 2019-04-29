@@ -4,7 +4,7 @@ import minimal_algorithms.statistics_aggregators._
 import minimal_algorithms.{KeyPartitioner, StatisticsMinimalAlgorithm}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import minimal_algorithms.statistics_aggregators.Helpers.safeMerge
+import minimal_algorithms.statistics_aggregators.StatisticsHelper._
 import scala.reflect.ClassTag
 
 /**
@@ -27,28 +27,18 @@ class MinimalGroupBy[T <: Serializable](spark: SparkSession, numOfPartitions: In
         val maxKey = grouped.keys.max
         grouped.map{ case (key, values) => {
           val destMachine = if (key == minKey || key == maxKey) masterIndex else pIndex
-          val statsAggObject = if (values.isEmpty) {
-            null.asInstanceOf[S]
-          } else {
-            values.tail.foldLeft(statsAgg(values.head)){(res, o) => safeMerge(res, statsAgg(o))}
-          }
+          val statsAggObject = if (values.isEmpty) null.asInstanceOf[S] else foldLeft(values.map{v => statsAgg(v)})
           (destMachine, new GroupByObject(statsAggObject, key))
-        }
-        }(collection.breakOut).toIterator
+        }}(collection.breakOut).toIterator
       }
     }).partitionBy(new KeyPartitioner(this.numOfPartitions)).map(p => p._2)
       .mapPartitionsWithIndex((pIndex, partition) => {
         if (pIndex == masterIndex) {
           partition.toList
             .groupBy{o => o.getKey}
-            .map{ case (key, values) => {
-              val resultStatsAgg = if (values.isEmpty) {
-                null.asInstanceOf[S]
-              } else {
-                values.tail.foldLeft(values.head.getAggregator){(res, o) => safeMerge(res, o.getAggregator)}
-              }
-              (key, resultStatsAgg)
-            } }(collection.breakOut)
+            .map{case (key, values) => {
+              (key, if (values.isEmpty) null.asInstanceOf[S] else foldLeft(values.map{v => v.getAggregator}))
+            }}(collection.breakOut)
             .toIterator
         } else {
           partition.map{o => (o.getKey, o.getAggregator)}
