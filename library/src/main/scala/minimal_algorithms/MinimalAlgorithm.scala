@@ -36,7 +36,8 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     this
   }
 
-  /** Applies Tera Sort algorithm on provided RDD. Provided RDD will not be affected.
+  /**
+    * Applies Tera Sort algorithm on provided RDD.
     * @param rdd  RDD on which Tera Sort will be performed.
     * @return Sorted RDD.
     */
@@ -49,7 +50,8 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * Each object has unique ranking. Ranking starts from 0 index.
     * @return RDD of pairs (ranking, object)
     */
-  def computeRanking[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = computeRanking(this.objects, cmpKey)
+  def ranked[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] =
+    ranking(this.objects, cmpKey)
 
   /**
     * Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
@@ -57,19 +59,18 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (ranking, object)
     */
-  def computeRanking[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
+  def ranking[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
-    val prefixSumsOfPartitionSizes = sc.broadcast(getPartitionSizes(sortedRdd).collect().scanLeft(0)(_+_))
-    sortedRdd.mapPartitionsWithIndex((index, partition) => {
-      val offset = prefixSumsOfPartitionSizes.value(index)
-      if (partition.isEmpty)
+    val partitionSizes = sendToAllHigherMachines(getPartitionSizes(sortedRdd).collect().zip(List.range(1, this.numOfPartitions)))
+
+    sortedRdd.zipPartitions(partitionSizes){(partitionIt, partitionSizesIt) => {
+      if (partitionIt.hasNext) {
+        val offset = if (partitionSizesIt.hasNext) partitionSizesIt.sum else 0
+        partitionIt.zipWithIndex.map{case (o, index) => (index + offset, o)}
+      } else {
         Iterator()
-      else
-        partition.toList.zipWithIndex.map{
-          case (mao, i) => (i+offset, mao)
-          case _        => throw new Exception("Error while creating ranking")
-        }.toIterator
-    })
+      }
+    }}
   }
 
   /**
@@ -94,7 +95,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * Sorts and perfectly balances imported objects.
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
-  def perfectlySortedWithRanks[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
+  def perfectSortWithRanks[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
     perfectlySortedWithRanks(this.objects, cmpKey)
   }
 
@@ -104,7 +105,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
   def perfectlySortedWithRanks[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
-    computeRanking(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+    ranking(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
   }
 
   /**
@@ -119,7 +120,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     }))
   }
 
-  def sendToAllHigherMachines[R](arr: Array[(R, Int)])(implicit rtag: ClassTag[R]): RDD[R] = {
+  def sendToAllHigherMachines[R](arr: Seq[(R, Int)])(implicit rtag: ClassTag[R]): RDD[R] = {
     partitionByKey(sc.parallelize(arr.flatMap{case (o, lowerBound) => List.range(lowerBound, this.numOfPartitions).map{i => (i, o)}}))
   }
 

@@ -17,6 +17,6 @@ class RankingTest extends FunSuite with SharedSparkContext with Matchers {
 
       // then
     elements = elements.sortBy(RankingObject.cmpKey)
-    assert(elements.sameElements(minimalRanking.computeRanking(RankingObject.cmpKey).collect().map{e => e._2}))
+    assert(elements.sameElements(minimalRanking.ranked(RankingObject.cmpKey).collect().map{e => e._2}))
   }
 }
