@@ -28,7 +28,7 @@ class MinimalSlidingAggregation[T <: Serializable](spark: SparkSession, numOfPar
                 (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {
     val dataWithRanks = importObjects(input).perfectSortWithRanks(cmpKey).persist()
     val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
-    val elements = getPartitionsStatistics(dataWithRanks.map{e => e._2}, statsAgg).collect().zipWithIndex
+    val elements = partitionsStatistics(dataWithRanks.map{e => e._2}, statsAgg).collect().zipWithIndex
     val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements)).value
     computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, statsAgg)
   }

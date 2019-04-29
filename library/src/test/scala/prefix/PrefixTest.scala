@@ -20,7 +20,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
     val statsAgg = (o: TestPrefixObject) => new SumAggregator(o.getWeight)
 
       // when
-    val result = minimalAlgorithm.prefix(cmpKey, statsAgg).collect()
+    val result = minimalAlgorithm.prefixed(cmpKey, statsAgg).collect()
 
       // then
     val expected = Array(-10, -17, -16, -15, -14, -12, -10, -5, 5, 17)
@@ -32,7 +32,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
     val statsAgg = (o: TestPrefixObject) => new MinAggregator(o.getWeight)
 
       // when
-    val result = minimalAlgorithm.prefix(cmpKey, statsAgg).collect()
+    val result = minimalAlgorithm.prefixed(cmpKey, statsAgg).collect()
 
       // then
     val expected = Array(-10, -10, -10, -10, -10, -10, -10, -10, -10, -10)
@@ -44,7 +44,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
     val statsAgg = (o: TestPrefixObject) => new MaxAggregator(o.getWeight)
 
       // when
-    val result = minimalAlgorithm.prefix(cmpKey, statsAgg).collect()
+    val result = minimalAlgorithm.prefixed(cmpKey, statsAgg).collect()
 
       // then
     val expected = Array(-10, -7, 1, 1, 1, 2, 2, 5, 10, 12)

@@ -61,11 +61,11 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     */
   def ranking[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
-    val partitionSizes = sendToAllHigherMachines(getPartitionSizes(sortedRdd).collect().zip(List.range(1, this.numOfPartitions)))
+    val distPartitionSizes = sendToAllHigherMachines(partitionSizes(sortedRdd).collect().zip(List.range(1, this.numOfPartitions)))
 
-    sortedRdd.zipPartitions(partitionSizes){(partitionIt, partitionSizesIt) => {
+    sortedRdd.zipPartitions(distPartitionSizes){(partitionIt, partitionSizesIt) => {
       if (partitionIt.hasNext) {
-        val offset = if (partitionSizesIt.hasNext) partitionSizesIt.sum else 0
+        val offset = partitionSizesIt.sum
         partitionIt.zipWithIndex.map{case (o, index) => (index + offset, o)}
       } else {
         Iterator()
@@ -146,7 +146,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * @tparam R Type of RDD's objects.
     * @return Number of elements on each partition
     */
-  def getPartitionSizes[R](rdd: RDD[R])(implicit rtag: ClassTag[R]): RDD[Int] = {
+  def partitionSizes[R](rdd: RDD[R])(implicit rtag: ClassTag[R]): RDD[Int] = {
     rdd.mapPartitions(partition => Iterator(partition.length))
   }
 }
