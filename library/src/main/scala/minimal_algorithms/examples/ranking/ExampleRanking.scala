@@ -15,7 +15,7 @@ object ExampleRanking {
       new RankingObject(p(0).toInt, p(1).toDouble)})
 
     val minimalAlgorithm = new MinimalAlgorithm[RankingObject](spark, numOfPartitions)
-    minimalAlgorithm.importObjects(inputMapped).ranked(RankingObject.cmpKey).saveAsTextFile(outputPath)
+    minimalAlgorithm.importObjects(inputMapped).rank(RankingObject.cmpKey).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

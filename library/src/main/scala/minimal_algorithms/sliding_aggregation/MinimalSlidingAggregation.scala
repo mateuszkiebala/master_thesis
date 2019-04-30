@@ -5,7 +5,7 @@ import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 import minimal_algorithms.{RangeTree, StatisticsMinimalAlgorithm}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import minimal_algorithms.statistics_aggregators.StatisticsHelper.safeMerge
+import minimal_algorithms.statistics_aggregators.StatisticsUtils.safeMerge
 import scala.reflect.ClassTag
 
 /**
@@ -76,7 +76,7 @@ class MinimalSlidingAggregation[T <: Serializable](spark: SparkSession, numOfPar
 
       val baseObjects = partitionObjects.filter{case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
       val rankToIndex = partitionObjects.map{case (rank, _) => rank}.zipWithIndex.toMap
-      val rangeTree = new RangeTree(partitionObjects.map{case (rank, o) => (statsAgg(o), rankToIndex(rank))}.toArray)
+      val rangeTree = new RangeTree(partitionObjects.map{case (rank, o) => (statsAgg(o), rankToIndex(rank))})
 
       baseObjects.map{case (rank, smao) => {
         val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1

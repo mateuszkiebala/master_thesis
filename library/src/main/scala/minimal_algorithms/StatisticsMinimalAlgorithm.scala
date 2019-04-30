@@ -1,7 +1,7 @@
 package minimal_algorithms
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
-import minimal_algorithms.statistics_aggregators.StatisticsHelper._
+import minimal_algorithms.statistics_aggregators.StatisticsUtils._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
@@ -19,8 +19,8 @@ class StatisticsMinimalAlgorithm[T <: Serializable]
     * Order for equal objects is picked randomly.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def prefixed[K, S <: StatisticsAggregator[S]](cmpKey: T => K, statsAgg: T => S)
-                                             (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] =
+  def prefixed[K, S <: StatisticsAggregator[S]]
+    (cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] =
     prefix(this.objects, cmpKey, statsAgg)
 
   /**
@@ -29,8 +29,8 @@ class StatisticsMinimalAlgorithm[T <: Serializable]
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (prefixStatistics, object)
     */
-  def prefix[K, S <: StatisticsAggregator[S]](rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)
-               (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = {
+  def prefix[K, S <: StatisticsAggregator[S]]
+    (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
     val partitionStatistics = sendToAllHigherMachines(partitionsStatistics(sortedRdd, statsAgg).collect().zip(List.range(1, this.numOfPartitions)))
 

@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession object
   * @param numOfPartitions  Number of partitions.
   */
-class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T]) {
+class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T]) {
   protected val sc = spark.sparkContext
   var objects: RDD[T] = sc.emptyRDD
   var itemsCntByPartition: Int = 0
@@ -50,8 +50,8 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * Each object has unique ranking. Ranking starts from 0 index.
     * @return RDD of pairs (ranking, object)
     */
-  def ranked[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] =
-    ranking(this.objects, cmpKey)
+  def rank[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] =
+    ranked(this.objects, cmpKey)
 
   /**
     * Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
@@ -59,7 +59,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * @param rdd  RDD with objects to process.
     * @return RDD of pairs (ranking, object)
     */
-  def ranking[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
+  def ranked[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
     val distPartitionSizes = sendToAllHigherMachines(partitionSizes(sortedRdd).collect().zip(List.range(1, this.numOfPartitions)))
 
@@ -105,7 +105,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
   def perfectlySortedWithRanks[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
-    ranking(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+    ranked(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
   }
 
   /**
@@ -114,7 +114,7 @@ class MinimalAlgorithm[T <: Serializable](spark: SparkSession, numOfPartitions: 
     * @tparam K [K : ClassTag]
     * @return RDD of reshuffled objects
     */
-  def sendToMachines[R](rdd: RDD[(R, List[Int])])(implicit rtag: ClassTag[R]): RDD[R] = {
+  def sendToMachines[R](rdd: RDD[(R, Seq[Int])])(implicit rtag: ClassTag[R]): RDD[R] = {
     partitionByKey[R](rdd.mapPartitionsWithIndex((pIndex, partition) => {
       partition.flatMap{case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.map{i => (i, o)}}
     }))

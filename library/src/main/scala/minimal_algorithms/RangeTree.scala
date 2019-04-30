@@ -1,7 +1,7 @@
 package minimal_algorithms
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
-import minimal_algorithms.statistics_aggregators.StatisticsHelper.safeMerge
+import minimal_algorithms.statistics_aggregators.StatisticsUtils.safeMerge
 
 import scala.reflect.ClassTag
 
@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
   * @param elements list of pairs (value, leaf position into which value will be insertedą)
   * @param aggFun aggregation function that will be applied on the tree (MAX, MIN, SUM)
   */
-class RangeTree[S <: StatisticsAggregator[S]](elements: Array[(S, Int)])(implicit stag: ClassTag[S]) extends Serializable {
+class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit stag: ClassTag[S]) extends Serializable {
   val log2: Double => Double = (x: Double) => math.log10(x) / math.log10(2.0)
   val BASE: Int = math.pow(2.0, math.ceil(log2(elements.length.toDouble))).toInt
   var tree: Array[S] = new Array[S](2 * BASE)
