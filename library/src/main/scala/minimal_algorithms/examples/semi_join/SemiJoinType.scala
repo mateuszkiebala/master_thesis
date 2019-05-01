@@ -4,7 +4,7 @@ import minimal_algorithms.semi_join.SemiJoinObject
 import minimal_algorithms.semi_join.SemiJoinSetTypeEnum.SemiJoinSetTypeEnum
 
 class SemiJoinType(key: Int, weight: Double, setType: SemiJoinSetTypeEnum) extends SemiJoinObject {
-  override def toString: String = "Key: " + this.key + " | Set: " + this.setType + " | Weight: " + this.weight
+  override def toString: String = this.key + " " + this.weight.toInt
 
   override def getSetType: SemiJoinSetTypeEnum = this.setType
 
@@ -20,7 +20,7 @@ object SemiJoinType {
 }
 
 class SemiJoinKey(sjt: SemiJoinType) extends Comparable[SemiJoinKey] with Serializable {
-  override def toString: String = "Key: " + this.getKey + " | Weight: " + this.getWeight
+  override def toString: String = this.getKey + " " + this.getWeight
 
   override def compareTo(o: SemiJoinKey): Int = {
     val keyCmp = this.getKey.compareTo(o.getKey)

@@ -1,35 +1,35 @@
 package minimal_algorithms.examples.sliding_aggregation
-/*
-import minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation
+
 import minimal_algorithms.examples.statistics_aggregators.SumAggregator
+import minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation
 import org.apache.spark.sql.SparkSession
+
+class InputObject(key: Int, weight: Int) extends Serializable {
+  def getWeight: Double = weight
+  def getKey: Int = key
+  override def toString: String = this.key.toString
+}
 
 object ExampleSlidingAggregation {
   def main(args: Array[String]) = {
     val spark = SparkSession.builder().appName("ExampleSlidingAggregation").master("local").getOrCreate()
 
-    //val inputPath = "hdfs://192.168.0.220:9000/user/test/input/input"
-    //val numOfPartitions = args(0).toInt
-    //val windowLen = args(1).toInt
-    //val inputPath = args(2)
-    //val outputPath = args(3)
-
-    val numOfPartitions = 3
-    val windowLen = 10
-    val inputPath = "test.txt"
+    val numOfPartitions = args(0).toInt
+    val windowLen = args(1).toInt
+    val inputPath = args(2)
+    val outputPath = args(3)
 
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new SumSlidingSMAO(p(0).toInt, p(1).toDouble)})
+      new InputObject(p(0).toInt, p(1).toInt)})
 
-    val msa = new MinimalSlidingAggregation[SumSlidingSMAO](spark, numOfPartitions)
-    //msa.sum(inputMapped, windowLen).map(res => res._1.toString + " " + res._2.toInt.toString).saveAsTextFile(outputPath)
-    //msa.execute(inputMapped, windowLen).collect().foreach(println)
-    //msa.max(inputMapped, windowLen).collect().foreach(println)
-    //msa.avg(inputMapped, windowLen).collect().foreach(println)
+    val cmpKey = (o: InputObject) => o.getKey
+    val minimalAlgorithm = new MinimalSlidingAggregation(spark, numOfPartitions)
+
+    val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
+    minimalAlgorithm.aggregate(inputMapped, windowLen, cmpKey, sumAgg).
+      map(res => res._1.toString + " " + res._2.getValue.toInt.toString).saveAsTextFile(outputPath)
     spark.stop()
-
   }
 }
-*/

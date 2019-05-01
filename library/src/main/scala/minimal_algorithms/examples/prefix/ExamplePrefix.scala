@@ -1,8 +1,14 @@
 package minimal_algorithms.examples.prefix
 
+import minimal_algorithms.MinimalAlgorithm
 import minimal_algorithms.examples.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
-/*
+
+class InputObject(weight: Double) extends Serializable {
+  def getWeight: Double = this.weight
+  override def toString: String = "%.6f".format(this.weight)
+}
+
 object ExamplePrefix {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("ExamplePrefix").master("local").getOrCreate()
@@ -13,11 +19,11 @@ object ExamplePrefix {
     val input = spark.sparkContext.textFile(inputPath)
     val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new SumPrefixSMAO(p(1).toDouble)})
+      new InputObject(p(1).toDouble)})
 
-    val sma = new StatisticsMinimalAlgorithm[SumPrefixSMAO](spark, numOfPartitions)
-    sma.importObjects(inputMapped).prefix(SumPrefixSMAO.cmpKey, SumPrefixSMAO.statsAgg).saveAsTextFile(outputPath)
+    val cmpKey = (o: InputObject) => o.getWeight
+    val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
+    new MinimalAlgorithm(spark, numOfPartitions).prefix(inputMapped, cmpKey, sumAgg).saveAsTextFile(outputPath)
     spark.stop()
   }
 }
-*/
