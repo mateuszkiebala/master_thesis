@@ -12,78 +12,70 @@ import scala.reflect.ClassTag
   * Class implementing sliding aggregation algorithm.
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
-  * @tparam T T <: StatisticsMinimalAlgorithmObject[T] : ClassTag
   */
 
-class MinimalSlidingAggregation[T <: Serializable](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T])
+class MinimalSlidingAggregation[T]
+(spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T])
   extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
-  /**
-    * Executes sliding aggregation algorithm for provided RDD
-    * @param input  Initial RDD with objects.
-    * @param windowLength Window length
-    * @return RDD of pairs (object, sliding aggregation value)
-    */
-  def execute[K, S <: StatisticsAggregator[S]](input: RDD[T], windowLength: Int, cmpKey: T => K, statsAgg: T => S)
-                (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {
-    val dataWithRanks = importObjects(input).perfectSortWithRanks(cmpKey).persist()
-    val distributedData = distributeDataToRemotelyRelevantPartitions(dataWithRanks, windowLength).persist()
-    val elements = partitionsStatistics(dataWithRanks.map{e => e._2}, statsAgg).collect().zipWithIndex
-    val partitionsRangeTree = spark.sparkContext.broadcast(new RangeTree(elements)).value
-    computeWindowValues(distributedData, itemsCntByPartition, windowLength, partitionsRangeTree, statsAgg)
+  def execute[K, S <: StatisticsAggregator[S]]
+  (windowLength: Int, cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {
+    val rankedData = perfectSortWithRanks(cmpKey).persist()
+    val distData = distributeDataToRemotelyRelevantPartitions(rankedData, windowLength).persist()
+    val distPartitionStatistics = partitionStatistics(rankedData.map{e => e._2}, statsAgg).collect().zipWithIndex
+    val partitionsRangeTree = sendToAllMachines(new RangeTree(distPartitionStatistics))
+    windowValues(distData, windowLength, partitionsRangeTree, statsAgg)
   }
 
-  /**
-    * Sends objects to remotely relevant partitions. Implements algorithm described in 'Minimal MapReduce Algorithms' paper.
-    * @param rdd  RDD with objects to process.
-    * @param windowLength  Window length.
-    * @return RDD of pairs (ranking, object)
-    */
   private[this] def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLength: Int): RDD[(Int, T)] = {
-    val numOfPartitionsBroadcast = spark.sparkContext.broadcast(this.numOfPartitions).value
-    val itemsCntByPartitionBroadcast = spark.sparkContext.broadcast(this.itemsCntByPartition).value
-    sendToMachines[(Int, T)](rdd.mapPartitionsWithIndex((pIndex, partition) => {
-      if (windowLength <= itemsCntByPartitionBroadcast) {
-        partition.map {rankMaoPair =>
-          if (pIndex+1 < numOfPartitionsBroadcast) {
-            (rankMaoPair, List(pIndex, pIndex+1))
+    val distNumOfPartitions = sendToAllMachines(numOfPartitions)
+    val distItemsCntByPartition = sendToAllMachines(itemsCntByPartition)
+    sendToMachines(rdd.mapPartitionsWithIndex((pIndex, partition) => {
+      if (windowLength <= distItemsCntByPartition) {
+        partition.map{rankPair =>
+          if (pIndex+1 < distNumOfPartitions) {
+            (rankPair, List(pIndex, pIndex+1))
           } else {
-            (rankMaoPair, List(pIndex))
+            (rankPair, List(pIndex))
           }
         }
       } else {
-        val remRelM = (windowLength-1) / itemsCntByPartitionBroadcast
-        partition.map {rankMaoPair =>
-          if (pIndex+remRelM+1 < numOfPartitionsBroadcast) {
-            (rankMaoPair, List(pIndex, pIndex+remRelM, pIndex+remRelM+1))
-          } else if (pIndex+remRelM < numOfPartitionsBroadcast) {
-            (rankMaoPair, List(pIndex, pIndex+remRelM))
+        val remRelM = (windowLength-1) / distItemsCntByPartition
+        partition.map{rankPair =>
+          if (pIndex+remRelM+1 < distNumOfPartitions) {
+            (rankPair, List(pIndex, pIndex+remRelM, pIndex+remRelM+1))
+          } else if (pIndex+remRelM < distNumOfPartitions) {
+            (rankPair, List(pIndex, pIndex+remRelM))
           } else {
-            (rankMaoPair, List(pIndex))
+            (rankPair, List(pIndex))
           }
         }
       }
     }))
   }
 
-  private[this] def computeWindowValues[S <: StatisticsAggregator[S]]
-    (rdd: RDD[(Int, T)], itemsCntByPartition: Int, windowLen: Int, partitionsRangeTree: RangeTree[S], statsAgg: T => S)
-    (implicit stag: ClassTag[S]): RDD[(T, S)] = {
+  private[this] def windowValues[S <: StatisticsAggregator[S]]
+  (rdd: RDD[(Int, T)], windowLength: Int, partitionsRangeTree: RangeTree[S], statsAgg: T => S)
+  (implicit stag: ClassTag[S]): RDD[(T, S)] = {
+
+    val distItemsCntByPartition = sendToAllMachines(itemsCntByPartition)
     rdd.mapPartitionsWithIndex((index, partition) => {
-      val pEleMinRank = index * itemsCntByPartition
-      val pEleMaxRank = (index + 1) * itemsCntByPartition - 1
+      val pEleMinRank = index * distItemsCntByPartition
+      val pEleMaxRank = (index + 1) * distItemsCntByPartition - 1
       val partitionObjects = partition.toList
 
       val baseObjects = partitionObjects.filter{case (rank, _) => rank >= pEleMinRank && rank <= pEleMaxRank}
+
+      // tu powinien byc sort rankingow
       val rankToIndex = partitionObjects.map{case (rank, _) => rank}.zipWithIndex.toMap
       val rangeTree = new RangeTree(partitionObjects.map{case (rank, o) => (statsAgg(o), rankToIndex(rank))})
 
       baseObjects.map{case (rank, smao) => {
-        val minRank = if ((rank - windowLen + 1) < 0) 0 else rank - windowLen + 1
-        val a = ((rank+1-windowLen+itemsCntByPartition) / itemsCntByPartition) - 1
+        val minRank = if ((rank-windowLength+1) < 0) 0 else rank-windowLength+1
+        val a = ((rank+1-windowLength+distItemsCntByPartition) / distItemsCntByPartition) - 1
         val alpha = if (a >= 0) a else -1
         val result = if (index > alpha + 1) {
-          val w1 = if (alpha < 0) null.asInstanceOf[S] else rangeTree.query(rankToIndex(minRank), rankToIndex((alpha+1)*itemsCntByPartition-1))
+          val w1 = if (alpha < 0) null.asInstanceOf[S] else rangeTree.query(rankToIndex(minRank), rankToIndex((alpha+1)*distItemsCntByPartition-1))
           val w2 = partitionsRangeTree.query(alpha+1, index-1)
           val w3 = rangeTree.query(rankToIndex(pEleMinRank), rankToIndex(rank))
           safeMerge(safeMerge(w1, w2), w3)

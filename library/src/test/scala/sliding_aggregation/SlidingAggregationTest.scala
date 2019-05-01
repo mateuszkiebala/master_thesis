@@ -20,7 +20,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
     val statsAgg = (o: TestSlidingObject) => new SumAggregator(o.getWeight)
 
       // when
-    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).execute(rdd, 7, cmpKey, statsAgg).collect()
+    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).importObjects(rdd).execute(7, cmpKey, statsAgg).collect()
 
       // then
     val expected = Array((1, 2.0), (2, -8.0), (3, -3.0), (4, -2.0), (5, 10.0), (6, 11.0), (7, 13.0), (8, 21.0), (9, 33.0), (10, 21.0), (11, 25.0))
@@ -32,7 +32,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
     val statsAgg = (o: TestSlidingObject) => new MinAggregator(o.getWeight)
 
       // when
-    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).execute(rdd, 7, cmpKey, statsAgg).collect()
+    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).importObjects(rdd).execute(7, cmpKey, statsAgg).collect()
 
       // then
     val expected = Array((1, 2.0), (2, -10.0), (3, -10.0), (4, -10.0), (5, -10), (6, -10.0), (7, -10.0), (8, -10.0), (9, 1.0), (10, -7.0), (11, -7.0))
@@ -44,7 +44,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
     val statsAgg = (o: TestSlidingObject) => new MaxAggregator(o.getWeight)
 
       // when
-    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).execute(rdd, 7, cmpKey, statsAgg).collect()
+    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).importObjects(rdd).execute(7, cmpKey, statsAgg).collect()
 
       // then
     val expected = Array((1, 2.0), (2, 2.0), (3, 5.0), (4, 5.0), (5, 12.0), (6, 12.0), (7, 12.0), (8, 12.0), (9, 12.0), (10, 12.0), (11, 12.0))
@@ -57,7 +57,7 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
     val statsAgg = (o: TestSlidingObject) => new AvgAggregator(o.getWeight, 1)
 
       // when
-    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).execute(rdd, 7, cmpKey, statsAgg).collect()
+    val result = new MinimalSlidingAggregation[TestSlidingObject](spark, 3).importObjects(rdd).execute(7, cmpKey, statsAgg).collect()
 
       // then
     val expected = Array((1, 2.0), (2, -4.0), (3, -1.0), (4, -0.5), (5, 2.0), (6, 11.0 / 6), (7, 13.0 / 7), (8, 3.0), (9, 33.0 / 7), (10, 3.0), (11, 25.0 / 7))

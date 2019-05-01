@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession
   * @param numOfPartitions  Number of partitions
   */
-class MinimalGroupBy[T <: Serializable](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T])
+class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T])
   extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
 
   def execute[K, S <: StatisticsAggregator[S]]

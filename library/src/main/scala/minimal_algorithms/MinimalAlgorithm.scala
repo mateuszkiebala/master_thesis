@@ -12,6 +12,7 @@ import scala.reflect.ClassTag
 class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T]) {
   protected val sc = spark.sparkContext
   var objects: RDD[T] = sc.emptyRDD
+  var itemsTotalCnt: Int = 0
   var itemsCntByPartition: Int = 0
   object PerfectPartitioner {}
   object KeyPartitioner {}
@@ -21,10 +22,16 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @param rdd  Objects to be processed by minimal algorithm.
     * @return this
     */
-  def importObjects(rdd: RDD[T]): this.type = {
+  def importObjects(rdd: RDD[T], itemsTotalCnt: Int = -1): this.type = {
     this.objects = rdd.repartition(numOfPartitions)
-    itemsCntByPartition = (rdd.count().toInt+this.numOfPartitions-1) / this.numOfPartitions
+    this.itemsTotalCnt = if (itemsTotalCnt < 0) this.objects.count().toInt else itemsTotalCnt
+    this.itemsCntByPartition = computeItemsCntByPartition(this.objects, this.itemsTotalCnt)
     this
+  }
+
+  def computeItemsCntByPartition(rdd: RDD[T], itemsTotalCnt: Int = -1): Int = {
+    val cnt = if (itemsTotalCnt < 0) rdd.count().toInt else itemsTotalCnt
+    (cnt + this.numOfPartitions - 1) / this.numOfPartitions
   }
 
   /**
@@ -42,7 +49,7 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @return Sorted RDD.
     */
   def teraSorted[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
-    rdd.repartition(numOfPartitions).sortBy(cmpKey)
+    rdd.repartition(this.numOfPartitions).sortBy(cmpKey)
   }
 
   /**
@@ -62,7 +69,6 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
   def ranked[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
     val distPartitionSizes = sendToAllHigherMachines(partitionSizes(sortedRdd).collect().zip(List.range(1, this.numOfPartitions)))
-
     sortedRdd.zipPartitions(distPartitionSizes){(partitionIt, partitionSizesIt) => {
       if (partitionIt.hasNext) {
         val offset = partitionSizesIt.sum
@@ -78,7 +84,7 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @return this
     */
   def perfectSort[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
-    this.objects = perfectlySortedWithRanks(this.objects, cmpKey).map(o => o._2).persist()
+    this.objects = perfectlySortedWithRanks(this.objects, cmpKey, this.itemsTotalCnt).map(o => o._2).persist()
     this.objects
   }
 
@@ -87,8 +93,8 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @param rdd  RDD with objects to process.
     * @return Perfectly balanced RDD of objects
     */
-  def perfectlySorted[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
-    perfectlySortedWithRanks(rdd, cmpKey).map(o => o._2)
+  def perfectlySorted[K](rdd: RDD[T], cmpKey: T => K, itemsTotalCnt: Int = -1)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
+    perfectlySortedWithRanks(rdd, cmpKey, itemsTotalCnt).map(o => o._2)
   }
 
   /**
@@ -96,7 +102,7 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
   def perfectSortWithRanks[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
-    perfectlySortedWithRanks(this.objects, cmpKey)
+    perfectlySortedWithRanks(this.objects, cmpKey, this.itemsTotalCnt)
   }
 
   /**
@@ -104,8 +110,8 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @param rdd  RDD with objects to process.
     * @return Perfectly balanced RDD of pairs (ranking, object)
     */
-  def perfectlySortedWithRanks[K](rdd: RDD[T], cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
-    ranked(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, this.itemsCntByPartition))
+  def perfectlySortedWithRanks[K](rdd: RDD[T], cmpKey: T => K, itemsTotalCnt: Int = -1)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(Int, T)] = {
+    ranked(rdd, cmpKey).partitionBy(new PerfectPartitioner(numOfPartitions, computeItemsCntByPartition(rdd, itemsTotalCnt)))
   }
 
   /**
@@ -134,6 +140,10 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     partitionByKey[R](rdd.mapPartitions(partition => {
       partition.flatMap{case (o, upperBound) => List.range(0, upperBound).map{i => (i, o)}}
     }))
+  }
+
+  def sendToAllMachines[R](o: R)(implicit rtag: ClassTag[R]): R = {
+    sc.broadcast(o).value
   }
 
   def partitionByKey[R](rdd: RDD[(Int, R)])(implicit rtag: ClassTag[R]): RDD[R] = {
