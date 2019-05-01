@@ -9,10 +9,10 @@ import scala.reflect.ClassTag
 /**
   * Class implementing semi join algorithm.
   * @param spark  SparkSession
-  * @param numOfPartitions  Number of partitions
+  * @param numOfPartitions  Number of partitionIts
   */
-class MinimalSemiJoin[T <: SemiJoinObject](spark: SparkSession, numOfPartitions: Int)
-                                          (implicit ttag: ClassTag[T]) extends MinimalAlgorithm[T](spark, numOfPartitions) {
+class MinimalSemiJoin[T <: SemiJoinObject]
+(spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T]) extends MinimalAlgorithm[T](spark, numOfPartitions) {
 
   /**
     * Imports two sets: R and T from the same domain.
@@ -30,22 +30,17 @@ class MinimalSemiJoin[T <: SemiJoinObject](spark: SparkSession, numOfPartitions:
     * @return RDD of objects that belong to set R and have a match in set T.
     */
   def execute[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
-    val rdd = perfectlySorted(this.objects, cmpKey)
-    val TBounds = sc.broadcast(rdd.mapPartitions(partition => {
-      val tObjects = partition.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
-      if (tObjects.nonEmpty) Iterator(cmpKey(tObjects.head), cmpKey(tObjects.last)) else Iterator.empty
+    val rdd = perfectSort(cmpKey)
+    val tKeyBounds = sendToAllMachines(rdd.mapPartitions(partitionIt => {
+      val tObjects = partitionIt.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
+      if (tObjects.nonEmpty) Iterator(cmpKey(tObjects.head), cmpKey(tObjects.last)) else Iterator()
     }).collect().toSet)
 
-    rdd.mapPartitions(partition => {
-      val groupedByType = partition.toList.groupBy(o => o.getSetType)
-      if (groupedByType.contains(SemiJoinSetTypeEnum.RType)) {
-        val rObjects = groupedByType(SemiJoinSetTypeEnum.RType)
-        val tObjects = if (groupedByType.contains(SemiJoinSetTypeEnum.TType)) {
-          groupedByType(SemiJoinSetTypeEnum.TType).map(cmpKey).toSet.union(TBounds.value)
-        } else {
-          TBounds.value
-        }
-        rObjects.filter(o => tObjects.contains(cmpKey(o))).toIterator
+    rdd.mapPartitions(partitionIt => {
+      val (rObjects, tObjects) = partitionIt.partition(o => o.getSetType == SemiJoinSetTypeEnum.RType)
+      if (rObjects.nonEmpty) {
+        val tKeys = if (tObjects.nonEmpty) tObjects.map(cmpKey).toSet.union(tKeyBounds) else tKeyBounds
+        rObjects.filter(ro => tKeys.contains(cmpKey(ro)))
       } else {
         Iterator.empty
       }
