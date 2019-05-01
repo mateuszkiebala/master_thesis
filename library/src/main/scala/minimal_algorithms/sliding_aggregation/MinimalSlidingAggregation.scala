@@ -17,11 +17,23 @@ class MinimalSlidingAggregation[T]
 (spark: SparkSession, numPartitions: Int)(implicit ttag: ClassTag[T])
   extends MinimalAlgorithm[T](spark, numPartitions) {
 
-  def execute[K, S <: StatisticsAggregator[S]]
+  def aggregate[K, S <: StatisticsAggregator[S]]
   (windowLength: Int, cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {
-    val rankedData = perfectSortWithRanks(cmpKey).persist()
-    val distData = distributeDataToRemotelyRelevantPartitions(rankedData, windowLength).persist()
-    val distPartitionStatistics = partitionStatistics(rankedData.map{e => e._2}, statsAgg).collect().zipWithIndex
+    execute(perfectSortWithRanks(cmpKey).persist(), windowLength, cmpKey, statsAgg)
+  }
+
+  def aggregated[K, S <: StatisticsAggregator[S]]
+  (rdd: RDD[T], windowLength: Int, cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {
+    val rankedData = perfectlySortedWithRanks(rdd, cmpKey).persist()
+    itemsTotalCnt = rdd.count().toInt
+    itemsCntByPartition = computeItemsCntByPartition(rdd, itemsTotalCnt)
+    execute(rankedData, windowLength, cmpKey, statsAgg)
+  }
+
+  private[this] def execute[K, S <: StatisticsAggregator[S]]
+  (rdd: RDD[(Int, T)], windowLength: Int, cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {
+    val distData = distributeDataToRemotelyRelevantPartitions(rdd, windowLength).persist()
+    val distPartitionStatistics = partitionStatistics(rdd.map{e => e._2}, statsAgg).collect().zipWithIndex
     val partitionsRangeTree = Utils.sendToAllMachines(sc, new RangeTree(distPartitionStatistics))
     windowValues(distData, windowLength, partitionsRangeTree, statsAgg)
   }

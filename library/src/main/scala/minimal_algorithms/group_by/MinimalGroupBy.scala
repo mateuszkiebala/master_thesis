@@ -16,10 +16,22 @@ import scala.reflect.ClassTag
 class MinimalGroupBy[T](spark: SparkSession, numPartitions: Int)(implicit ttag: ClassTag[T])
   extends MinimalAlgorithm[T](spark, numPartitions) {
 
-  def execute[K, S <: StatisticsAggregator[S]]
+  def groupBy[K, S <: StatisticsAggregator[S]]
   (cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
+    val sortedRdd = perfectSort(cmpKey)
+    execute(sortedRdd, cmpKey, statsAgg)
+  }
+
+  def groupedBy[K, S <: StatisticsAggregator[S]]
+  (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
+    val sortedRdd = perfectlySorted(rdd, cmpKey)
+    execute(sortedRdd, cmpKey, statsAgg)
+  }
+
+  private[this] def execute[K, S <: StatisticsAggregator[S]]
+  (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
     val masterIndex = 0
-    val mapPhase = perfectSort(cmpKey).mapPartitionsWithIndex((pIndex, partitionIt) => {
+    val mapPhase = rdd.mapPartitionsWithIndex((pIndex, partitionIt) => {
       if (partitionIt.isEmpty) {
         Iterator[(GroupByObject[K, S], Seq[Int])]()
       } else {

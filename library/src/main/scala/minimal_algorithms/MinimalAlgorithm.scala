@@ -2,6 +2,7 @@ package minimal_algorithms
 
 import minimal_algorithms.statistics_aggregators.StatisticsAggregator
 import minimal_algorithms.statistics_aggregators.StatisticsUtils.{foldLeft, scanLeft}
+import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
@@ -13,7 +14,7 @@ import scala.reflect.ClassTag
   * @param numPartitions  Number of partitions.
   */
 class MinimalAlgorithm[T](spark: SparkSession, numPartitions: Int)(implicit ttag: ClassTag[T]) {
-  protected val sc = spark.sparkContext
+  protected val sc: SparkContext = spark.sparkContext
   var objects: RDD[T] = sc.emptyRDD
   var itemsTotalCnt: Int = 0
   var itemsCntByPartition: Int = 0
