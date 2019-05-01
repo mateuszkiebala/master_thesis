@@ -1,7 +1,7 @@
 package prefix
 
-import minimal_algorithms.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
-import minimal_algorithms.StatisticsMinimalAlgorithm
+import minimal_algorithms.MinimalAlgorithm
+import minimal_algorithms.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import org.scalatest.{FunSuite, Matchers}
 import setup.SharedSparkContext
 
@@ -12,7 +12,7 @@ class TestPrefixObject(weight: Double) extends Serializable {
 
 class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   val rdd = spark.sparkContext.parallelize(Seq(1, 5, -10, 1, 2, 1, 12, 10, -7, 2).map{e => new TestPrefixObject(e)})
-  val minimalAlgorithm = new StatisticsMinimalAlgorithm[TestPrefixObject](spark, 2).importObjects(rdd)
+  val minimalAlgorithm = new MinimalAlgorithm[TestPrefixObject](spark, 2).importObjects(rdd)
   val cmpKey = (o: TestPrefixObject) => o.getWeight
 
   test("Prefix sum") {

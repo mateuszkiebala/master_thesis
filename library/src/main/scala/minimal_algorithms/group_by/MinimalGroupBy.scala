@@ -1,19 +1,20 @@
 package minimal_algorithms.group_by
 
 import minimal_algorithms.statistics_aggregators._
-import minimal_algorithms.StatisticsMinimalAlgorithm
+import minimal_algorithms.{MinimalAlgorithm, Utils}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import minimal_algorithms.statistics_aggregators.StatisticsUtils._
+
 import scala.reflect.ClassTag
 
 /**
   * Class implementing group by algorithm.
   * @param spark  SparkSession
-  * @param numOfPartitions  Number of partitions
+  * @param numPartitions  Number of partitions
   */
-class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T])
-  extends StatisticsMinimalAlgorithm[T](spark, numOfPartitions) {
+class MinimalGroupBy[T](spark: SparkSession, numPartitions: Int)(implicit ttag: ClassTag[T])
+  extends MinimalAlgorithm[T](spark, numPartitions) {
 
   def execute[K, S <: StatisticsAggregator[S]]
   (cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
@@ -32,7 +33,7 @@ class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag
       }
     })
 
-    sendToMachines(mapPhase).mapPartitionsWithIndex((pIndex, partitionIt) => {
+    Utils.sendToMachines(mapPhase).mapPartitionsWithIndex((pIndex, partitionIt) => {
       if (pIndex == masterIndex) {
         partitionIt.toList.groupBy{o => o.getKey}.map{case (key, values) =>
           (key, foldLeft(values.map{v => v.getAggregator}))

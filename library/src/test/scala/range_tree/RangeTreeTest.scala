@@ -1,6 +1,7 @@
 package range_tree
 import org.scalatest.FunSuite
 import minimal_algorithms.RangeTree
+import minimal_algorithms.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.statistics_aggregators._
 
 class RangeTreeTest extends FunSuite {

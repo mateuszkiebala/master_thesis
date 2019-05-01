@@ -9,10 +9,10 @@ import scala.reflect.ClassTag
 /**
   * Class implementing semi join algorithm.
   * @param spark  SparkSession
-  * @param numOfPartitions  Number of partitionIts
+  * @param numPartitions  Number of partitionIts
   */
 class MinimalSemiJoin[T <: SemiJoinObject]
-(spark: SparkSession, numOfPartitions: Int)(implicit ttag: ClassTag[T]) extends MinimalAlgorithm[T](spark, numOfPartitions) {
+(spark: SparkSession, numPartitions: Int)(implicit ttag: ClassTag[T]) extends MinimalAlgorithm[T](spark, numPartitions) {
 
   /**
     * Imports two sets: R and T from the same domain.
@@ -31,7 +31,7 @@ class MinimalSemiJoin[T <: SemiJoinObject]
     */
   def execute[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
     val rdd = perfectSort(cmpKey)
-    val tKeyBounds = sendToAllMachines(rdd.mapPartitions(partitionIt => {
+    val tKeyBounds = Utils.sendToAllMachines(sc, rdd.mapPartitions(partitionIt => {
       val tObjects = partitionIt.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
       if (tObjects.nonEmpty) Iterator(cmpKey(tObjects.head), cmpKey(tObjects.last)) else Iterator()
     }).collect().toSet)

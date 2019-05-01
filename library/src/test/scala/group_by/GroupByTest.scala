@@ -1,5 +1,6 @@
 package group_by
 
+import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.group_by.MinimalGroupBy
 import minimal_algorithms.statistics_aggregators._
 import org.scalatest.{FunSuite, Matchers}

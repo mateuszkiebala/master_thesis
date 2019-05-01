@@ -1,7 +1,7 @@
 package minimal_algorithms.examples.sliding_aggregation
 /*
 import minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation
-import minimal_algorithms.statistics_aggregators.SumAggregator
+import minimal_algorithms.examples.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
 
 object ExampleSlidingAggregation {

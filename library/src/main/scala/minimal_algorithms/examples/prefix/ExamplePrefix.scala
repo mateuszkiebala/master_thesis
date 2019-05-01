@@ -1,7 +1,6 @@
 package minimal_algorithms.examples.prefix
 
-import minimal_algorithms.StatisticsMinimalAlgorithm
-import minimal_algorithms.statistics_aggregators.SumAggregator
+import minimal_algorithms.examples.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
 /*
 object ExamplePrefix {
