@@ -1,17 +1,14 @@
 package minimal_algorithms.group_by
 /*
+import minimal_algorithms.examples.statistics_aggregators.SumAggregator
 import minimal_algorithms.{MinimalAlgorithm, MinimalAlgorithmObject}
-import minimal_algorithms.examples.group_by.IntKey
 import minimal_algorithms.statistics_aggregators._
 import org.apache.spark.sql.SparkSession
 
-class MAOPair(key: Int, value: Double) extends MinimalAlgorithmObject[MAOPair] {
-  override def compareTo(o: MAOPair): Int = {
-    this.key.compareTo(o.getKey)
-  }
-
+class InputObject(key: Int, weight: Double) extends Serializable {
   def getKey: Int = this.key
-  def getValue: Double = this.value
+  def getWeight: Double = this.weight
+  override def toString: String = key + " " + weight
 }
 
 object ExampleGroupBy {
@@ -23,12 +20,14 @@ object ExampleGroupBy {
     val outputPath = args(2)
     val input = spark.sparkContext.textFile(inputPath)
 
-    val inputMappedSum = input.map(line => {
+    val inputMapped = input.map(line => {
       val p = line.split(' ')
-      new GroupByObject(new SumAggregator(p(1).toDouble), new IntKey(p(0).toInt))
+      new InputObject(p(0).toInt, p(1).toDouble)
     })
-    val groupedSum = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedSum).execute.
-      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[SumAggregator].getValue))
+    val cmpKey = (o: InputObject) => o.getKey
+
+    val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
+    val groupedSum = new MinimalGroupBy[InputObject](spark, numOfPartitions).importObjects(inputMapped).groupBy(cmpKey, sumAgg)
     var outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedSum)
     outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_sum")
 
@@ -62,5 +61,4 @@ object ExampleGroupBy {
 
     spark.stop()
   }
-}
-*/
+}*/

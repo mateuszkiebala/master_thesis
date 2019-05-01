@@ -11,26 +11,15 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession
   * @param numPartitions  Number of partitionIts
   */
-class MinimalSemiJoin[T <: SemiJoinObject]
-(spark: SparkSession, numPartitions: Int)(implicit ttag: ClassTag[T]) extends MinimalAlgorithm[T](spark, numPartitions) {
-
-  /**
-    * Imports two sets: R and T from the same domain.
-    * @param rddR Set from which we report objects.
-    * @param rddT Set in which we look for matches.
-    * @return this
-    */
-  def importObjects(rddR: RDD[T], rddT: RDD[T]): this.type = {
-    super.importObjects(rddR.union(rddT))
-    this
-  }
-
+class MinimalSemiJoin(spark: SparkSession, numPartitions: Int) extends MinimalAlgorithm(spark, numPartitions) {
   /**
     * Runs semi join algorithm on imported data.
     * @return RDD of objects that belong to set R and have a match in set T.
     */
-  def execute[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
-    val rdd = perfectSort(cmpKey)
+  def semiJoin[T <: SemiJoinObject, K]
+  (rddR: RDD[T], rddT: RDD[T], cmpKey: T => K, totalCount: Int = -1)
+  (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
+    val rdd = perfectSort(rddR.union(rddT), cmpKey, totalCount)
     val tKeyBounds = Utils.sendToAllMachines(sc, rdd.mapPartitions(partitionIt => {
       val tObjects = partitionIt.filter(o => o.getSetType == SemiJoinSetTypeEnum.TType).toList
       if (tObjects.nonEmpty) Iterator(cmpKey(tObjects.head), cmpKey(tObjects.last)) else Iterator()

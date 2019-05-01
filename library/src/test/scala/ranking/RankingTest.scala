@@ -13,10 +13,10 @@ class RankingTest extends FunSuite with SharedSparkContext with Matchers {
     val rdd = spark.sparkContext.parallelize(elements)
 
       // when
-    val minimalRanking = new MinimalAlgorithm[RankingObject](spark, 2).importObjects(rdd)
+    val result = new MinimalAlgorithm(spark, 2).rank(rdd, RankingObject.cmpKey).collect()
 
       // then
     elements = elements.sortBy(RankingObject.cmpKey)
-    assert(elements.sameElements(minimalRanking.rank(RankingObject.cmpKey).collect().map{e => e._2}))
+    assert(elements.sameElements(result.map{e => e._2}))
   }
 }

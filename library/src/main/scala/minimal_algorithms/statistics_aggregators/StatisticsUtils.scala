@@ -1,5 +1,9 @@
 package minimal_algorithms.statistics_aggregators
 
+import org.apache.spark.rdd.RDD
+
+import scala.reflect.ClassTag
+
 object StatisticsUtils {
   def safeMerge[S <: StatisticsAggregator[S]](a: S, b: S): S = {
     if (a == null) {
@@ -9,6 +13,34 @@ object StatisticsUtils {
     } else {
       a.merge(b)
     }
+  }
+
+  /**
+    * Computes prefix values on partitions' statistics
+    * @param rdd  RDD of objects
+    * @return Array of prefix statistics for partitions
+    */
+  def prefixedPartitionStatistics[A, S <: StatisticsAggregator[S]]
+  (rdd: RDD[A], statsAgg: A => S)(implicit atag: ClassTag[A], stag: ClassTag[S]): Seq[S] = {
+    val elements = partitionStatistics(rdd, statsAgg).collect()
+    if (elements.isEmpty) Seq[S]() else scanLeft(elements)
+  }
+
+  /**
+    * Computes aggregated values for each partition.
+    * @param rdd  Elements
+    * @return RDD[aggregated value for partition]
+    */
+  def partitionStatistics[A, S <: StatisticsAggregator[S]]
+  (rdd: RDD[A], statsAgg: A => S)(implicit atag: ClassTag[A], stag: ClassTag[S]): RDD[S] = {
+    rdd.mapPartitions(partitionIt => {
+      if (partitionIt.isEmpty) {
+        Iterator()
+      } else {
+        val start = partitionIt.next
+        Iterator(partitionIt.foldLeft(statsAgg(start)){(acc, o) => acc.merge(statsAgg(o))})
+      }
+    })
   }
 
   def scanLeft[S <: StatisticsAggregator[S]](seq: Seq[S], start: S): Seq[S] = {
