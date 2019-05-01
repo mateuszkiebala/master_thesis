@@ -157,6 +157,6 @@ class MinimalAlgorithm[T](spark: SparkSession, numOfPartitions: Int)(implicit tt
     * @return Number of elements on each partition
     */
   def partitionSizes[R](rdd: RDD[R])(implicit rtag: ClassTag[R]): RDD[Int] = {
-    rdd.mapPartitions(partition => Iterator(partition.length))
+    rdd.mapPartitions(partitionIt => Iterator(partitionIt.length))
   }
 }

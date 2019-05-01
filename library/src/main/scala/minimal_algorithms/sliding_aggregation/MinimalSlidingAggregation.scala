@@ -28,15 +28,15 @@ class MinimalSlidingAggregation[T]
   private[this] def distributeDataToRemotelyRelevantPartitions(rdd: RDD[(Int, T)], windowLength: Int): RDD[(Int, T)] = {
     val distNumOfPartitions = sendToAllMachines(numOfPartitions)
     val distItemsCntByPartition = sendToAllMachines(itemsCntByPartition)
-    sendToMachines(rdd.mapPartitionsWithIndex((pIndex, partition) => {
+    sendToMachines(rdd.mapPartitionsWithIndex((pIndex, partitionIt) => {
       if (windowLength <= distItemsCntByPartition) {
-        partition.map{rankPair =>
+        partitionIt.map{rankPair =>
           val machineIndices = if (pIndex+1 < distNumOfPartitions) List(pIndex, pIndex+1) else List(pIndex)
           (rankPair, machineIndices)
         }
       } else {
         val remRelM = (windowLength-1) / distItemsCntByPartition
-        partition.map{rankPair =>
+        partitionIt.map{rankPair =>
           val machineIndices =
           if (pIndex+remRelM+1 < distNumOfPartitions) {
             List(pIndex, pIndex+remRelM, pIndex+remRelM+1)
@@ -56,10 +56,10 @@ class MinimalSlidingAggregation[T]
   (implicit stag: ClassTag[S]): RDD[(T, S)] = {
 
     val distItemsCntByPartition = sendToAllMachines(itemsCntByPartition)
-    rdd.mapPartitionsWithIndex((pIndex, partition) => {
+    rdd.mapPartitionsWithIndex((pIndex, partitionIt) => {
       val baseLowerBound = pIndex * distItemsCntByPartition
       val baseUpperBound = (pIndex+1) * distItemsCntByPartition - 1
-      val partitionObjects = partition.toList
+      val partitionObjects = partitionIt.toList
       val baseObjects = partitionObjects.filter{case (rank, _) => rank >= baseLowerBound && rank <= baseUpperBound}
       val rankToIndex = partitionObjects.map{case (rank, _) => rank}.sorted.zipWithIndex.toMap
       val rangeTree = new RangeTree(partitionObjects.map{case (rank, o) => (statsAgg(o), rankToIndex(rank))})

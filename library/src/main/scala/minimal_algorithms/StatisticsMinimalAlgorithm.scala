@@ -66,12 +66,12 @@ class StatisticsMinimalAlgorithm[T]
     * @return RDD[aggregated value for partition]
     */
   def partitionStatistics[S <: StatisticsAggregator[S]](rdd: RDD[T], statsAgg: T => S)(implicit stag: ClassTag[S]): RDD[S] = {
-    rdd.mapPartitions(partition => {
-      if (partition.isEmpty) {
+    rdd.mapPartitions(partitionIt => {
+      if (partitionIt.isEmpty) {
         Iterator()
       } else {
-        val start = partition.next
-        Iterator(partition.foldLeft(statsAgg(start)){(acc, o) => acc.merge(statsAgg(o))})
+        val start = partitionIt.next
+        Iterator(partitionIt.foldLeft(statsAgg(start)){(acc, o) => acc.merge(statsAgg(o))})
       }
     })
   }

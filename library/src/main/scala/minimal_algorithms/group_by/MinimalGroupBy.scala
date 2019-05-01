@@ -18,11 +18,11 @@ class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag
   def execute[K, S <: StatisticsAggregator[S]]
   (cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
     val masterIndex = 0
-    val mapPhase = perfectSort(cmpKey).mapPartitionsWithIndex((pIndex, partition) => {
-      if (partition.isEmpty) {
+    val mapPhase = perfectSort(cmpKey).mapPartitionsWithIndex((pIndex, partitionIt) => {
+      if (partitionIt.isEmpty) {
         Iterator[(GroupByObject[K, S], Seq[Int])]()
       } else {
-        val grouped = partition.toList.groupBy(cmpKey)
+        val grouped = partitionIt.toList.groupBy(cmpKey)
         val minKey = grouped.keys.min
         val maxKey = grouped.keys.max
         grouped.map{case (key, values) =>
@@ -32,13 +32,13 @@ class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag
       }
     })
 
-    sendToMachines(mapPhase).mapPartitionsWithIndex((pIndex, partition) => {
+    sendToMachines(mapPhase).mapPartitionsWithIndex((pIndex, partitionIt) => {
       if (pIndex == masterIndex) {
-        partition.toList.groupBy{o => o.getKey}.map{case (key, values) =>
+        partitionIt.toList.groupBy{o => o.getKey}.map{case (key, values) =>
           (key, foldLeft(values.map{v => v.getAggregator}))
         }.toIterator
       } else {
-        partition.map{o => (o.getKey, o.getAggregator)}
+        partitionIt.map{o => (o.getKey, o.getAggregator)}
       }
     })
   }
