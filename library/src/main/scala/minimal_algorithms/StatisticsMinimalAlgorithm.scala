@@ -21,7 +21,7 @@ class StatisticsMinimalAlgorithm[T]
     */
   def prefixed[K, S <: StatisticsAggregator[S]]
     (cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] =
-    prefix(this.objects, cmpKey, statsAgg)
+    prefix(objects, cmpKey, statsAgg)
 
   /**
     * Computes prefix aggregation on provided RDD. First orders elements and then computes prefixes.
@@ -32,7 +32,7 @@ class StatisticsMinimalAlgorithm[T]
   def prefix[K, S <: StatisticsAggregator[S]]
     (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = {
     val sortedRdd = teraSorted(rdd, cmpKey).persist()
-    val distPartitionStatistics = sendToAllHigherMachines(partitionStatistics(sortedRdd, statsAgg).collect().zip(List.range(1, this.numOfPartitions)))
+    val distPartitionStatistics = sendToAllHigherMachines(partitionStatistics(sortedRdd, statsAgg).collect().zip(List.range(1, numOfPartitions)))
 
     sortedRdd.zipPartitions(distPartitionStatistics){(partitionIt, partitionStatisticsIt) => {
       if (partitionIt.hasNext) {

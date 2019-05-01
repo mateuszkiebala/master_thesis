@@ -18,7 +18,7 @@ class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag
   def execute[K, S <: StatisticsAggregator[S]]
   (cmpKey: T => K, statsAgg: T => S)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[(K, S)] = {
     val masterIndex = 0
-    val mapPhase = this.perfectSort(cmpKey).mapPartitionsWithIndex((pIndex, partition) => {
+    val mapPhase = perfectSort(cmpKey).mapPartitionsWithIndex((pIndex, partition) => {
       if (partition.isEmpty) {
         Iterator[(GroupByObject[K, S], Seq[Int])]()
       } else {
@@ -45,6 +45,6 @@ class MinimalGroupBy[T](spark: SparkSession, numOfPartitions: Int)(implicit ttag
 }
 
 class GroupByObject[K, S <: StatisticsAggregator[S]](aggregator: S, key: K) extends Serializable {
-  def getAggregator: S = this.aggregator
-  def getKey: K = this.key
+  def getAggregator: S = aggregator
+  def getKey: K = key
 }

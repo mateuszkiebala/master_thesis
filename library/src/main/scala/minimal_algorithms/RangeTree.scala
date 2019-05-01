@@ -17,9 +17,9 @@ class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit 
   val BASE: Int = math.pow(2.0, math.ceil(log2(elements.length.toDouble))).toInt
   var tree: Array[S] = new Array[S](2 * BASE)
 
-  this.elements.foreach{ case(element, pos) => this.insert(element, pos) }
+  elements.foreach{ case(element, pos) => insert(element, pos) }
 
-  private[this] def insert(element: S, start: Int): Unit = {
+  def insert(element: S, start: Int): Unit = {
     if (start >= BASE)
       throw new IndexOutOfBoundsException("Position out of range: " + start)
 
