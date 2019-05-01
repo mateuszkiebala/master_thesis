@@ -10,6 +10,8 @@ class AvgAggregator(sum: Double, count: Int) extends StatisticsAggregator[AvgAgg
     new AvgAggregator(this.sum + that.getSum, this.count + that.getCount)
   }
 
+  override def toString: String = "%.6f".format(this.getValue)
+
   def canEqual(a: Any): Boolean = a.isInstanceOf[AvgAggregator]
 
   override def equals(that: Any): Boolean =

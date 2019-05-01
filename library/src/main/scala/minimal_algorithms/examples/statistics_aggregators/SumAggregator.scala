@@ -9,9 +9,7 @@ class SumAggregator(value: Double) extends StatisticsAggregator[SumAggregator] {
     new SumAggregator(this.value + that.getValue)
   }
 
-  override def toString: String = {
-    "SUM: " + this.value.toString
-  }
+  override def toString: String = "%.6f".format(this.getValue)
 
   def canEqual(a: Any): Boolean = a.isInstanceOf[SumAggregator]
 

@@ -1,8 +1,7 @@
-package minimal_algorithms.group_by
-/*
-import minimal_algorithms.examples.statistics_aggregators.SumAggregator
-import minimal_algorithms.{MinimalAlgorithm, MinimalAlgorithmObject}
-import minimal_algorithms.statistics_aggregators._
+package minimal_algorithms.examples.group_by
+
+import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
+import minimal_algorithms.group_by.MinimalGroupBy
 import org.apache.spark.sql.SparkSession
 
 class InputObject(key: Int, weight: Double) extends Serializable {
@@ -25,40 +24,25 @@ object ExampleGroupBy {
       new InputObject(p(0).toInt, p(1).toDouble)
     })
     val cmpKey = (o: InputObject) => o.getKey
+    val resultCmpKey = (o: (Int, _)) => o._1
+    val minimalAlgorithm = new MinimalGroupBy(spark, numOfPartitions)
 
     val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
-    val groupedSum = new MinimalGroupBy[InputObject](spark, numOfPartitions).importObjects(inputMapped).groupBy(cmpKey, sumAgg)
-    var outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedSum)
-    outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_sum")
+    val groupedSum = minimalAlgorithm.groupBy(inputMapped, cmpKey, sumAgg)
+    minimalAlgorithm.perfectSort(groupedSum, resultCmpKey).map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath + "/output_sum")
 
+    val minAgg = (o: InputObject) => new MinAggregator(o.getWeight)
+    val groupedMin = minimalAlgorithm.groupBy(inputMapped, cmpKey, minAgg)
+    minimalAlgorithm.perfectSort(groupedMin, resultCmpKey).map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath + "/output_min")
 
-    val inputMappedMin = input.map(line => {
-      val p = line.split(' ')
-      new GroupByObject(new MinAggregator(p(1).toDouble), new IntKey(p(0).toInt))
-    })
-    val groupedMin = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedMin).execute.
-      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[MinAggregator].getValue))
-    outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedMin)
-    outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_min")
+    val maxAgg = (o: InputObject) => new MaxAggregator(o.getWeight)
+    val groupedMax = minimalAlgorithm.groupBy(inputMapped, cmpKey, maxAgg)
+    minimalAlgorithm.perfectSort(groupedMax, resultCmpKey).map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath + "/output_max")
 
-    val inputMappedMax = input.map(line => {
-      val p = line.split(' ')
-      new GroupByObject(new MaxAggregator(p(1).toDouble), new IntKey(p(0).toInt))
-    })
-    val groupedMax = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedMax).execute.
-      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[MaxAggregator].getValue))
-    outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedMax)
-    outputMA.perfectSort.map(res => res.getKey.toString + " " + res.getValue.toInt.toString).saveAsTextFile(outputPath + "/output_max")
-
-    val inputMappedAvg = input.map(line => {
-      val p = line.split(' ')
-      new GroupByObject(new AvgAggregator(p(1).toDouble, 1), new IntKey(p(0).toInt))
-    })
-    val groupedAvg = new MinimalGroupBy[GroupByObject](spark, numOfPartitions).importObjects(inputMappedAvg).execute.
-      map(p => new MAOPair(p._1.asInstanceOf[IntKey].getValue, p._2.asInstanceOf[AvgAggregator].getValue))
-    outputMA = new MinimalAlgorithm[MAOPair](spark, numOfPartitions).importObjects(groupedAvg)
-    outputMA.perfectSort.map(res => res.getKey.toString + " " + "%.6f".format(res.getValue)).saveAsTextFile(outputPath + "/output_avg")
+    val avgAgg = (o: InputObject) => new AvgAggregator(o.getWeight, 1)
+    val groupedAvg = minimalAlgorithm.groupBy(inputMapped, cmpKey, avgAgg)
+    minimalAlgorithm.perfectSort(groupedAvg, resultCmpKey).map(res => res._1.toString + " " + res._2.toString).saveAsTextFile(outputPath + "/output_avg")
 
     spark.stop()
   }
-}*/
+}

@@ -9,6 +9,8 @@ class MaxAggregator(value: Double) extends StatisticsAggregator[MaxAggregator] {
     new MaxAggregator(math.max(this.value, that.getValue))
   }
 
+  override def toString: String = "%.6f".format(this.getValue)
+
   def canEqual(a: Any): Boolean = a.isInstanceOf[MaxAggregator]
 
   override def equals(that: Any): Boolean =
