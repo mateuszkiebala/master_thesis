@@ -9,14 +9,12 @@ import scala.reflect.ClassTag
   * Fully binary tree. Enables searching for MAX, MIN, SUM on given range (start, end) in complexity O(n log n)
   * where n is number of initial elements.
   *
-  * @param elements list of pairs (value, leaf position into which value will be insertedą)
-  * @param aggFun aggregation function that will be applied on the tree (MAX, MIN, SUM)
+  * @param elements list of pairs (value, leaf position into which value will be inserted)
   */
 class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit stag: ClassTag[S]) extends Serializable {
   val log2: Double => Double = (x: Double) => math.log10(x) / math.log10(2.0)
   val BASE: Int = math.pow(2.0, math.ceil(log2(elements.length.toDouble))).toInt
   var tree: Array[S] = new Array[S](2 * BASE)
-
   elements.foreach{ case(element, pos) => insert(element, pos) }
 
   def insert(element: S, start: Int): Unit = {

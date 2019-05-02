@@ -8,11 +8,6 @@ import org.apache.spark.sql.SparkSession
 
 import scala.reflect.ClassTag
 
-/**
-  * Class implementing base functions required to create a minimal algorithm.
-  * @param spark  SparkSession object
-  * @param numPartitions  Number of partitions.
-  */
 class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
   protected val sc: SparkContext = spark.sparkContext
   object PerfectPartitioner {}
@@ -23,22 +18,11 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
     ((cnt + numPartitions - 1) / numPartitions, cnt)
   }
 
-  /**
-    * Applies Tera Sort algorithm on provided RDD.
-    * @param rdd  RDD on which Tera Sort will be performed.
-    * @return Sorted RDD.
-    */
   def teraSort[T, K](rdd: RDD[T], cmpKey: T => K)
                     (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
     rdd.repartition(numPartitions).sortBy(cmpKey)
   }
 
-  /**
-    * Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
-    * Each object has unique ranking. Ranking starts from 0 index.
-    * @param rdd  RDD with objects to process.
-    * @return RDD of pairs (ranking, object)
-    */
   def rank[T, K](rdd: RDD[T], cmpKey: T => K)
                 (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[(Int, T)] = {
     val sortedRdd = teraSort(rdd, cmpKey).persist()
@@ -55,32 +39,16 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
     }}
   }
 
-  /**
-    * Sorts and perfectly balances provided RDD.
-    * @param rdd  RDD with objects to process.
-    * @return Perfectly balanced RDD of objects
-    */
   def perfectSort[T, K](rdd: RDD[T], cmpKey: T => K, itemsCnt: Int = -1)
                        (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
     perfectSortWithRanks(rdd, cmpKey, itemsCnt).map(o => o._2)
   }
 
-  /**
-    * Sorts and perfectly balances provided RDD.
-    * @param rdd  RDD with objects to process.
-    * @return Perfectly balanced RDD of pairs (ranking, object)
-    */
   def perfectSortWithRanks[T, K](rdd: RDD[T], cmpKey: T => K, itemsCnt: Int = -1)
                                 (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[(Int, T)] = {
     rank(rdd, cmpKey).partitionBy(new PerfectPartitioner(numPartitions, computeItemsCntByPartition(rdd, itemsCnt)._1))
   }
 
-  /**
-    * Computes prefix aggregation on provided RDD. First orders elements and then computes prefixes.
-    * Order for equal objects is picked randomly.
-    * @param rdd  RDD with objects to process.
-    * @return RDD of pairs (prefixStatistics, object)
-    */
   def prefix[T, K, S <: StatisticsAggregator[S]]
   (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S)
   (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = {
@@ -88,7 +56,6 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
     val distPartitionStatistics = Utils.sendToAllHigherMachines(
       sc, partitionStatistics(sortedRdd, statsAgg).collect().zip(List.range(1, numPartitions)), numPartitions
     )
-
     sortedRdd.zipPartitions(distPartitionStatistics){(partitionIt, partitionStatisticsIt) => {
       if (partitionIt.hasNext) {
         val elements = partitionIt.toList
