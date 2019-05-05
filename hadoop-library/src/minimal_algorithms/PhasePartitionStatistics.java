@@ -37,31 +37,31 @@ public class PhasePartitionStatistics {
         MultipleMainObjects.setSchema(mainObjectSchema);
     }
 
-    public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<Statisticer>> {
+    public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
         private Configuration conf;
-        private Schema statisticerSchema;
-        private final AvroValue<Statisticer> avVal = new AvroValue<>();
+        private Schema statisticsAggregatorSchema;
+        private final AvroValue<StatisticsAggregator> avVal = new AvroValue<>();
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
         }
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
-            Statisticer statsMerger = null;
+            StatisticsAggregator statsMerger = null;
             try {
-                Class statisticerClass = SpecificData.get().getClass(statisticerSchema);
+                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
                 for (GenericRecord record : value.datum().getRecords()) {
-                    Statisticer statisticer = (Statisticer) statisticerClass.newInstance();
-                    statisticer.init(record);
+                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
+                    statisticsAggregator.create(record);
                     if (statsMerger == null) {
-                        statsMerger = statisticer;
+                        statsMerger = statisticsAggregator;
                     } else {
-                        statsMerger = statsMerger.merge(statisticer);
+                        statsMerger = statsMerger.merge(statisticsAggregator);
                     }
                 }
             } catch (Exception e) {
@@ -73,20 +73,20 @@ public class PhasePartitionStatistics {
         }
     }
 
-    public static class PartitionStatisticsReducer extends Reducer<AvroKey<Integer>, AvroValue<Statisticer>, AvroKey<Integer>, AvroValue<Statisticer>> {
+    public static class PartitionStatisticsReducer extends Reducer<AvroKey<Integer>, AvroValue<StatisticsAggregator>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
-        private final AvroValue<Statisticer> avVal = new AvroValue<>();
+        private final AvroValue<StatisticsAggregator> avVal = new AvroValue<>();
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<Statisticer>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<StatisticsAggregator>> values, Context context) throws IOException, InterruptedException {
             int size = 0;
-            for (AvroValue<Statisticer> av : values) {
+            for (AvroValue<StatisticsAggregator> av : values) {
                 avVal.datum(av.datum());
                 size++;
             }
 
             if (size != 1) {
-                throw new InterruptedException("Too many AvroValues<Statisticer> size = " + size);
+                throw new InterruptedException("Too many AvroValues<StatisticsAggregator> size = " + size);
             }
 
             context.write(key, avVal);
@@ -96,7 +96,7 @@ public class PhasePartitionStatistics {
     public static int run(Path input, Path output, Configuration conf) throws Exception {
         LOG.info("starting partition statistics");
         setSchemas(conf);
-        Schema statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
 
         Job job = Job.getInstance(conf, "JOB: Phase partition statistics");
         job.setJarByClass(PhasePartitionStatistics.class);
@@ -113,14 +113,14 @@ public class PhasePartitionStatistics {
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, statisticerSchema);
+        AvroJob.setMapOutputValueSchema(job, statisticsAggregatorSchema);
 
         job.setReducerClass(PartitionStatisticsReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, statisticerSchema);
+        AvroJob.setOutputValueSchema(job, statisticsAggregatorSchema);
 
         int ret = (job.waitForCompletion(true) ? 0 : 1);
         return ret;

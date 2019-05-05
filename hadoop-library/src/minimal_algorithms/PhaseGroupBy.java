@@ -38,10 +38,10 @@ public class PhaseGroupBy {
 
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        Schema statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
         Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
 
-        GroupByRecord.setSchema(statisticerSchema, keyRecordSchema);
+        GroupByRecord.setSchema(statisticsAggregatorSchema, keyRecordSchema);
         MultipleGroupByRecords.setSchema(GroupByRecord.getClassSchema());
         MultipleMainObjects.setSchema(mainObjectSchema);
     }
@@ -49,7 +49,7 @@ public class PhaseGroupBy {
     public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
 
         private Configuration conf;
-        private Schema statisticerSchema;
+        private Schema statisticsAggregatorSchema;
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
         private final AvroValue<MultipleGroupByRecords> avVal = new AvroValue<>();
@@ -60,7 +60,7 @@ public class PhaseGroupBy {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
         }
 
@@ -69,37 +69,37 @@ public class PhaseGroupBy {
             List<GroupByRecord> masterResult = new ArrayList<>();
             List<GroupByRecord> thisResult = new ArrayList<>();
             try {
-                Class statisticerClass = SpecificData.get().getClass(statisticerSchema);
+                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
                 Class keyRecordClass = SpecificData.get().getClass(keyRecordSchema);
 
                 List<GroupByRecord> groupByRecords = new ArrayList<>();
                 MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), value.datum());
                 for (GenericRecord record : mainObjects.getRecords()) {
-                    Statisticer statisticer = (Statisticer) statisticerClass.newInstance();
-                    statisticer.init(record);
+                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
+                    statisticsAggregator.create(record);
 
                     KeyRecord keyRecord = (KeyRecord) keyRecordClass.newInstance();
                     keyRecord.create(record);
-                    groupByRecords.add(new GroupByRecord(statisticer, keyRecord));
+                    groupByRecords.add(new GroupByRecord(statisticsAggregator, keyRecord));
                 }
 
                 KeyRecord minKey = null;
                 KeyRecord maxKey = null;
-                Map<KeyRecord, Statisticer> grouped = new HashMap<>();
+                Map<KeyRecord, StatisticsAggregator> grouped = new HashMap<>();
                 for (GroupByRecord record : groupByRecords) {
                     KeyRecord keyRecord = record.getKey();
                     if (grouped.containsKey(keyRecord)) {
-                        Statisticer mapStatisticer = grouped.get(keyRecord);
-                        grouped.put(keyRecord, mapStatisticer.merge(record.getStatisticer()));
+                        StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
+                        grouped.put(keyRecord, mapStatisticsAggregator.merge(record.getStatisticsAggregator()));
                     } else {
-                        grouped.put(keyRecord, record.getStatisticer());
+                        grouped.put(keyRecord, record.getStatisticsAggregator());
                     }
 
-                    minKey = minKey == null ? keyRecord : KeyRecord.min(minKey, keyRecord, cmp);
-                    maxKey = maxKey == null ? keyRecord : KeyRecord.max(maxKey, keyRecord, cmp);
+                    minKey = minKey == null ? keyRecord : KeyRecord.min(minKey, keyRecord);
+                    maxKey = maxKey == null ? keyRecord : KeyRecord.max(maxKey, keyRecord);
                 }
 
-                for (Map.Entry<KeyRecord, Statisticer> entry : grouped.entrySet()) {
+                for (Map.Entry<KeyRecord, StatisticsAggregator> entry : grouped.entrySet()) {
                     GroupByRecord record = new GroupByRecord(entry.getValue(), entry.getKey());
                     if (entry.getKey().equals(minKey) || entry.getKey().equals(maxKey)) {
                         masterResult.add(record);
@@ -136,7 +136,7 @@ public class PhaseGroupBy {
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleGroupByRecords>> values, Context context) throws IOException, InterruptedException {
             if (key.datum().equals(MASTER_MACHINE_INDEX)) {
                 List<GroupByRecord> result = new ArrayList<>();
-                Map<KeyRecord, Statisticer> grouped = new HashMap<>();
+                Map<KeyRecord, StatisticsAggregator> grouped = new HashMap<>();
 
                 for (AvroValue<MultipleGroupByRecords> o : values) {
                     for (GenericRecord gr : o.datum().getRecords()) {
@@ -144,15 +144,15 @@ public class PhaseGroupBy {
                         KeyRecord keyRecord = record.getKey();
 
                         if (grouped.containsKey(keyRecord)) {
-                            Statisticer mapStatisticer = grouped.get(keyRecord);
-                            grouped.put(keyRecord, mapStatisticer.merge(record.getStatisticer()));
+                            StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
+                            grouped.put(keyRecord, mapStatisticsAggregator.merge(record.getStatisticsAggregator()));
                         } else {
-                            grouped.put(keyRecord, record.getStatisticer());
+                            grouped.put(keyRecord, record.getStatisticsAggregator());
                         }
                     }
                 }
 
-                for (Map.Entry<KeyRecord, Statisticer> entry : grouped.entrySet()) {
+                for (Map.Entry<KeyRecord, StatisticsAggregator> entry : grouped.entrySet()) {
                     result.add(new GroupByRecord(entry.getValue(), entry.getKey()));
                 }
 

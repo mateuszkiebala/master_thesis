@@ -7,7 +7,7 @@ import minimal_algorithms.record.Record4Float;
 import minimal_algorithms.avro_types.utils.KeyRecord;
 import java.util.Comparator;
 
-public class IntKeyRecord4Float extends KeyRecord {
+public class IntKeyRecord4Float extends KeyRecord<IntKeyRecord4Float> {
 
   public static final Schema SCHEMA$ = new Schema.Parser().parse("{\"type\":\"record\",\"name\":\"IntKeyRecord4Float\",\"namespace\":\"minimal_algorithms.avro_types.group_by\",\"fields\":[{\"name\":\"value\",\"type\":\"int\"}]}");
   public static Schema getClassSchema() { return SCHEMA$; }
@@ -21,13 +21,20 @@ public class IntKeyRecord4Float extends KeyRecord {
     this.value = value;
   }
 
+  @Override
   public void create(GenericRecord record) {
     this.objectRecord = record;
     this.value = Math.round(((Record4Float) record).getFirst());
   }
 
-  public GenericRecord getObjectRecord() {
-    return this.objectRecord;
+  @Override
+  public int compare(IntKeyRecord4Float that) {
+    if (this.value > that.getValue())
+      return 1;
+    else if (this.value == that.getValue())
+      return 0;
+    else
+      return -1;
   }
 
   public Object get(int field$) {

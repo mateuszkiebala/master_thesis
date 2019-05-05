@@ -33,8 +33,8 @@ public class PhasePrefix {
 
     private static void setSchemas(Configuration conf) {
         Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        Schema statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
-        StatisticsRecord.setSchema(statisticerSchema, mainObjectSchema);
+        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
+        StatisticsRecord.setSchema(statisticsAggregatorSchema, mainObjectSchema);
         MultipleMainObjects.setSchema(mainObjectSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
     }
@@ -43,20 +43,20 @@ public class PhasePrefix {
 
         private Configuration conf;
         private Schema mainObjectSchema;
-        private Schema statisticerSchema;
-        private Statisticer[] partitionPrefixedStatistics;
+        private Schema statisticsAggregatorSchema;
+        private StatisticsAggregator[] partitionPrefixedStatistics;
         private final AvroValue<MultipleStatisticRecords> avVal = new AvroValue<>();
         private final AvroKey<Integer> avKey = new AvroKey<>();
 
         private void initPartitionPrefixedStatistics() {
-            Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), statisticerSchema);
+            Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), statisticsAggregatorSchema);
             GenericRecord[] partitionStatistics = Utils.readRecordsFromLocalFileAvro(conf, PhasePartitionStatistics.PARTITION_STATISTICS_CACHE, keyValueSchema);
-            partitionPrefixedStatistics = new Statisticer[partitionStatistics.length];
+            partitionPrefixedStatistics = new StatisticsAggregator[partitionStatistics.length];
 
             for (GenericRecord ps : partitionStatistics) {
                 int paritionIndex = (Integer) ps.get("key");
-                Statisticer paritionStatisticer = (Statisticer) SpecificData.get().deepCopy(statisticerSchema, ps.get("value"));
-                partitionPrefixedStatistics[paritionIndex] = paritionStatisticer;
+                StatisticsAggregator paritionStatisticsAggregator = (StatisticsAggregator) SpecificData.get().deepCopy(statisticsAggregatorSchema, ps.get("value"));
+                partitionPrefixedStatistics[paritionIndex] = paritionStatisticsAggregator;
             }
 
             for (int i = 1; i < partitionPrefixedStatistics.length; i++) {
@@ -69,7 +69,7 @@ public class PhasePrefix {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-            statisticerSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICER_SCHEMA);
+            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             initPartitionPrefixedStatistics();
         }
 
@@ -77,26 +77,26 @@ public class PhasePrefix {
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
             List<StatisticsRecord> statsRecords = new ArrayList<>();
             try {
-                Class statisticerClass = SpecificData.get().getClass(statisticerSchema);
-                Statisticer partitionStatistics = key.datum() == 0 ? null : partitionPrefixedStatistics[key.datum()-1];
-                Statisticer statsMerger = null;
+                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
+                StatisticsAggregator partitionStatistics = key.datum() == 0 ? null : partitionPrefixedStatistics[key.datum()-1];
+                StatisticsAggregator statsMerger = null;
                 MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), value.datum());
                 for (GenericRecord record : mainObjects.getRecords()) {
-                    Statisticer statisticer = (Statisticer) statisticerClass.newInstance();
-                    statisticer.init(record);
+                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
+                    statisticsAggregator.create(record);
                     if (statsMerger == null) {
-                        statsMerger = statisticer;
+                        statsMerger = statisticsAggregator;
                     } else {
-                        statsMerger = statsMerger.merge(statisticer);
+                        statsMerger = statsMerger.merge(statisticsAggregator);
                     }
 
-                    Statisticer prefixResult;
+                    StatisticsAggregator prefixResult;
                     if (partitionStatistics == null) {
                         prefixResult = statsMerger;
                     } else {
                         prefixResult = statsMerger.merge(partitionStatistics);
                     }
-                    statsRecords.add(new StatisticsRecord(SpecificData.get().deepCopy(statisticerSchema, prefixResult), record));
+                    statsRecords.add(new StatisticsRecord(SpecificData.get().deepCopy(statisticsAggregatorSchema, prefixResult), record));
                 }
             } catch (Exception e) {
                 System.err.println("Cannot create prefix statistics: " + e.toString());
