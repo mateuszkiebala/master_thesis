@@ -153,12 +153,11 @@ public class PhasePrefix {
         }
     }
 
-    public static int run(Path input, Path output, URI partitionStatisticsURI, Configuration conf) throws Exception {
+    public static int run(Path input, Path output, Configuration conf) throws Exception {
         LOG.info("starting prefix");
         setSchemas(conf);
 
         Job job = Job.getInstance(conf, "JOB: Phase prefix");
-        job.addCacheFile(partitionStatisticsURI);
         job.setJarByClass(PhasePrefix.class);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PrefixMapper.class);

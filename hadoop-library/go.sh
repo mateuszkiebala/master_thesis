@@ -27,8 +27,8 @@ export YARN_HEAPSIZE=1024
 ##hdfs dfs -rm -r /user/mati/2_sorting_output
 ##hdfs dfs -rm -r /user/mati/3_ranking_output
 ##hdfs dfs -rm -r /user/mati/4_partition_statistics_output
-##hdfs dfs -rm -r /user/mati/5_prefix_output
-hdfs dfs -rm -r /user/mati/6_group_by_output
+hdfs dfs -rm -r /user/mati/5_prefix_output
+##hdfs dfs -rm -r /user/mati/6_group_by_output
 yarn jar $src/dist/SortAvroRecord_przyklad_avro.jar minimal_algorithms.SortAvroRecord -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input.dir hdfs://$nn:9000/user/mati/ 20 3 3
 #yarn jar $src/dist/SortAvroRecord_przyklad_avro.jar minimal_algorithms.SortAvroRecord -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input.dir hdfs://$nn:9000/user/mati/ 100 10 3 1 >out1.txt 2>&1
 

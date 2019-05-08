@@ -119,10 +119,9 @@ public class SortAvroRecord extends Configured implements Tool {
         //PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
         //PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
         //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, conf);
-        //URI partitionStatisticsURI = new URI(partitionStatisticsSuperdir + "/part-r-00000.avro" + "#" + PhasePartitionStatistics.PARTITION_STATISTICS_CACHE);
-        //PhasePrefix.run(sortingSuperdir, prefixSuperdir, partitionStatisticsURI, conf);
+        PhasePrefix.run(sortingSuperdir, prefixSuperdir, conf);
 
-        PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, conf);
+        //PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, conf);
 
         System.out.println("n="+n);
         System.out.println("t="+t);
