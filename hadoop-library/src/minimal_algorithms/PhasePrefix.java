@@ -29,6 +29,7 @@ import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.utils.*;
 import minimal_algorithms.sending.SendingUtils;
+import minimal_algorithms.sending.Sender;
 
 public class PhasePrefix {
 
@@ -51,8 +52,7 @@ public class PhasePrefix {
         private Schema statisticsAggregatorSchema;
         private StatisticsAggregator[] partitionPrefixedStatistics;
         private int machinesCount;
-        private final AvroValue<SendWrapper> avVal = new AvroValue<>();
-        private final AvroKey<Integer> avKey = new AvroKey<>();
+        private Sender<SendWrapper> sender;
 
         private StatisticsAggregator getPartitionStatistics(MultipleMainObjects value) throws IOException, InterruptedException {
             StatisticsAggregator statsMerger = null;
@@ -76,6 +76,7 @@ public class PhasePrefix {
             mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             machinesCount = conf.getInt(PhaseSampling.NO_OF_STRIPS_KEY, 0);
+            sender = new Sender(ctx);
         }
 
         @Override
@@ -83,26 +84,20 @@ public class PhasePrefix {
             StatisticsAggregator partitionStatistics = getPartitionStatistics(value.datum());
             SendWrapper wrapperedPartitionStatistics = new SendWrapper();
             wrapperedPartitionStatistics.setRecord2(partitionStatistics);
-
-            for (int i = key.datum() + 1; i < machinesCount; i++) {
-                avKey.datum(i);
-                avVal.datum(wrapperedPartitionStatistics);
-                context.write(avKey, avVal);
-            }
+            sender.sendToRangeMachines(wrapperedPartitionStatistics, key.datum() + 1, machinesCount);
 
             List<SendWrapper> toSend = new ArrayList<>();
             for (GenericRecord record : value.datum().getRecords()) {
                 SendWrapper sw = new SendWrapper();
                 sw.setRecord1(record);
-                avVal.datum(sw);
-                context.write(key, avVal);
+                sender.sendToMachine(sw, key);
             }
         }
     }
 
     public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
 
-        private final AvroValue<MultipleStatisticRecords> avVal = new AvroValue<>();
+        private Sender<MultipleStatisticRecords> sender;
         private Configuration conf;
         private Schema statisticsAggregatorSchema;
 
@@ -142,14 +137,14 @@ public class PhasePrefix {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
+            sender = new Sender(ctx);
         }
 
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
             Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
             StatisticsAggregator partitionStatistics = getPartitionStatisticsValue(groupedRecords.get(2));
-            avVal.datum(new MultipleStatisticRecords(getPrefixes(groupedRecords.get(1), partitionStatistics)));
-            context.write(key, avVal);
+            sender.sendToMachine(new MultipleStatisticRecords(getPrefixes(groupedRecords.get(1), partitionStatistics)), key);
         }
     }
 

@@ -30,6 +30,7 @@ import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.group_by.*;
 import minimal_algorithms.avro_types.utils.KeyRecord;
+import minimal_algorithms.sending.Sender;
 
 public class PhaseGroupBy {
 
@@ -52,8 +53,7 @@ public class PhaseGroupBy {
         private Schema statisticsAggregatorSchema;
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
-        private final AvroValue<GroupByRecord> avVal = new AvroValue<>();
-        private final AvroKey<Integer> avKey = new AvroKey<>();
+        private Sender<GroupByRecord> sender;
 
         @Override
         public void setup(Context ctx) {
@@ -62,6 +62,7 @@ public class PhaseGroupBy {
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
+            sender = new Sender(ctx);
         }
 
         @Override
@@ -99,14 +100,8 @@ public class PhaseGroupBy {
 
                 for (Map.Entry<KeyRecord, StatisticsAggregator> entry : grouped.entrySet()) {
                     GroupByRecord record = new GroupByRecord(entry.getValue(), entry.getKey());
-                    if (entry.getKey().equals(minKey) || entry.getKey().equals(maxKey)) {
-                        avVal.datum(record);
-                        avKey.datum(MASTER_MACHINE_INDEX);
-                        context.write(avKey, avVal);
-                    } else {
-                        avVal.datum(record);
-                        context.write(key, avVal);
-                    }
+                    int dstMachineIndex = entry.getKey().equals(minKey) || entry.getKey().equals(maxKey) ? MASTER_MACHINE_INDEX : key.datum();
+                    sender.sendToMachine(record, dstMachineIndex);
                 }
             } catch (Exception e) {
                 System.err.println("Cannot run group_by: " + e.toString());
@@ -117,13 +112,13 @@ public class PhaseGroupBy {
     public static class GroupByReducer extends Reducer<AvroKey<Integer>, AvroValue<GroupByRecord>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
 
         private Configuration conf;
-        private final AvroKey<Integer> avKey = new AvroKey<>();
-        private final AvroValue<MultipleGroupByRecords> avVal = new AvroValue<>();
+        private Sender<MultipleGroupByRecords> sender;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
+            sender = new Sender(ctx);
         }
 
         @Override
@@ -151,8 +146,7 @@ public class PhaseGroupBy {
                     result.add(SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), value.datum()));
                 }
             }
-            avVal.datum(new MultipleGroupByRecords(result));
-            context.write(key, avVal);
+            sender.sendToMachine(new MultipleGroupByRecords(result), key);
         }
     }
 

@@ -32,6 +32,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.avro_types.ranking.*;
 import minimal_algorithms.avro_types.terasort.*;
+import minimal_algorithms.sending.Sender;
+
 
 public class PhaseRanking {
 
@@ -93,13 +95,13 @@ public class PhaseRanking {
 
         private Integer[] prefixedPartitionSizes;
         private Configuration conf;
-        private final AvroKey<Integer> avKey = new AvroKey<>();
-        private final AvroValue<MultipleRankWrappers> avVal = new AvroValue<>();
+        private Sender<MultipleRankWrappers> sender;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
+            sender = new Sender(ctx);
             prefixedPartitionSizes = readPartitionSizes(conf);
             for (int i = 1; i < prefixedPartitionSizes.length; i++) {
                 prefixedPartitionSizes[i] = prefixedPartitionSizes[i - 1] + prefixedPartitionSizes[i];
@@ -119,9 +121,7 @@ public class PhaseRanking {
                     i++;
                 }
             }
-            avKey.datum(key.datum());
-            avVal.datum(new MultipleRankWrappers(result));
-            context.write(avKey, avVal);
+            sender.sendToMachine(new MultipleRankWrappers(result), key);
         }
     }
 
