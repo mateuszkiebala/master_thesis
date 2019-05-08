@@ -49,6 +49,10 @@ public class SendWrapper extends SpecificRecordBase implements SpecificRecord {
 
     public Schema getSchema() { return SCHEMA$; }
 
+    public GenericRecord getRecord() {
+        return isType1() ? record1 : record2;
+    }
+
     public GenericRecord getRecord1() {
         return record1;
     }
@@ -65,11 +69,15 @@ public class SendWrapper extends SpecificRecordBase implements SpecificRecord {
         this.record2 = record2;
     }
 
-    public boolean isRecord1() {
-        return this.record1 != null;
+    public boolean isType1() {
+        return record1 != null;
     }
 
-    public boolean isRecord2() {
-        return this.record2 != null;
+    public boolean isType2() {
+        return record2 != null;
+    }
+
+    public int getType() {
+        return isType1() ? 1 : 2;
     }
 }

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.avro.Schema;
@@ -26,6 +28,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.utils.*;
+import minimal_algorithms.sending.SendingUtils;
 
 public class PhasePrefix {
 
@@ -39,33 +42,17 @@ public class PhasePrefix {
         MultipleMainObjects.setSchema(mainObjectSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
         SendWrapper.setSchema(mainObjectSchema, statisticsAggregatorSchema);
-        MultipleSendWrappers.setSchema(SendWrapper.getClassSchema());
     }
 
-    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleSendWrappers>> {
+    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
         private Schema mainObjectSchema;
         private Schema statisticsAggregatorSchema;
         private StatisticsAggregator[] partitionPrefixedStatistics;
-        private final AvroValue<MultipleSendWrappers> avVal = new AvroValue<>();
+        private int machinesCount;
+        private final AvroValue<SendWrapper> avVal = new AvroValue<>();
         private final AvroKey<Integer> avKey = new AvroKey<>();
-
-        /*private void initPartitionPrefixedStatistics() {
-            Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), statisticsAggregatorSchema);
-            GenericRecord[] partitionStatistics = Utils.readRecordsFromLocalFileAvro(conf, PhasePartitionStatistics.PARTITION_STATISTICS_CACHE, keyValueSchema);
-            partitionPrefixedStatistics = new StatisticsAggregator[partitionStatistics.length];
-
-            for (GenericRecord ps : partitionStatistics) {
-                int paritionIndex = (Integer) ps.get("key");
-                StatisticsAggregator paritionStatisticsAggregator = (StatisticsAggregator) SpecificData.get().deepCopy(statisticsAggregatorSchema, ps.get("value"));
-                partitionPrefixedStatistics[paritionIndex] = paritionStatisticsAggregator;
-            }
-
-            for (int i = 1; i < partitionPrefixedStatistics.length; i++) {
-                partitionPrefixedStatistics[i] = partitionPrefixedStatistics[i-1].merge(partitionPrefixedStatistics[i]);
-            }
-        }*/
 
         private StatisticsAggregator getPartitionStatistics(MultipleMainObjects value) throws IOException, InterruptedException {
             StatisticsAggregator statsMerger = null;
@@ -74,11 +61,7 @@ public class PhasePrefix {
                 for (GenericRecord record : value.getRecords()) {
                     StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
                     statisticsAggregator.create(record);
-                    if (statsMerger == null) {
-                        statsMerger = statisticsAggregator;
-                    } else {
-                        statsMerger = statsMerger.merge(statisticsAggregator);
-                    }
+                    statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
                 }
             } catch (Exception e) {
                 System.err.println("Cannot create partition statistics: " + e.toString());
@@ -88,32 +71,36 @@ public class PhasePrefix {
 
         @Override
         public void setup(Context ctx) {
-            this.conf = ctx.getConfiguration();
+            conf = ctx.getConfiguration();
             setSchemas(conf);
             mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
+            machinesCount = conf.getInt(PhaseSampling.NO_OF_STRIPS_KEY, 0);
         }
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
             StatisticsAggregator partitionStatistics = getPartitionStatistics(value.datum());
-            SendWrapper sendWrapperPartitionStatistics = new SendWrapper();
-            sendWrapperPartitionStatistics.setRecord2(partitionStatistics);
+            SendWrapper wrapperedPartitionStatistics = new SendWrapper();
+            wrapperedPartitionStatistics.setRecord2(partitionStatistics);
+
+            for (int i = key.datum() + 1; i < machinesCount; i++) {
+                avKey.datum(i);
+                avVal.datum(wrapperedPartitionStatistics);
+                context.write(avKey, avVal);
+            }
 
             List<SendWrapper> toSend = new ArrayList<>();
-            toSend.add(sendWrapperPartitionStatistics);
             for (GenericRecord record : value.datum().getRecords()) {
                 SendWrapper sw = new SendWrapper();
                 sw.setRecord1(record);
-                toSend.add(sw);
+                avVal.datum(sw);
+                context.write(key, avVal);
             }
-
-            avVal.datum(new MultipleSendWrappers(toSend));
-            context.write(key, avVal);
         }
     }
 
-    public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleSendWrappers>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
+    public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
 
         private final AvroValue<MultipleStatisticRecords> avVal = new AvroValue<>();
         private Configuration conf;
@@ -122,18 +109,30 @@ public class PhasePrefix {
         private StatisticsAggregator getPartitionStatisticsValue(List<GenericRecord> records) {
             StatisticsAggregator result = null;
             try {
-                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
                 for (GenericRecord record : records) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                    statisticsAggregator.create(record);
-                    if (result == null) {
-                        result = statisticsAggregator;
-                    } else {
-                        result = result.merge(statisticsAggregator);
-                    }
+                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) SpecificData.get().deepCopy(statisticsAggregatorSchema, record);
+                    result = result == null ? statisticsAggregator : result.merge(statisticsAggregator);
                 }
             } catch (Exception e) {
                 System.err.println("Cannot create partition statistics value: " + e.toString());
+            }
+            return result;
+        }
+
+        private List<StatisticsRecord> getPrefixes(List<GenericRecord> records, StatisticsAggregator partitionStatistics) {
+            List<StatisticsRecord> result = new ArrayList<>();
+            try {
+                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
+                StatisticsAggregator statsMerger = null;
+                for (GenericRecord record : records) {
+                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
+                    statisticsAggregator.create(record);
+                    statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                    StatisticsAggregator prefixResult = partitionStatistics == null ? statsMerger : statsMerger.merge(partitionStatistics);
+                    result.add(new StatisticsRecord(SpecificData.get().deepCopy(statisticsAggregatorSchema, prefixResult), record));
+                }
+            } catch (Exception e) {
+                System.err.println("Cannot create prefix statistics: " + e.toString());
             }
             return result;
         }
@@ -146,55 +145,13 @@ public class PhasePrefix {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleSendWrappers>> values, Context context) throws IOException, InterruptedException {
-            List<GenericRecord> records1 = new ArrayList<>();
-            List<GenericRecord> records2 = new ArrayList<>();
-            for (AvroValue<MultipleSendWrappers> value : values) {
-                MultipleSendWrappers sendWrappers = SpecificData.get().deepCopy(MultipleSendWrappers.getClassSchema(), value.datum());
-                records1.addAll(sendWrappers.select1Records());
-                records2.addAll(sendWrappers.select2Records());
-            }
-
-            StatisticsAggregator partitionStatistics = getPartitionStatisticsValue(records1);
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
+            Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
+            StatisticsAggregator partitionStatistics = getPartitionStatisticsValue(groupedRecords.get(2));
+            avVal.datum(new MultipleStatisticRecords(getPrefixes(groupedRecords.get(1), partitionStatistics)));
+            context.write(key, avVal);
         }
     }
-
-    /*
-    List<SendWrapper> toSend = new ArrayList<>();
-            try {
-                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
-                StatisticsAggregator partitionStatistics = key.datum() == 0 ? null : partitionPrefixedStatistics[key.datum()-1];
-                StatisticsAggregator statsMerger = null;
-                MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), value.datum());
-                for (GenericRecord record : mainObjects.getRecords()) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                    statisticsAggregator.create(record);
-                    if (statsMerger == null) {
-                        statsMerger = statisticsAggregator;
-                    } else {
-                        statsMerger = statsMerger.merge(statisticsAggregator);
-                    }
-
-                    StatisticsAggregator prefixResult;
-                    if (partitionStatistics == null) {
-                        prefixResult = statsMerger;
-                    } else {
-                        prefixResult = statsMerger.merge(partitionStatistics);
-                    }
-                    StatisticsAggregator statsAgg1 = SpecificData.get().deepCopy(statisticsAggregatorSchema, prefixResult);
-                    SendWrapper sw = new SendWrapper();
-                    sw.setRecord1(statsAgg1);
-                    statsRecords.add(sw);
-                }
-            } catch (Exception e) {
-                System.err.println("Cannot create prefix statistics: " + e.toString());
-            }
-
-            MultipleSendWrappers msw = new MultipleSendWrappers(statsRecords);
-            System.out.println(msw);
-            avVal.datum(msw);
-            context.write(key, avVal);
-     */
 
     public static int run(Path input, Path output, URI partitionStatisticsURI, Configuration conf) throws Exception {
         LOG.info("starting prefix");
@@ -203,7 +160,7 @@ public class PhasePrefix {
         Job job = Job.getInstance(conf, "JOB: Phase prefix");
         job.addCacheFile(partitionStatisticsURI);
         job.setJarByClass(PhasePrefix.class);
-        job.setNumReduceTasks(0);
+        job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PrefixMapper.class);
 
         FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
@@ -216,14 +173,14 @@ public class PhasePrefix {
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, MultipleSendWrappers.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, SendWrapper.getClassSchema());
 
         job.setReducerClass(PrefixReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultipleSendWrappers.getClassSchema());
+        AvroJob.setOutputValueSchema(job, MultipleStatisticRecords.getClassSchema());
 
         int ret = (job.waitForCompletion(true) ? 0 : 1);
         return ret;
