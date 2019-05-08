@@ -46,13 +46,13 @@ public class PhaseGroupBy {
         MultipleMainObjects.setSchema(mainObjectSchema);
     }
 
-    public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
+    public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<GroupByRecord>> {
 
         private Configuration conf;
         private Schema statisticsAggregatorSchema;
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
-        private final AvroValue<MultipleGroupByRecords> avVal = new AvroValue<>();
+        private final AvroValue<GroupByRecord> avVal = new AvroValue<>();
         private final AvroKey<Integer> avKey = new AvroKey<>();
 
         @Override
@@ -66,8 +66,6 @@ public class PhaseGroupBy {
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
-            List<GroupByRecord> masterResult = new ArrayList<>();
-            List<GroupByRecord> thisResult = new ArrayList<>();
             try {
                 Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
                 Class keyRecordClass = SpecificData.get().getClass(keyRecordSchema);
@@ -102,25 +100,21 @@ public class PhaseGroupBy {
                 for (Map.Entry<KeyRecord, StatisticsAggregator> entry : grouped.entrySet()) {
                     GroupByRecord record = new GroupByRecord(entry.getValue(), entry.getKey());
                     if (entry.getKey().equals(minKey) || entry.getKey().equals(maxKey)) {
-                        masterResult.add(record);
+                        avVal.datum(record);
+                        avKey.datum(MASTER_MACHINE_INDEX);
+                        context.write(avKey, avVal);
                     } else {
-                        thisResult.add(record);
+                        avVal.datum(record);
+                        context.write(key, avVal);
                     }
                 }
             } catch (Exception e) {
                 System.err.println("Cannot run group_by: " + e.toString());
             }
-
-            avVal.datum(new MultipleGroupByRecords(thisResult));
-            context.write(key, avVal);
-
-            avVal.datum(new MultipleGroupByRecords(masterResult));
-            avKey.datum(MASTER_MACHINE_INDEX);
-            context.write(avKey, avVal);
         }
     }
 
-    public static class GroupByReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleGroupByRecords>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
+    public static class GroupByReducer extends Reducer<AvroKey<Integer>, AvroValue<GroupByRecord>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
 
         private Configuration conf;
         private final AvroKey<Integer> avKey = new AvroKey<>();
@@ -133,33 +127,31 @@ public class PhaseGroupBy {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleGroupByRecords>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<GroupByRecord>> values, Context context) throws IOException, InterruptedException {
+            List<GroupByRecord> result = new ArrayList<>();
             if (key.datum().equals(MASTER_MACHINE_INDEX)) {
-                List<GroupByRecord> result = new ArrayList<>();
                 Map<KeyRecord, StatisticsAggregator> grouped = new HashMap<>();
 
-                for (AvroValue<MultipleGroupByRecords> o : values) {
-                    for (GenericRecord gr : o.datum().getRecords()) {
-                        GroupByRecord record = (GroupByRecord) SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), gr);
-                        KeyRecord keyRecord = record.getKey();
-
-                        if (grouped.containsKey(keyRecord)) {
-                            StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
-                            grouped.put(keyRecord, mapStatisticsAggregator.merge(record.getStatisticsAggregator()));
-                        } else {
-                            grouped.put(keyRecord, record.getStatisticsAggregator());
-                        }
+                for (AvroValue<GroupByRecord> value : values) {
+                    GroupByRecord record = SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), value.datum());
+                    KeyRecord keyRecord = record.getKey();
+                    if (grouped.containsKey(keyRecord)) {
+                        StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
+                        grouped.put(keyRecord, mapStatisticsAggregator.merge(record.getStatisticsAggregator()));
+                    } else {
+                        grouped.put(keyRecord, record.getStatisticsAggregator());
                     }
                 }
 
                 for (Map.Entry<KeyRecord, StatisticsAggregator> entry : grouped.entrySet()) {
                     result.add(new GroupByRecord(entry.getValue(), entry.getKey()));
                 }
-
-                avVal.datum(new MultipleGroupByRecords(result));
             } else {
-                avVal.datum(values.iterator().next().datum());
+                for (AvroValue<GroupByRecord> value : values) {
+                    result.add(SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), value.datum()));
+                }
             }
+            avVal.datum(new MultipleGroupByRecords(result));
             context.write(key, avVal);
         }
     }
@@ -183,7 +175,7 @@ public class PhaseGroupBy {
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, MultipleGroupByRecords.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, GroupByRecord.getClassSchema());
 
         job.setReducerClass(GroupByReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
