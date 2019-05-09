@@ -30,6 +30,7 @@ import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.utils.*;
 import minimal_algorithms.sending.SendingUtils;
 import minimal_algorithms.sending.Sender;
+import minimal_algorithms.statistics.StatisticsUtils;
 
 public class PhasePrefix {
 
@@ -48,40 +49,23 @@ public class PhasePrefix {
     public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
-        private Schema mainObjectSchema;
-        private Schema statisticsAggregatorSchema;
         private StatisticsAggregator[] partitionPrefixedStatistics;
         private int machinesCount;
         private Sender<SendWrapper> sender;
-
-        private StatisticsAggregator getPartitionStatistics(MultipleMainObjects value) throws IOException, InterruptedException {
-            StatisticsAggregator statsMerger = null;
-            try {
-                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
-                for (GenericRecord record : value.getRecords()) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                    statisticsAggregator.create(record);
-                    statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
-                }
-            } catch (Exception e) {
-                System.err.println("Cannot create partition statistics: " + e.toString());
-            }
-            return statsMerger;
-        }
+        private StatisticsUtils statsUtiler;
 
         @Override
         public void setup(Context ctx) {
             conf = ctx.getConfiguration();
             setSchemas(conf);
-            mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             machinesCount = conf.getInt(PhaseSampling.NO_OF_STRIPS_KEY, 0);
             sender = new Sender(ctx);
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
-            StatisticsAggregator partitionStatistics = getPartitionStatistics(value.datum());
+            StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
             SendWrapper wrapperedPartitionStatistics = new SendWrapper();
             wrapperedPartitionStatistics.setRecord2(partitionStatistics);
             sender.sendToRangeMachines(wrapperedPartitionStatistics, key.datum() + 1, machinesCount);
@@ -99,52 +83,23 @@ public class PhasePrefix {
 
         private Sender<MultipleStatisticRecords> sender;
         private Configuration conf;
-        private Schema statisticsAggregatorSchema;
-
-        private StatisticsAggregator getPartitionStatisticsValue(List<GenericRecord> records) {
-            StatisticsAggregator result = null;
-            try {
-                for (GenericRecord record : records) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) SpecificData.get().deepCopy(statisticsAggregatorSchema, record);
-                    result = result == null ? statisticsAggregator : result.merge(statisticsAggregator);
-                }
-            } catch (Exception e) {
-                System.err.println("Cannot create partition statistics value: " + e.toString());
-            }
-            return result;
-        }
-
-        private List<StatisticsRecord> getPrefixes(List<GenericRecord> records, StatisticsAggregator partitionStatistics) {
-            List<StatisticsRecord> result = new ArrayList<>();
-            try {
-                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
-                StatisticsAggregator statsMerger = null;
-                for (GenericRecord record : records) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                    statisticsAggregator.create(record);
-                    statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
-                    StatisticsAggregator prefixResult = partitionStatistics == null ? statsMerger : statsMerger.merge(partitionStatistics);
-                    result.add(new StatisticsRecord(SpecificData.get().deepCopy(statisticsAggregatorSchema, prefixResult), record));
-                }
-            } catch (Exception e) {
-                System.err.println("Cannot create prefix statistics: " + e.toString());
-            }
-            return result;
-        }
+        private StatisticsUtils statsUtiler;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             sender = new Sender(ctx);
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
             Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
-            StatisticsAggregator partitionStatistics = getPartitionStatisticsValue(groupedRecords.get(2));
-            sender.sendToMachine(new MultipleStatisticRecords(getPrefixes(groupedRecords.get(1), partitionStatistics)), key);
+            StatisticsAggregator partitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
+            List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(groupedRecords.get(1), partitionStatistics);
+            List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, groupedRecords.get(1));
+            sender.sendToMachine(new MultipleStatisticRecords(statsRecords), key);
         }
     }
 

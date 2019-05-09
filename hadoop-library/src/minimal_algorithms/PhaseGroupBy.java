@@ -31,6 +31,7 @@ import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.group_by.*;
 import minimal_algorithms.avro_types.utils.KeyRecord;
 import minimal_algorithms.sending.Sender;
+import minimal_algorithms.statistics.StatisticsUtils;
 
 public class PhaseGroupBy {
 
@@ -54,6 +55,7 @@ public class PhaseGroupBy {
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
         private Sender<GroupByRecord> sender;
+        private StatisticsUtils statsUtiler;
 
         @Override
         public void setup(Context ctx) {
@@ -63,6 +65,7 @@ public class PhaseGroupBy {
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
             sender = new Sender(ctx);
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
         @Override
