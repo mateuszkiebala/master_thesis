@@ -57,7 +57,7 @@ public class StatisticsUtils {
             Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
             for (GenericRecord record : records) {
                 StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                statisticsAggregator.create(record);
+                statisticsAggregator.init(record);
                 statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
                 result.add(SpecificData.get().deepCopy(statisticsAggregatorSchema, statsMerger));
             }
@@ -94,7 +94,7 @@ public class StatisticsUtils {
             Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
             for (GenericRecord record : records) {
                 StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                statisticsAggregator.create(record);
+                statisticsAggregator.init(record);
                 statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
             }
         } catch (Exception e) {

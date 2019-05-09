@@ -55,7 +55,6 @@ public class PhaseGroupBy {
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
         private Sender<GroupByRecord> sender;
-        private StatisticsUtils statsUtiler;
 
         @Override
         public void setup(Context ctx) {
@@ -65,21 +64,16 @@ public class PhaseGroupBy {
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
             keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
             sender = new Sender(ctx);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
             try {
-                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
                 Class keyRecordClass = SpecificData.get().getClass(keyRecordSchema);
-
                 List<GroupByRecord> groupByRecords = new ArrayList<>();
                 MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), value.datum());
                 for (GenericRecord record : mainObjects.getRecords()) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                    statisticsAggregator.create(record);
-
+                    StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
                     KeyRecord keyRecord = (KeyRecord) keyRecordClass.newInstance();
                     keyRecord.create(record);
                     groupByRecords.add(new GroupByRecord(statisticsAggregator, keyRecord));

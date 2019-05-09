@@ -27,7 +27,7 @@ public class SumStatisticsAggregator extends StatisticsAggregator {
 
     public Schema getSchema() { return SCHEMA$; }
 
-    public void create(GenericRecord record) {
+    public void init(GenericRecord record) {
         this.sum = Math.round(((Record4Float) record).getSecond());
     }
 

@@ -26,6 +26,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
+import minimal_algorithms.sending.Sender;
+import minimal_algorithms.statistics.StatisticsUtils;
 
 public class PhasePartitionStatistics {
 
@@ -40,56 +42,38 @@ public class PhasePartitionStatistics {
     public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
         private Configuration conf;
-        private Schema statisticsAggregatorSchema;
-        private final AvroValue<StatisticsAggregator> avVal = new AvroValue<>();
+        private StatisticsUtils statsUtiler;
+        private Sender<StatisticsAggregator> sender;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
+            sender = new Sender(ctx);
         }
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
-            StatisticsAggregator statsMerger = null;
-            try {
-                Class statisticsAggregatorClass = SpecificData.get().getClass(statisticsAggregatorSchema);
-                for (GenericRecord record : value.datum().getRecords()) {
-                    StatisticsAggregator statisticsAggregator = (StatisticsAggregator) statisticsAggregatorClass.newInstance();
-                    statisticsAggregator.create(record);
-                    if (statsMerger == null) {
-                        statsMerger = statisticsAggregator;
-                    } else {
-                        statsMerger = statsMerger.merge(statisticsAggregator);
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Cannot create partition statistics: " + e.toString());
-            }
-
-            avVal.datum(statsMerger);
-            context.write(key, avVal);
+            sender.sendToMachine(statsUtiler.foldLeftRecords(value.datum().getRecords()), key);
         }
     }
 
     public static class PartitionStatisticsReducer extends Reducer<AvroKey<Integer>, AvroValue<StatisticsAggregator>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
-        private final AvroValue<StatisticsAggregator> avVal = new AvroValue<>();
+        private Sender<StatisticsAggregator> sender;
+
+        @Override
+        public void setup(Context ctx) {
+            sender = new Sender(ctx);
+        }
 
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<StatisticsAggregator>> values, Context context) throws IOException, InterruptedException {
-            int size = 0;
             for (AvroValue<StatisticsAggregator> av : values) {
-                avVal.datum(av.datum());
-                size++;
+                sender.sendToMachine(av.datum(), key);
+                break;
             }
-
-            if (size != 1) {
-                throw new InterruptedException("Too many AvroValues<StatisticsAggregator> size = " + size);
-            }
-
-            context.write(key, avVal);
         }
     }
 
