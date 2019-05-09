@@ -69,13 +69,11 @@ public class PhaseGroupBy {
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
             try {
-                Class keyRecordClass = SpecificData.get().getClass(keyRecordSchema);
                 List<GroupByRecord> groupByRecords = new ArrayList<>();
                 MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), value.datum());
                 for (GenericRecord record : mainObjects.getRecords()) {
                     StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
-                    KeyRecord keyRecord = (KeyRecord) keyRecordClass.newInstance();
-                    keyRecord.create(record);
+                    KeyRecord keyRecord = KeyRecord.create(keyRecordSchema, record);
                     groupByRecords.add(new GroupByRecord(statisticsAggregator, keyRecord));
                 }
 
