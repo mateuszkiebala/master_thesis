@@ -33,6 +33,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.avro_types.ranking.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.sending.Sender;
+import minimal_algorithms.config.BaseConfig;
+
 
 
 public class PhaseRanking {
@@ -42,7 +44,7 @@ public class PhaseRanking {
     public static final String PARTITION_SIZES_CACHE = "partition_sizes.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
         MultipleMainObjects.setSchema(mainObjectSchema);
         RankWrapper.setSchema(mainObjectSchema);
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
@@ -125,8 +127,9 @@ public class PhaseRanking {
         }
     }
 
-    public static int run(Path input, Path output, Configuration conf) throws Exception {
+    public static int run(Path input, Path output, BaseConfig baseConfig) throws Exception {
         LOG.info("starting ranking");
+        Configuration conf = baseConfig.getConf();
         mergePartitionSizes(input, conf);
         setSchemas(conf);
 

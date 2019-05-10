@@ -32,6 +32,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import minimal_algorithms.record.Record4Float;
+import minimal_algorithms.config.Config;
 
 /**
  *
@@ -44,7 +45,6 @@ public class Utils {
     public static final String TREE_COMPARATORS_KEY = "tree.comparators.key";
     public static final String MAIN_COMPARATOR_KEY = "main.comparator.key";
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
-    public static final String MAIN_OBJECT_SCHEMA_KEY = "main.object.schema";
     public static final int NO_OF_REDUCE_TASKS_DEFAULT = 2;
 
     public static final Comparator retrieveComparatorFromConf(Configuration conf) {
@@ -102,16 +102,8 @@ public class Utils {
         Utils.createStringAndStoreComparators(otherCmps, conf);
     }
 
-    public static void storeMainObjectSchemaInConf(Configuration conf, Schema schema) {
-        storeSchemaInConf(conf, schema, MAIN_OBJECT_SCHEMA_KEY);
-    }
-
     public static void storeSchemaInConf(Configuration conf, Schema schema, String key) {
         conf.set(key, schema.toString());
-    }
-
-    public static Schema retrieveMainObjectSchemaFromConf(Configuration conf) {
-        return retrieveSchemaFromConf(conf, MAIN_OBJECT_SCHEMA_KEY);
     }
 
     public static Schema retrieveSchemaFromConf(Configuration conf, String key) {
@@ -271,7 +263,7 @@ public class Utils {
     }
 
     public static GenericRecord[] readMainObjectRecordsFromLocalFileAvro(Configuration conf, String fileName) {
-        return readRecordsFromLocalFileAvro(conf, fileName, MAIN_OBJECT_SCHEMA_KEY);
+        return readRecordsFromLocalFileAvro(conf, fileName, Config.BASE_SCHEMA);
     }
 
     public static GenericRecord[] readRecordsFromLocalFileAvro(Configuration conf, String fileName, String schemaKey) {

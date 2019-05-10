@@ -42,7 +42,7 @@ public class SendingUtils {
     public static Map<Integer, List<GenericRecord>> partitionRecords(Iterable<AvroValue<SendWrapper>> records) {
         Map<Integer, List<GenericRecord>> result = new HashMap<>();
         for (AvroValue<SendWrapper> record : records) {
-            SendWrapper sw = record.datum();
+            SendWrapper sw = SendWrapper.duplicate(record.datum());
             int swType = sw.getType();
             List<GenericRecord> value = new ArrayList<>();
 

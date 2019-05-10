@@ -22,7 +22,7 @@ public class IntKeyRecord4Float extends KeyRecord<IntKeyRecord4Float> {
   }
 
   @Override
-  public void create(GenericRecord record) {
+  public void init(GenericRecord record) {
     this.objectRecord = record;
     this.value = Math.round(((Record4Float) record).getFirst());
   }

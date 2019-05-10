@@ -31,6 +31,7 @@ import minimal_algorithms.avro_types.utils.*;
 import minimal_algorithms.sending.SendingUtils;
 import minimal_algorithms.sending.Sender;
 import minimal_algorithms.statistics.StatisticsUtils;
+import minimal_algorithms.config.StatisticsConfig;
 
 public class PhasePrefix {
 
@@ -38,8 +39,8 @@ public class PhasePrefix {
     public static final String PARTITION_STATISTICS_CACHE = "partition_statistics.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA);
+        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA);
         StatisticsRecord.setSchema(statisticsAggregatorSchema, mainObjectSchema);
         MultipleMainObjects.setSchema(mainObjectSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
@@ -60,7 +61,7 @@ public class PhasePrefix {
             setSchemas(conf);
             machinesCount = conf.getInt(PhaseSampling.NO_OF_STRIPS_KEY, 0);
             sender = new Sender(ctx);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
         @Override
@@ -90,25 +91,30 @@ public class PhasePrefix {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             sender = new Sender(ctx);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
             Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
+            System.out.println(groupedRecords);
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
             List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(groupedRecords.get(1), partitionStatistics);
+            System.out.println(statistics);
             List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, groupedRecords.get(1));
+            System.out.println(statsRecords);
             sender.sendToMachine(new MultipleStatisticRecords(statsRecords), key);
         }
     }
 
-    public static int run(Path input, Path output, Configuration conf) throws Exception {
+    public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
         LOG.info("starting prefix");
+        Configuration conf = statsConfig.getConf();
         setSchemas(conf);
 
         Job job = Job.getInstance(conf, "JOB: Phase prefix");
         job.setJarByClass(PhasePrefix.class);
+        //job.setNumReduceTasks(0);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PrefixMapper.class);
 

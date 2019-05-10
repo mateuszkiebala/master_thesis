@@ -32,6 +32,7 @@ import minimal_algorithms.avro_types.group_by.*;
 import minimal_algorithms.avro_types.utils.KeyRecord;
 import minimal_algorithms.sending.Sender;
 import minimal_algorithms.statistics.StatisticsUtils;
+import minimal_algorithms.config.GroupByConfig;
 
 public class PhaseGroupBy {
 
@@ -39,9 +40,9 @@ public class PhaseGroupBy {
     static final Integer MASTER_MACHINE_INDEX = 0;
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
-        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
-        Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.BASE_SCHEMA);
+        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.STATISTICS_AGGREGATOR_SCHEMA);
+        Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.GROUP_BY_KEY_SCHEMA);
 
         GroupByRecord.setSchema(statisticsAggregatorSchema, keyRecordSchema);
         MultipleGroupByRecords.setSchema(GroupByRecord.getClassSchema());
@@ -61,8 +62,8 @@ public class PhaseGroupBy {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
-            keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.GROUP_BY_KEY_SCHEMA);
+            statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.STATISTICS_AGGREGATOR_SCHEMA);
+            keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.GROUP_BY_KEY_SCHEMA);
             sender = new Sender(ctx);
         }
 
@@ -145,8 +146,9 @@ public class PhaseGroupBy {
         }
     }
 
-    public static int run(Path input, Path output, Configuration conf) throws Exception {
+    public static int run(Path input, Path output, GroupByConfig groupByConfig) throws Exception {
         LOG.info("starting group_by");
+        Configuration conf = groupByConfig.getConf();
         setSchemas(conf);
 
         Job job = Job.getInstance(conf, "JOB: PhaseGroupBy");

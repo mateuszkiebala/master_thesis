@@ -15,6 +15,9 @@ import minimal_algorithms.record.RWC4Cmps;
 import minimal_algorithms.record.Record4Float;
 import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.group_by.*;
+import minimal_algorithms.config.BaseConfig;
+import minimal_algorithms.config.StatisticsConfig;
+import minimal_algorithms.config.GroupByConfig;
 
 /**
  *
@@ -32,8 +35,6 @@ public class SortAvroRecord extends Configured implements Tool {
     public static final String GROUP_BY_SUPERDIR = "/6_group_by_output";
 
     public static final String IS_LAST_DIMENSION_KEY = "is.last.dimension";
-    public static final String STATISTICS_AGGREGATOR_SCHEMA = "statisticer.schema";
-    public static final String GROUP_BY_KEY_SCHEMA = "group_by_key.schema";
     public static final int NO_OF_DIMENSIONS = 4;
 
     private Path getSamplingSuperdir(String commonPrefix, String dimPrefix) {
@@ -80,9 +81,11 @@ public class SortAvroRecord extends Configured implements Tool {
         //paths for files storing lo and hi borders; the last one was computed in this dimension; the missing ones were not yet computed
         Utils.storeInConfLoBoundsFilenamesComputedSoFar(conf);
         Utils.storeInConfHiBoundsFilenamesComputedSoFar(conf);
-        Utils.storeMainObjectSchemaInConf(conf, Record4Float.getClassSchema());
-        Utils.storeSchemaInConf(conf, SumStatisticsAggregator.getClassSchema(), STATISTICS_AGGREGATOR_SCHEMA);
-        Utils.storeSchemaInConf(conf, IntKeyRecord4Float.getClassSchema(), GROUP_BY_KEY_SCHEMA);
+        Utils.storeSchemaInConf(conf, Record4Float.getClassSchema(), BaseConfig.BASE_SCHEMA);
+
+        BaseConfig baseConfig = new BaseConfig(conf, Record4Float.getClassSchema());
+        StatisticsConfig statsConfig = new StatisticsConfig(conf, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema());
+        GroupByConfig groupByConfig = new GroupByConfig(conf, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema(), IntKeyRecord4Float.getClassSchema());
 
         Path samplingSuperdir = new Path(args[1] + SAMPLING_SUPERDIR);
         Path sortingSuperdir = new Path(args[1] + SORTING_SUPERDIR);
@@ -117,11 +120,10 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         //PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
-        //PhaseRanking.run(sortingSuperdir, rankingSuperdir, conf);
-        //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, conf);
-        PhasePrefix.run(sortingSuperdir, prefixSuperdir, conf);
-
-        //PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, conf);
+        //PhaseRanking.run(sortingSuperdir, rankingSuperdir, baseConfig);
+        //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
+        PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);
+        //PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);
 
         System.out.println("n="+n);
         System.out.println("t="+t);

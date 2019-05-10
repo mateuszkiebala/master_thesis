@@ -3,6 +3,7 @@ package minimal_algorithms.avro_types.utils;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.specific.SpecificData;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.avro.specific.SpecificRecord;
 
@@ -20,6 +21,10 @@ public class SendWrapper extends SpecificRecordBase implements SpecificRecord {
     }
 
     public static Schema getClassSchema() { return SCHEMA$; }
+
+    public static SendWrapper duplicate(SendWrapper record) {
+        return SpecificData.get().deepCopy(getClassSchema(), record);
+    }
 
     private GenericRecord record1;
     private GenericRecord record2;

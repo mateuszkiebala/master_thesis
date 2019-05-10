@@ -28,6 +28,7 @@ import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.sending.Sender;
 import minimal_algorithms.statistics.StatisticsUtils;
+import minimal_algorithms.config.StatisticsConfig;
 
 public class PhasePartitionStatistics {
 
@@ -35,7 +36,7 @@ public class PhasePartitionStatistics {
     static final String PARTITION_STATISTICS_CACHE = "partition_statistics.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA);
         MultipleMainObjects.setSchema(mainObjectSchema);
     }
 
@@ -49,7 +50,7 @@ public class PhasePartitionStatistics {
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA));
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
             sender = new Sender(ctx);
         }
 
@@ -77,10 +78,11 @@ public class PhasePartitionStatistics {
         }
     }
 
-    public static int run(Path input, Path output, Configuration conf) throws Exception {
+    public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
         LOG.info("starting partition statistics");
+        Configuration conf = statsConfig.getConf();
         setSchemas(conf);
-        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SortAvroRecord.STATISTICS_AGGREGATOR_SCHEMA);
+        Schema statisticsAggregatorSchema = statsConfig.getStatisticsAggregatorSchema();
 
         Job job = Job.getInstance(conf, "JOB: Phase partition statistics");
         job.setJarByClass(PhasePartitionStatistics.class);

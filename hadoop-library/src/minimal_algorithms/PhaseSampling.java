@@ -24,6 +24,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import minimal_algorithms.config.BaseConfig;
 
 /**
  *
@@ -78,7 +79,7 @@ public class PhaseSampling {
             super.setup(ctx);
             noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(ctx.getConfiguration());
+            mainObjectSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA);
         }
         
         @Override
@@ -102,7 +103,7 @@ public class PhaseSampling {
 
     public static int runSampling(Path input, Path output, Configuration conf) throws IOException, InterruptedException, ClassNotFoundException {
         SortAvroRecord.LOG.info("starting phase 1 sampling");
-        Schema mainObjectSchema = Utils.retrieveMainObjectSchemaFromConf(conf);
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
 
         Job job = Job.getInstance(conf, "JOB: Phase one sampling");
         job.setJarByClass(PhaseSampling.class);
