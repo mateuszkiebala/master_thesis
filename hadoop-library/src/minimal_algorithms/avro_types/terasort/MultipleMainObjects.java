@@ -19,6 +19,14 @@ public class MultipleMainObjects extends org.apache.avro.specific.SpecificRecord
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
+  public static MultipleMainObjects deepCopy(MultipleMainObjects record) {
+    return SpecificData.get().deepCopy(getClassSchema(), record);
+  }
+
+  public static MultipleMainObjects deepCopy(MultipleMainObjects record, Schema recordSchema) {
+    return SpecificData.get().deepCopy(recordSchema, record);
+  }
+
   private List<GenericRecord> records;
 
   public MultipleMainObjects() {}

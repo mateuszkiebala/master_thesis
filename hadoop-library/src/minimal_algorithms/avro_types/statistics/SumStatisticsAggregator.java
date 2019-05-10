@@ -3,7 +3,6 @@ package minimal_algorithms.avro_types.statistics;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.specific.SpecificData;
 import minimal_algorithms.record.Record4Float;
 
 public class SumStatisticsAggregator extends StatisticsAggregator {

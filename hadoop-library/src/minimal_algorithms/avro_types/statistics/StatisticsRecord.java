@@ -19,6 +19,14 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
+    public static StatisticsRecord deepCopy(StatisticsRecord record) {
+        return SpecificData.get().deepCopy(getClassSchema(), record);
+    }
+
+    public static StatisticsRecord deepCopy(StatisticsRecord record, Schema recordSchema) {
+        return SpecificData.get().deepCopy(recordSchema, record);
+    }
+
     private StatisticsAggregator statisticsAggregator;
     private GenericRecord mainObject;
 

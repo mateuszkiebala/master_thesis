@@ -19,6 +19,14 @@ public class MultipleStatisticRecords extends org.apache.avro.specific.SpecificR
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
+    public static MultipleStatisticRecords deepCopy(MultipleStatisticRecords record) {
+        return SpecificData.get().deepCopy(getClassSchema(), record);
+    }
+
+    public static MultipleStatisticRecords deepCopy(MultipleStatisticRecords record, Schema recordSchema) {
+        return SpecificData.get().deepCopy(recordSchema, record);
+    }
+
     private List<StatisticsRecord> records;
 
     public MultipleStatisticRecords() {}

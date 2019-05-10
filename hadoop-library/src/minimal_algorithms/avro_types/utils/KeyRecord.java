@@ -30,4 +30,8 @@ public abstract class KeyRecord<T> extends SpecificRecordBase implements Specifi
         }
         return keyRecord;
     }
+
+    public static KeyRecord deepCopy(KeyRecord record, Schema recordSchema) {
+        return SpecificData.get().deepCopy(recordSchema, record);
+    }
 }

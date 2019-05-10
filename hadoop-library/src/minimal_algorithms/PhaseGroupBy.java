@@ -16,7 +16,6 @@ import org.apache.avro.mapred.AvroValue;
 import org.apache.avro.mapreduce.AvroJob;
 import org.apache.avro.mapreduce.AvroKeyValueInputFormat;
 import org.apache.avro.mapreduce.AvroKeyValueOutputFormat;
-import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.hadoop.io.AvroKeyValue;
 import org.apache.hadoop.conf.Configuration;
@@ -71,8 +70,7 @@ public class PhaseGroupBy {
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
             try {
                 List<GroupByRecord> groupByRecords = new ArrayList<>();
-                MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), value.datum());
-                for (GenericRecord record : mainObjects.getRecords()) {
+                for (GenericRecord record : MultipleMainObjects.deepCopy(value.datum()).getRecords()) {
                     StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
                     KeyRecord keyRecord = KeyRecord.create(keyRecordSchema, record);
                     groupByRecords.add(new GroupByRecord(statisticsAggregator, keyRecord));
@@ -124,7 +122,7 @@ public class PhaseGroupBy {
                 Map<KeyRecord, StatisticsAggregator> grouped = new HashMap<>();
 
                 for (AvroValue<GroupByRecord> value : values) {
-                    GroupByRecord record = SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), value.datum());
+                    GroupByRecord record = GroupByRecord.deepCopy(value.datum());
                     KeyRecord keyRecord = record.getKey();
                     if (grouped.containsKey(keyRecord)) {
                         StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
@@ -139,7 +137,7 @@ public class PhaseGroupBy {
                 }
             } else {
                 for (AvroValue<GroupByRecord> value : values) {
-                    result.add(SpecificData.get().deepCopy(GroupByRecord.getClassSchema(), value.datum()));
+                    result.add(GroupByRecord.deepCopy(value.datum()));
                 }
             }
             sender.sendToMachine(new MultipleGroupByRecords(result), key);

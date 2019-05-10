@@ -18,6 +18,14 @@ public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecor
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
+  public static MultipleRankWrappers deepCopy(MultipleRankWrappers record) {
+    return SpecificData.get().deepCopy(getClassSchema(), record);
+  }
+
+  public static MultipleRankWrappers deepCopy(MultipleRankWrappers record, Schema recordSchema) {
+    return SpecificData.get().deepCopy(recordSchema, record);
+  }
+
   private List<RankWrapper> records;
 
   public MultipleRankWrappers() {}

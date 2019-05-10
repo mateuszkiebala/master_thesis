@@ -20,6 +20,14 @@ public class GroupByRecord extends org.apache.avro.specific.SpecificRecordBase i
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
+    public static GroupByRecord deepCopy(GroupByRecord record) {
+        return SpecificData.get().deepCopy(getClassSchema(), record);
+    }
+
+    public static GroupByRecord deepCopy(GroupByRecord record, Schema recordSchema) {
+        return SpecificData.get().deepCopy(recordSchema, record);
+    }
+
     private StatisticsAggregator statisticsAggregator;
     private KeyRecord key;
 

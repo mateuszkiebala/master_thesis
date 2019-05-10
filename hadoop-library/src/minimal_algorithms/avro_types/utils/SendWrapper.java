@@ -22,8 +22,12 @@ public class SendWrapper extends SpecificRecordBase implements SpecificRecord {
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
-    public static SendWrapper duplicate(SendWrapper record) {
+    public static SendWrapper deepCopy(SendWrapper record) {
         return SpecificData.get().deepCopy(getClassSchema(), record);
+    }
+
+    public static SendWrapper deepCopy(SendWrapper record, Schema recordSchema) {
+        return SpecificData.get().deepCopy(recordSchema, record);
     }
 
     private GenericRecord record1;

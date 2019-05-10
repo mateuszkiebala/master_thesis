@@ -18,6 +18,14 @@ public class MultipleGroupByRecords extends org.apache.avro.specific.SpecificRec
 
     public static Schema getClassSchema() { return SCHEMA$; }
 
+    public static MultipleGroupByRecords deepCopy(MultipleGroupByRecords record) {
+        return SpecificData.get().deepCopy(getClassSchema(), record);
+    }
+
+    public static MultipleGroupByRecords deepCopy(MultipleGroupByRecords record, Schema recordSchema) {
+        return SpecificData.get().deepCopy(recordSchema, record);
+    }
+
     private List<GroupByRecord> records;
 
     public MultipleGroupByRecords() {}

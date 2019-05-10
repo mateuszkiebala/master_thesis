@@ -1,7 +1,6 @@
 package minimal_algorithms.avro_types.group_by;
 
 import org.apache.avro.Schema;
-import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 import minimal_algorithms.record.Record4Float;
 import minimal_algorithms.avro_types.utils.KeyRecord;

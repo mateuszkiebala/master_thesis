@@ -16,7 +16,6 @@ import org.apache.avro.mapreduce.AvroJob;
 import org.apache.avro.mapreduce.AvroKeyValueInputFormat;
 import org.apache.avro.mapreduce.AvroKeyValueOutputFormat;
 import org.apache.avro.mapreduce.AvroMultipleOutputs;
-import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.hadoop.io.AvroKeyValue;
@@ -34,8 +33,6 @@ import minimal_algorithms.avro_types.ranking.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.sending.Sender;
 import minimal_algorithms.config.BaseConfig;
-
-
 
 public class PhaseRanking {
 
@@ -115,7 +112,7 @@ public class PhaseRanking {
             int partitionIndex = key.datum();
             ArrayList<RankWrapper> result = new ArrayList<>();
             for (AvroValue<MultipleMainObjects> o : values) {
-                MultipleMainObjects mainObjects = SpecificData.get().deepCopy(MultipleMainObjects.getClassSchema(), o.datum());
+                MultipleMainObjects mainObjects = MultipleMainObjects.deepCopy(o.datum());
                 int i = 0;
                 for (GenericRecord record : mainObjects.getRecords()) {
                     int rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;

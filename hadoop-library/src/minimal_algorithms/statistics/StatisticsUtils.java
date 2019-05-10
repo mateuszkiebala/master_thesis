@@ -32,15 +32,13 @@ public class StatisticsUtils {
 
     public List<StatisticsAggregator> scanLeftAggregators(List<GenericRecord> aggregators, StatisticsAggregator start) {
         List<StatisticsAggregator> result = new ArrayList<>();
-        StatisticsAggregator statsMerger = start;
-        try {
+        if (aggregators != null) {
+            StatisticsAggregator statsMerger = start;
             for (GenericRecord record : aggregators) {
-                StatisticsAggregator statisticsAggregator = (StatisticsAggregator) SpecificData.get().deepCopy(statisticsAggregatorSchema, record);
+                StatisticsAggregator statisticsAggregator = (StatisticsAggregator) record;
                 statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
-                result.add(SpecificData.get().deepCopy(statisticsAggregatorSchema, statsMerger));
+                result.add(StatisticsAggregator.deepCopy(statsMerger, statisticsAggregatorSchema));
             }
-        } catch (Exception e) {
-            System.err.println("Cannot perform foldLeftAggregators: " + e.toString());
         }
         return result;
     }
@@ -51,11 +49,13 @@ public class StatisticsUtils {
 
     public List<StatisticsAggregator> scanLeftRecords(List<GenericRecord> records, StatisticsAggregator start) {
         List<StatisticsAggregator> result = new ArrayList<>();
-        StatisticsAggregator statsMerger = start;
-        for (GenericRecord record : records) {
-            StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
-            statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
-            result.add(SpecificData.get().deepCopy(statisticsAggregatorSchema, statsMerger));
+        if (records != null) {
+            StatisticsAggregator statsMerger = start;
+            for (GenericRecord record : records) {
+                StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
+                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                result.add(StatisticsAggregator.deepCopy(statsMerger, statisticsAggregatorSchema));
+            }
         }
         return result;
     }
@@ -65,14 +65,13 @@ public class StatisticsUtils {
     }
 
     public StatisticsAggregator foldLeftAggregators(List<GenericRecord> aggregators, StatisticsAggregator start) {
-        StatisticsAggregator statsMerger = start;
-        try {
+        StatisticsAggregator statsMerger = null;
+        if (aggregators != null) {
+            statsMerger = start;
             for (GenericRecord record : aggregators) {
-                StatisticsAggregator statisticsAggregator = (StatisticsAggregator) SpecificData.get().deepCopy(statisticsAggregatorSchema, record);
+                StatisticsAggregator statisticsAggregator = (StatisticsAggregator) record;
                 statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
             }
-        } catch (Exception e) {
-            System.err.println("Cannot perform foldLeftAggregators: " + e.toString());
         }
         return statsMerger;
     }
@@ -82,10 +81,13 @@ public class StatisticsUtils {
     }
 
     public StatisticsAggregator foldLeftRecords(List<GenericRecord> records, StatisticsAggregator start) {
-        StatisticsAggregator statsMerger = start;
-        for (GenericRecord record : records) {
-            StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
-            statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+        StatisticsAggregator statsMerger = null;
+        if (records != null) {
+            statsMerger = start;
+            for (GenericRecord record : records) {
+                StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
+                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+            }
         }
         return statsMerger;
     }
@@ -99,7 +101,7 @@ public class StatisticsUtils {
         Iterator<StatisticsAggregator> itA = aggregators.iterator();
         Iterator<GenericRecord> itR = records.iterator();
         while (itA.hasNext() && itR.hasNext()) {
-            result.add(new StatisticsRecord(SpecificData.get().deepCopy(statisticsAggregatorSchema, itA.next()), itR.next()));
+            result.add(new StatisticsRecord(itA.next(), itR.next()));
         }
         return result;
     }

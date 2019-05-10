@@ -19,6 +19,14 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
+  public static RankWrapper deepCopy(RankWrapper record) {
+    return SpecificData.get().deepCopy(getClassSchema(), record);
+  }
+
+  public static RankWrapper deepCopy(RankWrapper record, Schema recordSchema) {
+    return SpecificData.get().deepCopy(recordSchema, record);
+  }
+
   private int rank;
   private GenericRecord value;
 
