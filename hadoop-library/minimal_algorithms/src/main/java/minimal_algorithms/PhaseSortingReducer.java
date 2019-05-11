@@ -26,7 +26,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.avro.reflect.ReflectData;
 import minimal_algorithms.avro_types.terasort.*;
-import minimal_algorithms.config.Config;
+import minimal_algorithms.config.BaseConfig;
 
 /**
  *
@@ -54,7 +54,7 @@ public class PhaseSortingReducer {
             this.conf = ctx.getConfiguration();
             splitPoints = Utils.readMainObjectRecordsFromLocalFileAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            mainObjectSchema = Utils.retrieveSchemaFromConf(conf, Config.BASE_SCHEMA);
+            mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
         }
 
         @Override
@@ -80,7 +80,7 @@ public class PhaseSortingReducer {
             this.conf = ctx.getConfiguration();
             amos = new AvroMultipleOutputs(ctx);
             cmp = Utils.retrieveComparatorFromConf(conf);
-            mainObjectSchema = Utils.retrieveSchemaFromConf(conf, Config.BASE_SCHEMA);
+            mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
             MultipleMainObjects.setSchema(mainObjectSchema);
         }
 
@@ -113,9 +113,10 @@ public class PhaseSortingReducer {
         }
     }
 
-    public static int runSorting(Path input, Path output, URI partitionsURI, Configuration conf) throws IOException, InterruptedException, ClassNotFoundException {
+    public static int runSorting(Path input, Path output, URI partitionsURI, BaseConfig config) throws IOException, InterruptedException, ClassNotFoundException {
         SortAvroRecord.LOG.info("starting phase 2 sorting");
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, Config.BASE_SCHEMA);
+        Configuration conf = config.getConf();
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
         MultipleMainObjects.setSchema(mainObjectSchema);
 
         Job job = Job.getInstance(conf, "JOB: Phase two sorting");

@@ -39,6 +39,10 @@ import minimal_algorithms.config.Config;
  */
 public class Utils {
 
+    public static GenericRecord deepCopy(Schema schema, GenericRecord record) {
+        return SpecificData.get().deepCopy(schema, record);
+    }
+
     public static void storeComparatorInConf(Configuration conf, Comparator sortingCmp) {
         conf.set(Config.MAIN_COMPARATOR_KEY, sortingCmp.getClass().getName());
     }
@@ -78,11 +82,11 @@ public class Utils {
     }
 
     public static int getStripsCount(Configuration conf) {
-        return conf.getInt(PhaseSampling.NO_OF_STRIPS_KEY, PhaseSampling.NO_OF_KEYS_DEFAULT);
+        return conf.getInt(Config.NO_OF_STRIPS_KEY, Config.NO_OF_KEYS_DEFAULT);
     }
 
     public static int getTotalValuesCount(Configuration conf) {
-        return conf.getInt(PhaseSampling.NO_OF_VALUES_KEY, PhaseSampling.NO_OF_KEYS_DEFAULT);
+        return conf.getInt(Config.NO_OF_VALUES_KEY, Config.NO_OF_KEYS_DEFAULT);
     }
 
     public static int getReduceTasksCount(Configuration conf) {

@@ -29,7 +29,7 @@ import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.group_by.*;
 import minimal_algorithms.avro_types.utils.KeyRecord;
-import minimal_algorithms.sending.Sender;
+import minimal_algorithms.sending.AvroSender;
 import minimal_algorithms.statistics.StatisticsUtils;
 import minimal_algorithms.config.GroupByConfig;
 
@@ -54,7 +54,7 @@ public class PhaseGroupBy {
         private Schema statisticsAggregatorSchema;
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
-        private Sender<Integer, GroupByRecord> sender;
+        private AvroSender sender;
 
         @Override
         public void setup(Context ctx) {
@@ -63,7 +63,7 @@ public class PhaseGroupBy {
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.STATISTICS_AGGREGATOR_SCHEMA);
             keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.GROUP_BY_KEY_SCHEMA);
-            sender = new Sender(ctx);
+            sender = new AvroSender(ctx);
         }
 
         @Override
@@ -95,7 +95,7 @@ public class PhaseGroupBy {
                 for (Map.Entry<KeyRecord, StatisticsAggregator> entry : grouped.entrySet()) {
                     GroupByRecord record = new GroupByRecord(entry.getValue(), entry.getKey());
                     int dstMachineIndex = entry.getKey().equals(minKey) || entry.getKey().equals(maxKey) ? MASTER_MACHINE_INDEX : key.datum();
-                    sender.sendToMachine(record, dstMachineIndex);
+                    sender.send(dstMachineIndex, record);
                 }
             } catch (Exception e) {
                 System.err.println("Cannot run group_by: " + e.toString());
@@ -106,13 +106,13 @@ public class PhaseGroupBy {
     public static class GroupByReducer extends Reducer<AvroKey<Integer>, AvroValue<GroupByRecord>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
 
         private Configuration conf;
-        private Sender<Integer, MultipleGroupByRecords> sender;
+        private AvroSender sender;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            sender = new Sender(ctx);
+            sender = new AvroSender(ctx);
         }
 
         @Override
@@ -140,7 +140,7 @@ public class PhaseGroupBy {
                     result.add(GroupByRecord.deepCopy(value.datum()));
                 }
             }
-            sender.sendToMachine(new MultipleGroupByRecords(result), key);
+            sender.send(key, new MultipleGroupByRecords(result));
         }
     }
 

@@ -26,7 +26,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import minimal_algorithms.config.Config;
+import minimal_algorithms.config.BaseConfig;
 import minimal_algorithms.sending.Sender;
 
 /**
@@ -36,25 +36,17 @@ import minimal_algorithms.sending.Sender;
 public class PhaseSampling {
     static final Log LOG = LogFactory.getLog(PhaseSampling.class);
 
-    public static final String NO_OF_VALUES_KEY = "sampling.noOfValues";
-    public static final String NO_OF_STRIPS_KEY = "sampling.noOfSplits";
-    public static final String RATIO_FOR_RANDOM_KEY = "sampling.ratioForRandom";
-    public static final int RATIO_FOR_RANDOM_DEFAULT = -1;
-    public static final int NO_OF_KEYS_DEFAULT = -1;
-    public static final int NO_OF_VALUES_DEFAULT = -1;
-
     public static class SamplerMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, NullWritable, AvroValue<GenericRecord>> implements Configurable {
 
         private Configuration conf;
         private final Random random = new Random();
-        private final AvroValue<GenericRecord> avVal = new AvroValue();
-        private Sender<NullWritable, GenericRecord> sender;
+        private Sender sender;
         private int ratioForRandom;
 
         @Override
         public void setConf(Configuration conf) {
             this.conf = conf;
-            ratioForRandom = this.conf.getInt(RATIO_FOR_RANDOM_KEY, RATIO_FOR_RANDOM_DEFAULT);
+            ratioForRandom = this.conf.getInt(BaseConfig.RATIO_FOR_RANDOM_KEY, BaseConfig.RATIO_FOR_RANDOM_DEFAULT);
         }
 
         @Override
@@ -63,10 +55,14 @@ public class PhaseSampling {
         }
 
         @Override
+        public void setup(Context ctx) {
+            sender = new Sender(ctx);
+        }
+
+        @Override
         public void map(AvroKey<GenericRecord> record, NullWritable nV, Context context) throws IOException, InterruptedException {
             if (random.nextInt(ratioForRandom) == 0) {
-                avVal.datum(record.datum());
-                context.write(NullWritable.get(), avVal);
+                sender.send(NullWritable.get(), new AvroValue<GenericRecord>(record.datum()));
             }
         }
     }
@@ -75,6 +71,7 @@ public class PhaseSampling {
 
         private Schema mainObjectSchema;
         private Comparator<GenericRecord> cmp;
+        private Sender sender;
         private int noOfSplitPoints;
 
         @Override
@@ -82,28 +79,29 @@ public class PhaseSampling {
             super.setup(ctx);
             noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            mainObjectSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), Config.BASE_SCHEMA);
+            mainObjectSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA);
+            sender = new Sender(ctx);
         }
         
         @Override
         protected void reduce(NullWritable nV, Iterable<AvroValue<GenericRecord>> values, Context context) throws IOException, InterruptedException {
-            ArrayList<GenericRecord> l = new ArrayList<>();
-            for (AvroValue<GenericRecord> t : values) {
-                l.add(SpecificData.get().deepCopy(mainObjectSchema, t.datum()));
+            ArrayList<GenericRecord> result = new ArrayList<>();
+            for (AvroValue<GenericRecord> record : values) {
+                result.add(Utils.deepCopy(mainObjectSchema, record.datum()));
             }
 
-            java.util.Collections.sort(l, cmp);
-            int step = l.size() / (noOfSplitPoints+1);
+            java.util.Collections.sort(result, cmp);
+            int step = result.size() / (noOfSplitPoints+1);
 
-            AvroKey<GenericRecord> avKey = new AvroKey<>(null);
+            AvroKey<GenericRecord> avKey = new AvroKey<>();
             for (int i = 1; i <= noOfSplitPoints; i++) {
-                avKey.datum(l.get(i * step));
-                context.write(avKey, NullWritable.get());
+                avKey.datum(result.get(i * step));
+                sender.send(avKey, NullWritable.get());
             }
         }
     }
 
-    public static int run(Path input, Path output, Config config) throws IOException, InterruptedException, ClassNotFoundException {
+    public static int run(Path input, Path output, BaseConfig config) throws IOException, InterruptedException, ClassNotFoundException {
         LOG.info("Starting phase sampling");
 
         Job job = Job.getInstance(config.getConf(), "JOB: Phase one sampling");

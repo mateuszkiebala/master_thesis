@@ -25,7 +25,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
-import minimal_algorithms.sending.Sender;
+import minimal_algorithms.sending.AvroSender;
 import minimal_algorithms.statistics.StatisticsUtils;
 import minimal_algorithms.config.StatisticsConfig;
 
@@ -43,35 +43,35 @@ public class PhasePartitionStatistics {
 
         private Configuration conf;
         private StatisticsUtils statsUtiler;
-        private Sender<Integer, StatisticsAggregator> sender;
+        private AvroSender sender;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
-            sender = new Sender(ctx);
+            sender = new AvroSender(ctx);
         }
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
-            sender.sendToMachine(statsUtiler.foldLeftRecords(value.datum().getRecords()), key);
+            sender.send(key, statsUtiler.foldLeftRecords(value.datum().getRecords()));
         }
     }
 
     public static class PartitionStatisticsReducer extends Reducer<AvroKey<Integer>, AvroValue<StatisticsAggregator>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
-        private Sender<Integer, StatisticsAggregator> sender;
+        private AvroSender sender;
 
         @Override
         public void setup(Context ctx) {
-            sender = new Sender(ctx);
+            sender = new AvroSender(ctx);
         }
 
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<StatisticsAggregator>> values, Context context) throws IOException, InterruptedException {
             for (AvroValue<StatisticsAggregator> av : values) {
-                sender.sendToMachine(av.datum(), key);
+                sender.send(key, av.datum());
                 break;
             }
         }

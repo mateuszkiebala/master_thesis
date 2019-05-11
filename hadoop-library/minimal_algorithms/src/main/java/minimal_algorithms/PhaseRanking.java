@@ -31,8 +31,8 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.avro_types.ranking.*;
 import minimal_algorithms.avro_types.terasort.*;
-import minimal_algorithms.sending.Sender;
-import minimal_algorithms.config.Config;
+import minimal_algorithms.sending.AvroSender;
+import minimal_algorithms.config.BaseConfig;
 
 public class PhaseRanking {
 
@@ -41,7 +41,7 @@ public class PhaseRanking {
     public static final String PARTITION_SIZES_CACHE = "partition_sizes.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, Config.BASE_SCHEMA);
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
         MultipleMainObjects.setSchema(mainObjectSchema);
         RankWrapper.setSchema(mainObjectSchema);
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
@@ -94,13 +94,13 @@ public class PhaseRanking {
 
         private Integer[] prefixedPartitionSizes;
         private Configuration conf;
-        private Sender<Integer, MultipleRankWrappers> sender;
+        private AvroSender sender;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            sender = new Sender(ctx);
+            sender = new AvroSender(ctx);
             prefixedPartitionSizes = readPartitionSizes(conf);
             for (int i = 1; i < prefixedPartitionSizes.length; i++) {
                 prefixedPartitionSizes[i] = prefixedPartitionSizes[i - 1] + prefixedPartitionSizes[i];
@@ -120,11 +120,11 @@ public class PhaseRanking {
                     i++;
                 }
             }
-            sender.sendToMachine(new MultipleRankWrappers(result), key);
+            sender.send(key, new MultipleRankWrappers(result));
         }
     }
 
-    public static int run(Path input, Path output, Config config) throws Exception {
+    public static int run(Path input, Path output, BaseConfig config) throws Exception {
         LOG.info("starting ranking");
         Configuration conf = config.getConf();
         mergePartitionSizes(input, conf);

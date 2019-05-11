@@ -29,7 +29,7 @@ import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.avro_types.utils.*;
 import minimal_algorithms.sending.SendingUtils;
-import minimal_algorithms.sending.Sender;
+import minimal_algorithms.sending.AvroSender;
 import minimal_algorithms.statistics.StatisticsUtils;
 import minimal_algorithms.config.StatisticsConfig;
 
@@ -52,15 +52,15 @@ public class PhasePrefix {
         private Configuration conf;
         private StatisticsAggregator[] partitionPrefixedStatistics;
         private int machinesCount;
-        private Sender<Integer, SendWrapper> sender;
+        private AvroSender sender;
         private StatisticsUtils statsUtiler;
 
         @Override
         public void setup(Context ctx) {
             conf = ctx.getConfiguration();
             setSchemas(conf);
-            machinesCount = conf.getInt(PhaseSampling.NO_OF_STRIPS_KEY, 0);
-            sender = new Sender(ctx);
+            machinesCount = conf.getInt(StatisticsConfig.NO_OF_STRIPS_KEY, 0);
+            sender = new AvroSender(ctx);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
@@ -75,14 +75,14 @@ public class PhasePrefix {
             for (GenericRecord record : value.datum().getRecords()) {
                 SendWrapper sw = new SendWrapper();
                 sw.setRecord1(record);
-                sender.sendToMachine(sw, key);
+                sender.send(key, sw);
             }
         }
     }
 
     public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
 
-        private Sender<Integer, MultipleStatisticRecords> sender;
+        private AvroSender sender;
         private Configuration conf;
         private StatisticsUtils statsUtiler;
 
@@ -90,7 +90,7 @@ public class PhasePrefix {
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            sender = new Sender(ctx);
+            sender = new AvroSender(ctx);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
         }
 
@@ -103,7 +103,7 @@ public class PhasePrefix {
             System.out.println(statistics);
             List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, groupedRecords.get(1));
             System.out.println(statsRecords);
-            sender.sendToMachine(new MultipleStatisticRecords(statsRecords), key);
+            sender.send(key, new MultipleStatisticRecords(statsRecords));
         }
     }
 
