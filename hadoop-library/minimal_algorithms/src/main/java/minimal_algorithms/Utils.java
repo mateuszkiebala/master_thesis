@@ -73,7 +73,7 @@ public class Utils {
             }
         }
         StringBuilder b = new StringBuilder();
-        names.forEach(b::append);
+        //names.forEach(b::append);
         conf.set(TREE_COMPARATORS_KEY, b.toString());
     }
 
@@ -129,7 +129,7 @@ public class Utils {
         }
         names.add(";<dummy>");
         StringBuilder b = new StringBuilder();
-        names.forEach(b::append);
+        //names.forEach(b::append);
         return b.toString();
     }
 
@@ -203,7 +203,7 @@ public class Utils {
 
         try (FileSystem hdfs = FileSystem.get(conf);
              OutputStream os = hdfs.create(path);
-             DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(new SpecificDatumWriter<>(schema))) {
+             DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<GenericRecord>(new SpecificDatumWriter<GenericRecord>(schema))) {
             dataFileWriter.create(schema, os);
 
             for (GenericRecord rec : records) {
@@ -226,7 +226,7 @@ public class Utils {
         Path path = new Path(fileName);
 
         try (SeekableInput sInput = new FsInput(path, conf);
-             FileReader<GenericRecord> fileReader = DataFileReader.openReader(sInput, new GenericDatumReader<>(schema))) {
+             FileReader<GenericRecord> fileReader = DataFileReader.openReader(sInput, new GenericDatumReader<GenericRecord>(schema))) {
             for (int i = 0; i < count; i++) {
                 records[i] = fileReader.next();
             }
@@ -289,7 +289,7 @@ public class Utils {
 
     public static void writeRecordsToLocalFileAvro(Configuration conf, String fileName, GenericRecord[] records, Schema schema) {
         File f = new File(fileName);
-        try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(new SpecificDatumWriter<>(schema))) {
+        try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<GenericRecord>(new SpecificDatumWriter<GenericRecord>(schema))) {
             dataFileWriter.create(schema, f);
 
             for (GenericRecord rec : records) {
@@ -328,7 +328,7 @@ public class Utils {
         for (int i = 0; i < reducerTasksCount; i++) {
             path = new Path(String.format(filesFormatter, i));
             try (SeekableInput sInput = new FsInput(path, conf);
-                    FileReader<GenericRecord> fileReader = DataFileReader.openReader(sInput, new GenericDatumReader<>(keyValueSchema))) {
+                    FileReader<GenericRecord> fileReader = DataFileReader.openReader(sInput, new GenericDatumReader<GenericRecord>(keyValueSchema))) {
                 while (fileReader.hasNext()) {
                     datum = fileReader.next(datum);
                     values[(int) datum.get(0)] = (int) datum.get(1);

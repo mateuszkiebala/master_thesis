@@ -78,7 +78,7 @@ public class PhaseRanking {
 
         GenericRecord datumKeyValuePair = null;
         Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
-        try (DataFileReader<GenericRecord> fileReader = new DataFileReader<>(f, new GenericDatumReader<>(keyValueSchema))) {
+        try (DataFileReader<GenericRecord> fileReader = new DataFileReader<GenericRecord>(f, new GenericDatumReader<GenericRecord>(keyValueSchema))) {
             while (fileReader.hasNext()) {
                 datumKeyValuePair = (GenericRecord) fileReader.next(datumKeyValuePair);
                 records[(int) datumKeyValuePair.get(0)] = (int) datumKeyValuePair.get(1);
