@@ -53,6 +53,7 @@ public class PhasePrefix {
         private StatisticsAggregator[] partitionPrefixedStatistics;
         private int machinesCount;
         private Sender<SendWrapper> sender;
+        private AvroValue<SendWrapper> avVal = new AvroValue<>();
         private StatisticsUtils statsUtiler;
 
         @Override
@@ -66,6 +67,7 @@ public class PhasePrefix {
 
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
+            System.out.println(value);
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
             SendWrapper wrapperedPartitionStatistics = new SendWrapper();
             wrapperedPartitionStatistics.setRecord2(partitionStatistics);
