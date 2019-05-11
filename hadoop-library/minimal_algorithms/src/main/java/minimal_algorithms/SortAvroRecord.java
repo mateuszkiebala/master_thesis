@@ -18,6 +18,7 @@ import minimal_algorithms.avro_types.group_by.*;
 import minimal_algorithms.config.BaseConfig;
 import minimal_algorithms.config.StatisticsConfig;
 import minimal_algorithms.config.GroupByConfig;
+import minimal_algorithms.config.Config;
 
 /**
  *
@@ -72,15 +73,12 @@ public class SortAvroRecord extends Configured implements Tool {
         conf.setLong(PhaseSampling.NO_OF_VALUES_KEY, n);
         conf.setInt(PhaseSampling.NO_OF_STRIPS_KEY, t);
         conf.setInt(PhaseSampling.RATIO_FOR_RANDOM_KEY, reverseRho);
-        conf.setInt(Utils.NO_OF_REDUCE_TASKS_KEY, Integer.parseInt(args[4]));
+        conf.setInt(Config.NO_OF_REDUCE_TASKS_KEY, Integer.parseInt(args[4]));
 
         conf.setBoolean(MRJobConfig.MAPREDUCE_JOB_USER_CLASSPATH_FIRST, true);//potrzebne zeby hadoop bral odpowiednie jary avro
 
         //set comparators used in this dimmension
-        Utils.storeComparatorsInConf(conf, RWC4Cmps.firstCmp, RWC4Cmps.firstCmp, RWC4Cmps.secondCmp, RWC4Cmps.thirdCmp, RWC4Cmps.fourthCmp);
-        //paths for files storing lo and hi borders; the last one was computed in this dimension; the missing ones were not yet computed
-        Utils.storeInConfLoBoundsFilenamesComputedSoFar(conf);
-        Utils.storeInConfHiBoundsFilenamesComputedSoFar(conf);
+        Utils.storeComparatorInConf(conf, RWC4Cmps.firstCmp);
         Utils.storeSchemaInConf(conf, Record4Float.getClassSchema(), BaseConfig.BASE_SCHEMA);
 
         BaseConfig baseConfig = new BaseConfig(conf, Record4Float.getClassSchema());
