@@ -104,10 +104,10 @@ public class SortAvroRecord extends Configured implements Tool {
         //         so that they divide the sample in such a way: ..., sp1, ..., sp2, ..., sp_noOfSplitPoints, ...
         //output: avro file with RecordWithCount4
         //        containing split points
-        //PhaseSampling.runSampling(input, samplingSuperdir, conf);
+        PhaseSampling.runSampling(input, samplingSuperdir, conf);
 
         //-------------------------------SORTING--------------------------------
-        //URI samplingBoundsURI = new URI(samplingSuperdir + "/part-r-00000.avro" + "#" + PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);//po # jest nazwa pod ktora plik zostanie umieszczony w cache
+        URI samplingBoundsURI = new URI(samplingSuperdir + "/part-r-00000.avro" + "#" + PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);//po # jest nazwa pod ktora plik zostanie umieszczony w cache
         //input: avro file with RecordWithCount4
         //       containing whole input
         //       and the path to the output of PhaseSampling which is cached in the cluster in the location after #
@@ -119,7 +119,7 @@ public class SortAvroRecord extends Configured implements Tool {
         //output:  avro files with pairs in AvroKeyValueOutputFormat
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
-        //PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
+        PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
         PhaseRanking.run(sortingSuperdir, rankingSuperdir, baseConfig);
         PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
         PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);

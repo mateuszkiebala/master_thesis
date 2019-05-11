@@ -1,0 +1,19 @@
+[
+{"namespace": "minimal_algorithms.record",
+ "type": "record",
+ "name": "Record4Float",
+ "fields": [
+            {"name": "first", "type": "float"},
+            {"name": "second", "type": "float"},
+            {"name": "third", "type": "float"},
+            {"name": "fourth", "type": "float"}
+           ]
+},
+{"namespace": "minimal_algorithms.avro_types.group_by",
+ "type": "record",
+ "name": "IntKeyRecord4Float",
+ "fields": [
+            {"name": "value", "type": "int"}
+           ]
+}
+]

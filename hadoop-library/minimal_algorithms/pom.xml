@@ -6,11 +6,10 @@
 
   <groupId>mateuszkiebala.minimal_algorithms</groupId>
   <artifactId>minimal_algorithms</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>minimal_algorithms</name>
-  <!-- FIXME change it to the project's website -->
-  <url>http://www.example.com</url>
+  <url>https://github.com/mateuszkiebala/master_thesis</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,11 +43,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>15.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xerial.snappy</groupId>
-      <artifactId>snappy-java</artifactId>
-      <version>1.1.4</version>
     </dependency>
   </dependencies>
 
@@ -93,18 +87,17 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
-  	</plugin>
-	<plugin>
-		            <artifactId>maven-compiler-plugin</artifactId>
-			                <version>3.1</version>
-					            <configuration>
-							                    <fork>true</fork>
-									    <executable>/home/mati/hadoop/library/tmp/jdk1.8.0_202/bin/javac</executable>
-											                </configuration>
-													        </plugin>
+  	    </plugin>
+        <!-- SET JAVA COMPILER PATH -->
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <configuration>
+            <fork>true</fork>
+            <executable>/home/mati/hadoop/library/tmp/jdk1.8.0_202/bin/javac</executable>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
 </project>
-
-<!-- mvn install:install-file -Dfile=../lib/avro-mapred-1.8.1.jar -DgroupId=mateuszkiebala -DartifactId=avro-mapred -Dversion=1.8.1 -Dpackaging=jar -DgeneratePom=true -->
