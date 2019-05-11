@@ -24,7 +24,7 @@ echo "===== Copying test input directories to HDFS ====="
 hdfs dfs -put $INPUT_R_TEST/* $INPUT_R_HDFS
 hdfs dfs -put $INPUT_T_TEST/* $INPUT_T_HDFS
 
-HDFS="hdfs://192.168.0.220:9000"
+HDFS="hdfs://192.168.0.199:9000"
 OUTPUT_HDFS="$USER_PATH/output"
 
 hdfs dfs -rm -r $OUTPUT_HDFS

@@ -120,10 +120,10 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         //PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
-        //PhaseRanking.run(sortingSuperdir, rankingSuperdir, baseConfig);
-        //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
+        PhaseRanking.run(sortingSuperdir, rankingSuperdir, baseConfig);
+        PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
         PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);
-        //PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);
+        PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);
 
         System.out.println("n="+n);
         System.out.println("t="+t);

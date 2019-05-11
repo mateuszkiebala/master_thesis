@@ -19,7 +19,7 @@ hdfs dfs -mkdir $INPUT_HDFS
 echo "===== Copying test input directory to HDFS ====="
 hdfs dfs -put $INPUT_TEST/* $INPUT_HDFS
 
-HDFS="hdfs://192.168.0.220:9000"
+HDFS="hdfs://192.168.0.199:9000"
 NUM_OF_PARTITIONS=10
 OUTPUT_HDFS=$USER_PATH
 
@@ -45,9 +45,11 @@ run() {
     ALL=0
     for file in tmp/$CORRECT_OUT_DIR/part-*
     do
+        formated_file="$file-formated"
+        sed 's/\([[:digit:]]\)\,\([[:digit:]]\)/\1.\2/g' $file > $formated_file
         correct_output="$CORRECT_OUT_DIR/output_$ALL.txt"
         printf "$file <-> $correct_output" >> $LOGS
-        if diff -Bb -c $file $correct_output >/dev/null ; then
+        if diff -Bb -c $formated_file $correct_output >/dev/null ; then
             PASSED=$((PASSED+1))
             printf "${OKGREEN} OK ${COLOR_OFF}\n" >> $LOGS
         else

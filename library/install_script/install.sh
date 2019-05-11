@@ -26,7 +26,6 @@ master=$(hostname)
 #changine this
 cat <<EOF > ${etc_hadoop}/slaves
 $(hostname)
-192.168.0.242
 EOF
 
 sed -i -e "s|^export JAVA_HOME=\${JAVA_HOME}|export JAVA_HOME=$JAVA_HOME|g" ${etc_hadoop}/hadoop-env.sh
