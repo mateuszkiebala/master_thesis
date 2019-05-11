@@ -43,7 +43,7 @@ public class PhasePartitionStatistics {
 
         private Configuration conf;
         private StatisticsUtils statsUtiler;
-        private Sender<StatisticsAggregator> sender;
+        private Sender<Integer, StatisticsAggregator> sender;
 
         @Override
         public void setup(Context ctx) {
@@ -61,7 +61,7 @@ public class PhasePartitionStatistics {
 
     public static class PartitionStatisticsReducer extends Reducer<AvroKey<Integer>, AvroValue<StatisticsAggregator>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
-        private Sender<StatisticsAggregator> sender;
+        private Sender<Integer, StatisticsAggregator> sender;
 
         @Override
         public void setup(Context ctx) {

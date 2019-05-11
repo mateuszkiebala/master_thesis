@@ -15,7 +15,6 @@ import minimal_algorithms.record.RWC4Cmps;
 import minimal_algorithms.record.Record4Float;
 import minimal_algorithms.avro_types.statistics.*;
 import minimal_algorithms.avro_types.group_by.*;
-import minimal_algorithms.config.BaseConfig;
 import minimal_algorithms.config.StatisticsConfig;
 import minimal_algorithms.config.GroupByConfig;
 import minimal_algorithms.config.Config;
@@ -77,13 +76,9 @@ public class SortAvroRecord extends Configured implements Tool {
 
         conf.setBoolean(MRJobConfig.MAPREDUCE_JOB_USER_CLASSPATH_FIRST, true);//potrzebne zeby hadoop bral odpowiednie jary avro
 
-        //set comparators used in this dimmension
-        Utils.storeComparatorInConf(conf, RWC4Cmps.firstCmp);
-        Utils.storeSchemaInConf(conf, Record4Float.getClassSchema(), BaseConfig.BASE_SCHEMA);
-
-        BaseConfig baseConfig = new BaseConfig(conf, Record4Float.getClassSchema());
-        StatisticsConfig statsConfig = new StatisticsConfig(conf, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema());
-        GroupByConfig groupByConfig = new GroupByConfig(conf, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema(), IntKeyRecord4Float.getClassSchema());
+        Config config = new Config(conf, RWC4Cmps.firstCmp, Record4Float.getClassSchema());
+        StatisticsConfig statsConfig = new StatisticsConfig(conf, RWC4Cmps.firstCmp, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema());
+        GroupByConfig groupByConfig = new GroupByConfig(conf, RWC4Cmps.firstCmp, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema(), IntKeyRecord4Float.getClassSchema());
 
         Path samplingSuperdir = new Path(args[1] + SAMPLING_SUPERDIR);
         Path sortingSuperdir = new Path(args[1] + SORTING_SUPERDIR);
@@ -102,7 +97,7 @@ public class SortAvroRecord extends Configured implements Tool {
         //         so that they divide the sample in such a way: ..., sp1, ..., sp2, ..., sp_noOfSplitPoints, ...
         //output: avro file with RecordWithCount4
         //        containing split points
-        PhaseSampling.runSampling(input, samplingSuperdir, conf);
+        PhaseSampling.run(input, samplingSuperdir, config);
 
         //-------------------------------SORTING--------------------------------
         URI samplingBoundsURI = new URI(samplingSuperdir + "/part-r-00000.avro" + "#" + PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);//po # jest nazwa pod ktora plik zostanie umieszczony w cache
@@ -118,7 +113,7 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, conf);
-        PhaseRanking.run(sortingSuperdir, rankingSuperdir, baseConfig);
+        PhaseRanking.run(sortingSuperdir, rankingSuperdir, config);
         PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
         PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);
         PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);

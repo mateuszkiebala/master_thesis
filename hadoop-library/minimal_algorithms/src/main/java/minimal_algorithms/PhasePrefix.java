@@ -52,7 +52,7 @@ public class PhasePrefix {
         private Configuration conf;
         private StatisticsAggregator[] partitionPrefixedStatistics;
         private int machinesCount;
-        private Sender<SendWrapper> sender;
+        private Sender<Integer, SendWrapper> sender;
         private StatisticsUtils statsUtiler;
 
         @Override
@@ -82,7 +82,7 @@ public class PhasePrefix {
 
     public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
 
-        private Sender<MultipleStatisticRecords> sender;
+        private Sender<Integer, MultipleStatisticRecords> sender;
         private Configuration conf;
         private StatisticsUtils statsUtiler;
 

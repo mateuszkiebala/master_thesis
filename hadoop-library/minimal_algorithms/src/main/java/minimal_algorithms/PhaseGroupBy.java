@@ -54,7 +54,7 @@ public class PhaseGroupBy {
         private Schema statisticsAggregatorSchema;
         private Schema keyRecordSchema;
         private Comparator<GenericRecord> cmp;
-        private Sender<GroupByRecord> sender;
+        private Sender<Integer, GroupByRecord> sender;
 
         @Override
         public void setup(Context ctx) {
@@ -106,7 +106,7 @@ public class PhaseGroupBy {
     public static class GroupByReducer extends Reducer<AvroKey<Integer>, AvroValue<GroupByRecord>, AvroKey<Integer>, AvroValue<MultipleGroupByRecords>> {
 
         private Configuration conf;
-        private Sender<MultipleGroupByRecords> sender;
+        private Sender<Integer, MultipleGroupByRecords> sender;
 
         @Override
         public void setup(Context ctx) {

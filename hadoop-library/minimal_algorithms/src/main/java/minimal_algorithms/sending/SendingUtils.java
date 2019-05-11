@@ -13,12 +13,6 @@ import minimal_algorithms.avro_types.utils.SendWrapper;
 
 public class SendingUtils {
 
-    public static void sendToRangeMachines(SendWrapper o, int lowerBound, int upperBound, Context context) throws IOException, InterruptedException {
-        for (int i = lowerBound; i < upperBound; i++) {
-            context.write(i, o);
-        }
-    }
-
     public static List<GenericRecord> select1Records(List<SendWrapper> records) {
         List<GenericRecord> result = new ArrayList<>();
         for (SendWrapper sw : records) {

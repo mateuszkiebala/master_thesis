@@ -6,9 +6,9 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapred.AvroValue;
 
-public class Sender<T> {
-    private final AvroValue<T> avVal = new AvroValue<>();
-    private final AvroKey<Integer> avKey = new AvroKey<>();
+public class Sender<K, V> {
+    private final AvroValue<V> avVal = new AvroValue<>();
+    private final AvroKey<K> avKey = new AvroKey<>();
     private Mapper.Context mContext;
     private Reducer.Context rContext;
 
@@ -20,23 +20,33 @@ public class Sender<T> {
         this.rContext = context;
     }
 
-    public void sendToMachine(T o, AvroKey<Integer> dstMachineIndex) throws IOException, InterruptedException {
+    public void sendToMachine(V o, AvroKey<K> dstMachineIndex) throws IOException, InterruptedException {
         avKey.datum(dstMachineIndex.datum());
         avVal.datum(o);
         send();
     }
 
-    public void sendToMachine(T o, int dstMachineIndex) throws IOException, InterruptedException {
-        avKey.datum(dstMachineIndex);
+    public void sendToMachine(V o, int dstMachineIndex) throws IOException, InterruptedException {
+        final AvroKey<Integer> key = new AvroKey<>();
+        key.datum(dstMachineIndex);
         avVal.datum(o);
-        send();
+        send(key);
     }
 
-    public void sendToRangeMachines(T o, int lowerBound, int upperBound) throws IOException, InterruptedException {
+    public void sendToRangeMachines(V o, int lowerBound, int upperBound) throws IOException, InterruptedException {
+        final AvroKey<Integer> key = new AvroKey<>();
         for (int i = lowerBound; i < upperBound; i++) {
-            avKey.datum(i);
+            key.datum(i);
             avVal.datum(o);
-            send();
+            send(key);
+        }
+    }
+
+    private <T> void send(AvroKey<T> key) throws IOException, InterruptedException {
+        if (mContext == null) {
+            rContext.write(key, avVal);
+        } else {
+            mContext.write(key, avVal);
         }
     }
 
