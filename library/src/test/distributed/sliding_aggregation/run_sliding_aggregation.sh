@@ -19,7 +19,7 @@ hdfs dfs -mkdir $INPUT_HDFS
 echo "===== Copying test input directory to HDFS ====="
 hdfs dfs -put $INPUT_TEST/* $INPUT_HDFS
 
-HDFS="hdfs://192.168.0.220:9000"
+HDFS="hdfs://192.168.0.199:9000"
 
 run() {
     NUM_OF_PARTITIONS=$1
