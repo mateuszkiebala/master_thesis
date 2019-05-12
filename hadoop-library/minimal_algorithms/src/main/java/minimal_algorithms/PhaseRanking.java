@@ -58,7 +58,7 @@ public class PhaseRanking {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             sender = new AvroSender(ctx);
-            prefixedPartitionSizes = Utils.readAvroSortingCounts(conf, PARTITION_SIZES_CACHE);
+            prefixedPartitionSizes = Utils.readAvroSortingCountsFromCache(conf, PARTITION_SIZES_CACHE);
             for (int i = 1; i < prefixedPartitionSizes.length; i++) {
                 prefixedPartitionSizes[i] = prefixedPartitionSizes[i - 1] + prefixedPartitionSizes[i];
             }
