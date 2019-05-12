@@ -39,15 +39,15 @@ public class PhasePrefix {
     public static final String PARTITION_STATISTICS_CACHE = "partition_statistics.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA);
         Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA);
-        StatisticsRecord.setSchema(statisticsAggregatorSchema, mainObjectSchema);
-        MultipleMainObjects.setSchema(mainObjectSchema);
+        StatisticsRecord.setSchema(statisticsAggregatorSchema, baseSchema);
+        MultipleBaseRecords.setSchema(baseSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
-        SendWrapper.setSchema(mainObjectSchema, statisticsAggregatorSchema);
+        SendWrapper.setSchema(baseSchema, statisticsAggregatorSchema);
     }
 
-    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<SendWrapper>> {
+    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
         private StatisticsAggregator[] partitionPrefixedStatistics;
@@ -65,7 +65,7 @@ public class PhasePrefix {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleBaseRecords> value, Context context) throws IOException, InterruptedException {
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
             SendWrapper wrapperedPartitionStatistics = new SendWrapper();
             wrapperedPartitionStatistics.setRecord2(partitionStatistics);
@@ -123,7 +123,7 @@ public class PhasePrefix {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);

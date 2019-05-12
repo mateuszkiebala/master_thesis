@@ -39,16 +39,16 @@ public class PhaseGroupBy {
     static final Integer MASTER_MACHINE_INDEX = 0;
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.BASE_SCHEMA);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.BASE_SCHEMA);
         Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.STATISTICS_AGGREGATOR_SCHEMA);
         Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.GROUP_BY_KEY_SCHEMA);
 
         GroupByRecord.setSchema(statisticsAggregatorSchema, keyRecordSchema);
         MultipleGroupByRecords.setSchema(GroupByRecord.getClassSchema());
-        MultipleMainObjects.setSchema(mainObjectSchema);
+        MultipleBaseRecords.setSchema(baseSchema);
     }
 
-    public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<GroupByRecord>> {
+    public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<GroupByRecord>> {
 
         private Configuration conf;
         private Schema statisticsAggregatorSchema;
@@ -67,10 +67,10 @@ public class PhaseGroupBy {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleMainObjects> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleBaseRecords> value, Context context) throws IOException, InterruptedException {
             try {
                 List<GroupByRecord> groupByRecords = new ArrayList<>();
-                for (GenericRecord record : MultipleMainObjects.deepCopy(value.datum()).getRecords()) {
+                for (GenericRecord record : MultipleBaseRecords.deepCopy(value.datum()).getRecords()) {
                     StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
                     KeyRecord keyRecord = KeyRecord.create(keyRecordSchema, record);
                     groupByRecords.add(new GroupByRecord(statisticsAggregator, keyRecord));
@@ -159,7 +159,7 @@ public class PhaseGroupBy {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);

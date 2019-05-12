@@ -67,7 +67,7 @@ public class PhaseSampling {
 
     public static class ComputeBoundsForSortingReducer extends Reducer<NullWritable, AvroValue<GenericRecord>, AvroKey<GenericRecord>, NullWritable> {
 
-        private Schema mainObjectSchema;
+        private Schema baseSchema;
         private Comparator<GenericRecord> cmp;
         private Sender sender;
         private int noOfSplitPoints;
@@ -77,7 +77,7 @@ public class PhaseSampling {
             super.setup(ctx);
             noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            mainObjectSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA);
+            baseSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA);
             sender = new Sender(ctx);
         }
         
@@ -85,7 +85,7 @@ public class PhaseSampling {
         protected void reduce(NullWritable nV, Iterable<AvroValue<GenericRecord>> values, Context context) throws IOException, InterruptedException {
             ArrayList<GenericRecord> result = new ArrayList<>();
             for (AvroValue<GenericRecord> record : values) {
-                result.add(Utils.deepCopy(mainObjectSchema, record.datum()));
+                result.add(Utils.deepCopy(baseSchema, record.datum()));
             }
 
             java.util.Collections.sort(result, cmp);
@@ -119,10 +119,10 @@ public class PhaseSampling {
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(NullWritable.class);
 
-        Schema mainObjectSchema = config.getBaseSchema();
-        AvroJob.setInputKeySchema(job, mainObjectSchema);
-        AvroJob.setMapOutputValueSchema(job, mainObjectSchema);
-        AvroJob.setOutputKeySchema(job, mainObjectSchema);
+        Schema baseSchema = config.getBaseSchema();
+        AvroJob.setInputKeySchema(job, baseSchema);
+        AvroJob.setMapOutputValueSchema(job, baseSchema);
+        AvroJob.setOutputKeySchema(job, baseSchema);
 
         LOG.info("Waiting for phase sampling");
         int ret = (job.waitForCompletion(true) ? 0 : 1);

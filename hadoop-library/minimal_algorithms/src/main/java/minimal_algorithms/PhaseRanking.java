@@ -41,13 +41,13 @@ public class PhaseRanking {
     public static final String PARTITION_SIZES_CACHE = "partition_sizes.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
-        MultipleMainObjects.setSchema(mainObjectSchema);
-        RankWrapper.setSchema(mainObjectSchema);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+        MultipleBaseRecords.setSchema(baseSchema);
+        RankWrapper.setSchema(baseSchema);
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
     }
 
-    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
+    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
 
         private Integer[] prefixedPartitionSizes;
         private Configuration conf;
@@ -65,13 +65,13 @@ public class PhaseRanking {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleMainObjects>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleBaseRecords>> values, Context context) throws IOException, InterruptedException {
             int partitionIndex = key.datum();
             ArrayList<RankWrapper> result = new ArrayList<>();
-            for (AvroValue<MultipleMainObjects> o : values) {
-                MultipleMainObjects mainObjects = MultipleMainObjects.deepCopy(o.datum());
+            for (AvroValue<MultipleBaseRecords> o : values) {
+                MultipleBaseRecords baseRecords = MultipleBaseRecords.deepCopy(o.datum());
                 int i = 0;
-                for (GenericRecord record : mainObjects.getRecords()) {
+                for (GenericRecord record : baseRecords.getRecords()) {
                     int rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
                     result.add(new RankWrapper(rank, record));
                     i++;
@@ -97,12 +97,12 @@ public class PhaseRanking {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, MultipleMainObjects.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, MultipleBaseRecords.getClassSchema());
 
         job.setReducerClass(RankingReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);

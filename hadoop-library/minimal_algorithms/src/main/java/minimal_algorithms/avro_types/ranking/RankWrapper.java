@@ -13,7 +13,7 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
             .record("RankWrapper").namespace("minimal_algorithms.avro_types.ranking")
             .fields()
             .name("rank").type().intType().noDefault()
-            .name("mainObject").type(schema).noDefault()
+            .name("baseRecord").type(schema).noDefault()
             .endRecord();
   }
 

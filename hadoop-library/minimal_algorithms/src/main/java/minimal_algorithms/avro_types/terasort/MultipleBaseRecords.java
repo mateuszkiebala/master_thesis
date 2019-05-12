@@ -6,12 +6,12 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 
-public class MultipleMainObjects extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+public class MultipleBaseRecords extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
     SCHEMA$ = SchemaBuilder
-            .record("MultipleMainObjects").namespace("minimal_algorithms.avro_types.terasort")
+            .record("MultipleBaseRecords").namespace("minimal_algorithms.avro_types.terasort")
             .fields()
             .name("records").type().array().items(schema).noDefault()
             .endRecord();
@@ -19,19 +19,19 @@ public class MultipleMainObjects extends org.apache.avro.specific.SpecificRecord
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
-  public static MultipleMainObjects deepCopy(MultipleMainObjects record) {
+  public static MultipleBaseRecords deepCopy(MultipleBaseRecords record) {
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static MultipleMainObjects deepCopy(MultipleMainObjects record, Schema recordSchema) {
+  public static MultipleBaseRecords deepCopy(MultipleBaseRecords record, Schema recordSchema) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 
   private List<GenericRecord> records;
 
-  public MultipleMainObjects() {}
+  public MultipleBaseRecords() {}
 
-  public MultipleMainObjects(List<GenericRecord> records) {
+  public MultipleBaseRecords(List<GenericRecord> records) {
     this.records = records;
   }
 

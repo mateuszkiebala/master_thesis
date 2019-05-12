@@ -24,12 +24,12 @@ export app_jar=$src/target/minimal_algorithms-1.0.0.jar
 ##hdfs dfs -setrep -w 1 /user/mati/input.dir
 ##hdfs fsck /user/mati/input.dir
 
-##hdfs dfs -rm -r /user/mati/1_sampling_output
-##hdfs dfs -rm -r /user/mati/2_sorting_output
-##hdfs dfs -rm -r /user/mati/3_ranking_output
-##hdfs dfs -rm -r /user/mati/4_partition_statistics_output
-##hdfs dfs -rm -r /user/mati/5_prefix_output
-##hdfs dfs -rm -r /user/mati/6_group_by_output
+hdfs dfs -rm -r /user/mati/1_sampling_output
+hdfs dfs -rm -r /user/mati/2_sorting_output
+hdfs dfs -rm -r /user/mati/3_ranking_output
+hdfs dfs -rm -r /user/mati/4_partition_statistics_output
+hdfs dfs -rm -r /user/mati/5_prefix_output
+hdfs dfs -rm -r /user/mati/6_group_by_output
 yarn jar $app_jar minimal_algorithms.SortAvroRecord -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input.dir hdfs://$nn:9000/user/mati/ 20 3 3
 
 #stop-yarn.sh

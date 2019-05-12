@@ -8,12 +8,12 @@ import org.apache.avro.specific.SpecificData;
 public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
     public static Schema SCHEMA$;
 
-    public static void setSchema(Schema statisticsAggregatorSchema, Schema mainObjectSchema) {
+    public static void setSchema(Schema statisticsAggregatorSchema, Schema baseSchema) {
         SCHEMA$ = SchemaBuilder.record("StatisticsRecord")
                 .namespace("sortavro.avro_types.statistics")
                 .fields()
                 .name("statisticsAggregator").type(statisticsAggregatorSchema).noDefault()
-                .name("mainObject").type(mainObjectSchema).noDefault()
+                .name("baseRecord").type(baseSchema).noDefault()
                 .endRecord();
     }
 
@@ -28,13 +28,13 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     }
 
     private StatisticsAggregator statisticsAggregator;
-    private GenericRecord mainObject;
+    private GenericRecord baseRecord;
 
     public StatisticsRecord() {}
 
-    public StatisticsRecord(StatisticsAggregator statisticsAggregator, GenericRecord mainObject) {
+    public StatisticsRecord(StatisticsAggregator statisticsAggregator, GenericRecord baseRecord) {
         this.statisticsAggregator = statisticsAggregator;
-        this.mainObject = mainObject;
+        this.baseRecord = baseRecord;
     }
 
     public Schema getSchema() { return SCHEMA$; }
@@ -43,7 +43,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     public Object get(int field$) {
         switch (field$) {
             case 0: return statisticsAggregator;
-            case 1: return mainObject;
+            case 1: return baseRecord;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
@@ -52,7 +52,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     public void put(int field$, Object value$) {
         switch (field$) {
             case 0: statisticsAggregator = (StatisticsAggregator)value$; break;
-            case 1: mainObject = (GenericRecord)value$; break;
+            case 1: baseRecord = (GenericRecord)value$; break;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
@@ -65,11 +65,11 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
         this.statisticsAggregator = statisticsAggregator;
     }
 
-    public GenericRecord getMainObject() {
-        return mainObject;
+    public GenericRecord getBaseRecord() {
+        return baseRecord;
     }
 
-    public void setMainObject(GenericRecord mainObject) {
-        this.mainObject = mainObject;
+    public void setBaseRecord(GenericRecord baseRecord) {
+        this.baseRecord = baseRecord;
     }
 }

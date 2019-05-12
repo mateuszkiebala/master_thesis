@@ -42,8 +42,8 @@ public class PhaseSortingReducer {
     public static final String SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS = "sampling_split_points.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
-        MultipleMainObjects.setSchema(mainObjectSchema);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+        MultipleBaseRecords.setSchema(baseSchema);
     }
 
     public static class PartitioningMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, AvroKey<Integer>, AvroValue<GenericRecord>> {
@@ -51,7 +51,7 @@ public class PhaseSortingReducer {
         private GenericRecord[] splitPoints;
         private Configuration conf;
         private Comparator<GenericRecord> cmp;
-        private Schema mainObjectSchema;
+        private Schema baseSchema;
         private AvroSender sender;
 
         @Override
@@ -59,25 +59,25 @@ public class PhaseSortingReducer {
             this.conf = ctx.getConfiguration();
             splitPoints = Utils.readRecordsFromCacheAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS, BaseConfig.BASE_SCHEMA);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+            baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
             sender = new AvroSender(ctx);
         }
 
         @Override
         protected void map(AvroKey<GenericRecord> key, NullWritable value, Context context) throws IOException, InterruptedException {
-            int dummy = java.util.Arrays.binarySearch(splitPoints, Utils.deepCopy(mainObjectSchema, key.datum()), cmp);
+            int dummy = java.util.Arrays.binarySearch(splitPoints, Utils.deepCopy(baseSchema, key.datum()), cmp);
             sender.send(dummy >= 0 ? dummy : -dummy - 1, new AvroValue<GenericRecord>(key.datum()));
         }
     }
 
-    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<GenericRecord>, AvroKey<Integer>, AvroValue<MultipleMainObjects>> {
+    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<GenericRecord>, AvroKey<Integer>, AvroValue<MultipleBaseRecords>> {
 
         private Configuration conf;
         private Comparator<GenericRecord> cmp;
         private AvroMultipleOutputs amos;
-        private Schema mainObjectSchema;
+        private Schema baseSchema;
         private final AvroValue<Integer> aInt = new AvroValue<>();
-        private final AvroValue<MultipleMainObjects> avValueMultRecords = new AvroValue<>();
+        private final AvroValue<MultipleBaseRecords> avValueMultRecords = new AvroValue<>();
         
         @Override
         public void setup(Context ctx) {
@@ -85,7 +85,7 @@ public class PhaseSortingReducer {
             setSchemas(conf);
             amos = new AvroMultipleOutputs(ctx);
             cmp = Utils.retrieveComparatorFromConf(conf);
-            mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+            baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
         }
 
         public void cleanup(Context ctx) throws IOException {
@@ -100,14 +100,14 @@ public class PhaseSortingReducer {
         protected void reduce(AvroKey<Integer> avKey, Iterable<AvroValue<GenericRecord>> values, Context context) throws IOException, InterruptedException {
             ArrayList<GenericRecord> result = new ArrayList<>();
             for (AvroValue<GenericRecord> record : values) {
-                result.add(Utils.deepCopy(mainObjectSchema, record.datum()));
+                result.add(Utils.deepCopy(baseSchema, record.datum()));
             }
             java.util.Collections.sort(result, cmp);
 
             aInt.datum(result.size());
             amos.write(BaseConfig.SORTED_COUNTS_TAG, avKey, aInt);
 
-            avValueMultRecords.datum(new MultipleMainObjects(result));
+            avValueMultRecords.datum(new MultipleBaseRecords(result));
             amos.write(BaseConfig.SORTED_DATA_TAG, avKey, avValueMultRecords);
         }
     }
@@ -134,7 +134,7 @@ public class PhaseSortingReducer {
         AvroJob.setMapOutputValueSchema(job, config.getBaseSchema());
 
         job.setReducerClass(SortingReducer.class);
-        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleMainObjects.getClassSchema());
+        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleBaseRecords.getClassSchema());
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
         LOG.info("Waiting for sorting reducer");
