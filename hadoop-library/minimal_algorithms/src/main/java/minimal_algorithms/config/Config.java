@@ -14,6 +14,7 @@ public class Config {
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
     public static final String NO_OF_VALUES_KEY = "no.of.values";
     public static final String NO_OF_STRIPS_KEY = "no.of.splits";
+    public static final String NO_OF_ITEMS_BY_MACHINE = "no.of.items.by.machine";
     public static final String RATIO_FOR_RANDOM_KEY = "ratio.for.random";
 
     public static final String SORTED_COUNTS_TAG = "sortedCountsTag";
@@ -43,6 +44,10 @@ public class Config {
         return (int) (1 / computeRHO(valuesNo, stripsNo));
     }
 
+    public static long computeItemsNoByMachine(int valuesNo, int stripsNo) {
+        return (valuesNo + stripsNo - 1) / stripsNo;
+    }
+
     public Config(Configuration conf, int valuesNo, int stripsNo, int reduceTasksNo) {
         this.conf = conf;
 
@@ -50,6 +55,7 @@ public class Config {
         conf.setInt(NO_OF_STRIPS_KEY, stripsNo);
         conf.setInt(RATIO_FOR_RANDOM_KEY, computeReversedRHO(valuesNo, stripsNo));
         conf.setInt(NO_OF_REDUCE_TASKS_KEY, reduceTasksNo);
+        conf.setLong(NO_OF_ITEMS_BY_MACHINE, computeItemsNoByMachine(valuesNo, stripsNo));
     }
 
     public Config(Config config) {

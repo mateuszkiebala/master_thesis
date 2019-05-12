@@ -96,8 +96,8 @@ public class Utils {
         return stripsNo;
     }
 
-    public static int getTotalValuesCount(Configuration conf) {
-        int valuesNo = conf.getInt(Config.NO_OF_VALUES_KEY, -1);
+    public static long getTotalValuesCount(Configuration conf) {
+        long valuesNo = conf.getLong(Config.NO_OF_VALUES_KEY, -1);
         if (valuesNo == -1) {
             throw new IllegalArgumentException("Number of values is not set in configuration.");
         }
@@ -110,6 +110,14 @@ public class Utils {
             throw new IllegalArgumentException("Number of reduce tasks is not set in configuration.");
         }
         return reducersNo;
+    }
+
+    public static long getItemsNoByMachines(Configuration conf) {
+        long itemsNo = conf.getLong(Config.NO_OF_ITEMS_BY_MACHINE, -1);
+        if (itemsNo == -1) {
+            throw new IllegalArgumentException("Number of items by machine is not set in configuration.");
+        }
+        return itemsNo;
     }
 
     public static int getRatioForRandomKey(Configuration conf) {
