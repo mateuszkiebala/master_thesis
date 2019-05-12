@@ -57,7 +57,7 @@ public class PhaseSortingReducer {
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
-            splitPoints = Utils.readRecordsFromLocalFileAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS, BaseConfig.BASE_SCHEMA);
+            splitPoints = Utils.readRecordsFromCacheAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS, BaseConfig.BASE_SCHEMA);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
             sender = new AvroSender(ctx);
