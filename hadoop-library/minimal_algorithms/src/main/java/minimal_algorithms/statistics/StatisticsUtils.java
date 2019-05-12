@@ -10,8 +10,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.AvroRuntimeException;
-import minimal_algorithms.avro_types.statistics.StatisticsAggregator;
-import minimal_algorithms.avro_types.statistics.StatisticsRecord;
 
 class StatisticsException extends Exception {
     public StatisticsException(String message) {

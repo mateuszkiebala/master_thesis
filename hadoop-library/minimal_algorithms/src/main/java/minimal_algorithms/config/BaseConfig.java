@@ -3,7 +3,7 @@ package minimal_algorithms.config;
 import java.util.Comparator;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
-import minimal_algorithms.Utils;
+import minimal_algorithms.utils.Utils;
 
 public class BaseConfig extends Config {
 

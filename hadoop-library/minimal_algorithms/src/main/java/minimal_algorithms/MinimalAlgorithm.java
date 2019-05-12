@@ -13,14 +13,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import minimal_algorithms.avro_types.statistics.*;
-import minimal_algorithms.avro_types.group_by.*;
-import minimal_algorithms.config.StatisticsConfig;
-import minimal_algorithms.config.GroupByConfig;
-import minimal_algorithms.config.BaseConfig;
-import minimal_algorithms.config.Config;
-import org.apache.avro.generic.GenericRecord;
-
+import minimal_algorithms.config.*;
+import minimal_algorithms.utils.*;
+import minimal_algorithms.phases.*;
 
 public class MinimalAlgorithm {
 
