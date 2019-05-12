@@ -47,49 +47,6 @@ public class PhaseRanking {
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
     }
 
-    private static void mergePartitionSizes(Path input, Configuration conf) {
-        try {
-            List<String> countFiles = new ArrayList<>();
-            FileSystem hdfs = FileSystem.get(conf);
-            FileStatus[] statusList = hdfs.listStatus(input);
-            if (statusList != null) {
-                for (FileStatus fileStatus : statusList) {
-                    String filename = fileStatus.getPath().getName();
-                    Pattern regex = Pattern.compile(BaseConfig.SORTED_COUNTS_TAG + "-r-.*\\.avro");
-                    Matcher matcher = regex.matcher(filename);
-
-                    if (matcher.find()) {
-                        countFiles.add(input.toString() + "/" + filename);
-                    }
-                }
-                countFiles.add(input.toString() + "/" + PARTITION_SIZES_FILE);
-                new ConcatTool().run(System.in, System.out, System.err, countFiles);
-            }
-        } catch (Exception e) {
-            System.err.println("Cannot merge partition sizes: " + e.toString());
-        }
-    }
-
-    private static Integer[] readPartitionSizes(Configuration conf) {
-        int stripsCount = Utils.getStripsCount(conf);
-        Integer[] records = new Integer[stripsCount];
-        String fileName = PARTITION_SIZES_CACHE;
-        File f = new File(fileName);
-
-        GenericRecord datumKeyValuePair = null;
-        Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
-        try (DataFileReader<GenericRecord> fileReader = new DataFileReader<GenericRecord>(f, new GenericDatumReader<GenericRecord>(keyValueSchema))) {
-            while (fileReader.hasNext()) {
-                datumKeyValuePair = (GenericRecord) fileReader.next(datumKeyValuePair);
-                records[(int) datumKeyValuePair.get(0)] = (int) datumKeyValuePair.get(1);
-            }
-        } catch (IOException ie) {
-            throw new IllegalArgumentException("can't read local file " + fileName, ie);
-        }
-
-        return records;
-    }
-
     public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleMainObjects>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
 
         private Integer[] prefixedPartitionSizes;
@@ -101,7 +58,7 @@ public class PhaseRanking {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             sender = new AvroSender(ctx);
-            prefixedPartitionSizes = readPartitionSizes(conf);
+            prefixedPartitionSizes = Utils.readAvroSortingCounts(conf, PARTITION_SIZES_CACHE);
             for (int i = 1; i < prefixedPartitionSizes.length; i++) {
                 prefixedPartitionSizes[i] = prefixedPartitionSizes[i - 1] + prefixedPartitionSizes[i];
             }
@@ -127,13 +84,12 @@ public class PhaseRanking {
     public static int run(Path input, Path output, BaseConfig config) throws Exception {
         LOG.info("starting ranking");
         Configuration conf = config.getConf();
-        mergePartitionSizes(input, conf);
+        Utils.mergeHDFSAvro(conf, input, BaseConfig.SORTED_COUNTS_TAG + "-r-.*\\.avro", PARTITION_SIZES_FILE);
         setSchemas(conf);
 
         Job job = Job.getInstance(conf, "JOB: Phase ranking");
-        URI partitionCountsCache = new URI(input + "/" + PARTITION_SIZES_FILE + "#" + PARTITION_SIZES_CACHE);
         job.setJarByClass(PhaseRanking.class);
-        job.addCacheFile(partitionCountsCache);
+        job.addCacheFile(new URI(input + "/" + PARTITION_SIZES_FILE + "#" + PARTITION_SIZES_CACHE));
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
 
         FileInputFormat.setInputPaths(job, input + "/" + BaseConfig.SORTED_DATA_PATTERN);

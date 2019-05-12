@@ -93,6 +93,24 @@ public class Utils {
         return conf.getInt(Config.NO_OF_REDUCE_TASKS_KEY, Config.NO_OF_REDUCE_TASKS_DEFAULT);
     }
 
+    public static Integer[] readAvroSortingCounts(Configuration conf, String fileName) {
+        int stripsCount = Utils.getStripsCount(conf);
+        Integer[] records = new Integer[stripsCount];
+        File f = new File(fileName);
+
+        GenericRecord datumKeyValuePair = null;
+        Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
+        try (DataFileReader<GenericRecord> fileReader = new DataFileReader<GenericRecord>(f, new GenericDatumReader<GenericRecord>(keyValueSchema))) {
+            while (fileReader.hasNext()) {
+                datumKeyValuePair = (GenericRecord) fileReader.next(datumKeyValuePair);
+                records[(int) datumKeyValuePair.get(0)] = (int) datumKeyValuePair.get(1);
+            }
+        } catch (IOException ie) {
+            throw new IllegalArgumentException("can't read local file " + fileName, ie);
+        }
+        return records;
+    }
+
     public static void writeRecordsToHDFSAvro(Configuration conf, String fileName, List<GenericRecord> records, Schema schema) {
         Path path = new Path(fileName);
 
@@ -131,14 +149,11 @@ public class Utils {
         return records;
     }
 
-    public static void mergeHDFSAvro(Configuration conf, Path dirPath, String filePattern, String outFileName) {
-        System.out.println(dirPath.toString());
-        System.out.println(filePattern);
-        System.out.println(outFileName);
+    public static void mergeHDFSAvro(Configuration conf, Path inputDir, String filePattern, String outFileName) {
         try {
             List<String> merged = new ArrayList<>();
             FileSystem hdfs = FileSystem.get(conf);
-            FileStatus[] statusList = hdfs.listStatus(dirPath);
+            FileStatus[] statusList = hdfs.listStatus(inputDir);
             if (statusList != null) {
                 for (FileStatus fileStatus : statusList) {
                     String filename = fileStatus.getPath().getName();
@@ -146,10 +161,10 @@ public class Utils {
                     Matcher matcher = regex.matcher(filename);
 
                     if (matcher.find()) {
-                        merged.add(dirPath.toString() + "/" + filename);
+                        merged.add(inputDir.toString() + "/" + filename);
                     }
                 }
-                merged.add(dirPath.toString() + "/" + outFileName);
+                merged.add(inputDir.toString() + "/" + outFileName);
                 new ConcatTool().run(System.in, System.out, System.err, merged);
             }
         } catch (Exception e) {
