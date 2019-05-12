@@ -42,7 +42,7 @@ public class PhaseSortingReducer {
     public static final String SAMPLING_SPLIT_POINTS_CACHE = "sampling_split_points.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
         MultipleBaseRecords.setSchema(baseSchema);
     }
 
@@ -57,9 +57,9 @@ public class PhaseSortingReducer {
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
-            splitPoints = Utils.readRecordsFromCacheAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE, BaseConfig.BASE_SCHEMA);
+            splitPoints = Utils.readRecordsFromCacheAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE, BaseConfig.BASE_SCHEMA_KEY);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+            baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
             sender = new AvroSender(ctx);
         }
 
@@ -85,7 +85,7 @@ public class PhaseSortingReducer {
             setSchemas(conf);
             amos = new AvroMultipleOutputs(ctx);
             cmp = Utils.retrieveComparatorFromConf(conf);
-            baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+            baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
         }
 
         public void cleanup(Context ctx) throws IOException {

@@ -41,7 +41,7 @@ public class PhaseRanking {
     public static final String PARTITION_SIZES_CACHE = "partition_sizes.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
         MultipleBaseRecords.setSchema(baseSchema);
         RankWrapper.setSchema(baseSchema);
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());

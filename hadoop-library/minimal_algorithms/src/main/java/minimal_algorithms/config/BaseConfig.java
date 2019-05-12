@@ -15,7 +15,7 @@ public class BaseConfig extends Config {
         this.cmp = cmp;
         this.baseSchema = baseSchema;
         Utils.storeComparatorInConf(conf, cmp);
-        Utils.storeSchemaInConf(conf, baseSchema, BASE_SCHEMA);
+        Utils.storeSchemaInConf(conf, baseSchema, BASE_SCHEMA_KEY);
     }
 
     public Comparator getCmp() {

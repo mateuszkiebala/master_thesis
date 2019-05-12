@@ -11,7 +11,7 @@ public class StatisticsConfig extends BaseConfig {
     public StatisticsConfig(Config config, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) {
         super(config, cmp, baseSchema);
         this.statisticsAggregatorSchema = statisticsAggregatorSchema;
-        Utils.storeSchemaInConf(conf, statisticsAggregatorSchema, STATISTICS_AGGREGATOR_SCHEMA);
+        Utils.storeSchemaInConf(conf, statisticsAggregatorSchema, STATISTICS_AGGREGATOR_SCHEMA_KEY);
     }
 
     public Schema getStatisticsAggregatorSchema() {

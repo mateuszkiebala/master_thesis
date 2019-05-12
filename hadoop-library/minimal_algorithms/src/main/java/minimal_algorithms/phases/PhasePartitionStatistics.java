@@ -34,7 +34,7 @@ public class PhasePartitionStatistics {
     static final String PARTITION_STATISTICS_CACHE = "partition_statistics.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);
         MultipleBaseRecords.setSchema(baseSchema);
     }
 
@@ -48,7 +48,7 @@ public class PhasePartitionStatistics {
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
             sender = new AvroSender(ctx);
         }
 

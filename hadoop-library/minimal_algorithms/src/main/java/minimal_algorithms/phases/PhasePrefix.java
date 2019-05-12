@@ -36,8 +36,8 @@ public class PhasePrefix {
     public static final String PARTITION_STATISTICS_CACHE = "partition_statistics.cache";
 
     private static void setSchemas(Configuration conf) {
-        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA);
-        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA);
+        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);
+        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
         StatisticsRecord.setSchema(statisticsAggregatorSchema, baseSchema);
         MultipleBaseRecords.setSchema(baseSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
@@ -58,7 +58,7 @@ public class PhasePrefix {
             setSchemas(conf);
             machinesCount = Utils.getStripsCount(conf);
             sender = new AvroSender(ctx);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
         }
 
         @Override
@@ -88,7 +88,7 @@ public class PhasePrefix {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             sender = new AvroSender(ctx);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
+            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
         }
 
         @Override

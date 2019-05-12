@@ -78,7 +78,7 @@ public class PhaseSampling {
             super.setup(ctx);
             noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            baseSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), "DUPA");
+            baseSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA_KEY);
             sender = new Sender(ctx);
         }
         

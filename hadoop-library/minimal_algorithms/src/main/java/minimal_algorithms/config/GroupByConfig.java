@@ -11,7 +11,7 @@ public class GroupByConfig extends StatisticsConfig {
     public GroupByConfig(Config config, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema, Schema keyRecordSchema) {
         super(config, cmp, baseSchema, statisticsAggregatorSchema);
         this.keyRecordSchema = keyRecordSchema;
-        Utils.storeSchemaInConf(conf, keyRecordSchema, GROUP_BY_KEY_SCHEMA);
+        Utils.storeSchemaInConf(conf, keyRecordSchema, GROUP_BY_KEY_SCHEMA_KEY);
     }
 
     public Schema getKeyRecordSchema() {
