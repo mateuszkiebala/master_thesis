@@ -39,7 +39,7 @@ public class PhaseSortingReducer {
 
     static final Log LOG = LogFactory.getLog(PhaseSortingReducer.class);
 
-    public static final String SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS = "sampling_split_points.cache";
+    public static final String SAMPLING_SPLIT_POINTS_CACHE = "sampling_split_points.cache";
 
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
@@ -57,7 +57,7 @@ public class PhaseSortingReducer {
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
-            splitPoints = Utils.readRecordsFromCacheAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS, BaseConfig.BASE_SCHEMA);
+            splitPoints = Utils.readRecordsFromCacheAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE, BaseConfig.BASE_SCHEMA);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
             sender = new AvroSender(ctx);
@@ -112,14 +112,14 @@ public class PhaseSortingReducer {
         }
     }
 
-    public static int runSorting(Path input, Path output, URI partitionsURI, BaseConfig config) throws IOException, InterruptedException, ClassNotFoundException {
-        LOG.info("Starting phase sorting reducer");
+    public static int run(Path input, Path samplingSuperdir, Path output, BaseConfig config) throws Exception {
+        LOG.info("Starting Phase Sorting Reducer");
         Configuration conf = config.getConf();
         setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase sorting reducer");
+        Job job = Job.getInstance(conf, "JOB: Phase Sorting Reducer");
         job.setJarByClass(PhaseSortingReducer.class);
-        job.addCacheFile(partitionsURI);
+        job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000.avro" + "#" + PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE));
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PartitioningMapper.class);
 
