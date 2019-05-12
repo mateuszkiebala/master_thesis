@@ -5,6 +5,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapred.AvroValue;
+import org.apache.hadoop.conf.Configuration;
+import minimal_algorithms.utils.Utils;
 
 public class AvroSender extends Sender {
     public AvroSender(Mapper.Context context) {
@@ -13,6 +15,30 @@ public class AvroSender extends Sender {
 
     public AvroSender(Reducer.Context context) {
         super(context);
+    }
+
+    public <V> void sendToAllLowerMachines(V value, int upperBound) throws IOException, InterruptedException {
+        sendToRangeMachines(new AvroValue<V>(value), 0 , upperBound);
+    }
+
+    public <V> void sendToAllLowerMachines(AvroValue<V> avVal, int upperBound) throws IOException, InterruptedException {
+        sendToRangeMachines(avVal, 0, upperBound);
+    }
+
+    public <V> void sendToAllHigherMachines(V value, int lowerBound) throws IOException, InterruptedException {
+        sendToRangeMachines(new AvroValue<V>(value), lowerBound + 1, Utils.getStripsCount(getConf()));
+    }
+
+    public <V> void sendToAllHigherMachines(AvroValue<V> avVal, int lowerBound) throws IOException, InterruptedException {
+        sendToRangeMachines(avVal, lowerBound + 1, Utils.getStripsCount(getConf()));
+    }
+
+    public <V> void sendToAllMachines(V value) throws IOException, InterruptedException {
+        sendToAllMachines(new AvroValue<V>(value));
+    }
+
+    public <V> void sendToAllMachines(AvroValue<V> avVal) throws IOException, InterruptedException {
+        sendToRangeMachines(avVal, 0, Utils.getStripsCount(getConf()));
     }
 
     public <V> void sendToRangeMachines(V value, int lowerBound, int upperBound) throws IOException, InterruptedException {

@@ -48,7 +48,6 @@ public class PhasePrefix {
 
         private Configuration conf;
         private StatisticsAggregator[] partitionPrefixedStatistics;
-        private int machinesCount;
         private AvroSender sender;
         private StatisticsUtils statsUtiler;
 
@@ -56,7 +55,6 @@ public class PhasePrefix {
         public void setup(Context ctx) {
             conf = ctx.getConfiguration();
             setSchemas(conf);
-            machinesCount = Utils.getStripsCount(conf);
             sender = new AvroSender(ctx);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
         }
@@ -66,7 +64,7 @@ public class PhasePrefix {
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
             SendWrapper wrapperedPartitionStatistics = new SendWrapper();
             wrapperedPartitionStatistics.setRecord2(partitionStatistics);
-            sender.sendToRangeMachines(wrapperedPartitionStatistics, key.datum() + 1, machinesCount);
+            sender.sendToAllHigherMachines(wrapperedPartitionStatistics, key.datum());
 
             List<SendWrapper> toSend = new ArrayList<>();
             for (GenericRecord record : value.datum().getRecords()) {
