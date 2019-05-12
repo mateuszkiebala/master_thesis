@@ -49,7 +49,7 @@ public class PhaseRanking {
 
     public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
 
-        private Integer[] prefixedPartitionSizes;
+        private Long[] prefixedPartitionSizes;
         private Configuration conf;
         private AvroSender sender;
 
@@ -72,7 +72,7 @@ public class PhaseRanking {
                 MultipleBaseRecords baseRecords = MultipleBaseRecords.deepCopy(o.datum());
                 int i = 0;
                 for (GenericRecord record : baseRecords.getRecords()) {
-                    int rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
+                    long rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
                     result.add(new RankWrapper(rank, record));
                     i++;
                 }

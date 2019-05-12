@@ -12,7 +12,7 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
     SCHEMA$ = SchemaBuilder
             .record("RankWrapper").namespace("minimal_algorithms.ranking")
             .fields()
-            .name("rank").type().intType().noDefault()
+            .name("rank").type().longType().noDefault()
             .name("baseRecord").type(schema).noDefault()
             .endRecord();
   }
@@ -27,12 +27,12 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 
-  private int rank;
+  private long rank;
   private GenericRecord value;
 
   public RankWrapper() {}
 
-  public RankWrapper(java.lang.Integer rank, GenericRecord value) {
+  public RankWrapper(java.lang.Long rank, GenericRecord value) {
     this.rank = rank;
     this.value = value;
   }
@@ -50,17 +50,17 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
   @Override
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: rank = (Integer)value$; break;
+    case 0: rank = (Long)value$; break;
     case 1: value = (GenericRecord)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
 
-  public Integer getRank() {
+  public Long getRank() {
     return rank;
   }
 
-  public void setRank(Integer value) {
+  public void setRank(Long value) {
     this.rank = value;
   }
 

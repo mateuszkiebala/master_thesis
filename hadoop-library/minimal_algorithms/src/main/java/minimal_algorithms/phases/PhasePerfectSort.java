@@ -48,7 +48,7 @@ public class PhasePerfectSort {
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
     }
 
-    public static class PerfectSortMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRankWrappers>, AvroKey<Integer>, AvroValue<RankWrapper>> {
+    public static class PerfectBalanceMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRankWrappers>, AvroKey<Integer>, AvroValue<RankWrapper>> {
 
         private Configuration conf;
         private AvroSender sender;
@@ -122,7 +122,7 @@ public class PhasePerfectSort {
         Job job = Job.getInstance(conf, "JOB: Phase Perfect Sort");
         job.setJarByClass(PhasePerfectSort.class);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
-        job.setMapperClass(PerfectSortMapper.class);
+        job.setMapperClass(PerfectBalanceMapper.class);
 
         FileInputFormat.setInputPaths(job, input);
         FileOutputFormat.setOutputPath(job, output);

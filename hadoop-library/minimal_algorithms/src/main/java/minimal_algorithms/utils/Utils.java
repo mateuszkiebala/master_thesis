@@ -151,17 +151,17 @@ public class Utils {
         }
     }
 
-    public static Integer[] readAvroSortingCountsFromCache(Configuration conf, String fileNameCache) {
+    public static Long[] readAvroSortingCountsFromCache(Configuration conf, String fileNameCache) {
         int stripsCount = Utils.getStripsCount(conf);
-        Integer[] records = new Integer[stripsCount];
+        Long[] records = new Long[stripsCount];
         File f = new File(fileNameCache);
 
         GenericRecord datumKeyValuePair = null;
-        Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
+        Schema keyValueSchema = AvroKeyValue.getSchema(Schema.create(Schema.Type.INT), Schema.create(Schema.Type.LONG));
         try (DataFileReader<GenericRecord> fileReader = new DataFileReader<GenericRecord>(f, new GenericDatumReader<GenericRecord>(keyValueSchema))) {
             while (fileReader.hasNext()) {
                 datumKeyValuePair = (GenericRecord) fileReader.next(datumKeyValuePair);
-                records[(int) datumKeyValuePair.get(0)] = (int) datumKeyValuePair.get(1);
+                records[(int) datumKeyValuePair.get(0)] = (long) datumKeyValuePair.get(1);
             }
         } catch (IOException ie) {
             throw new IllegalArgumentException("can't read local file " + fileNameCache, ie);
