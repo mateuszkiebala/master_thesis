@@ -27,7 +27,7 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
                 (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[(Int, T)] = {
     val sortedRdd = teraSort(rdd, cmpKey).persist()
     val distPartitionSizes = Utils.sendToAllHigherMachines(
-      sc, Utils.partitionSizes(sortedRdd).collect().zip(List.range(1, numPartitions)), numPartitions
+      sc, Utils.partitionSizes(sortedRdd).collect().zip(List.range(0, numPartitions)), numPartitions
     )
     sortedRdd.zipPartitions(distPartitionSizes){(partitionIt, partitionSizesIt) => {
       if (partitionIt.hasNext) {
@@ -54,7 +54,7 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
   (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(S, T)] = {
     val sortedRdd = teraSort(rdd, cmpKey).persist()
     val distPartitionStatistics = Utils.sendToAllHigherMachines(
-      sc, partitionStatistics(sortedRdd, statsAgg).collect().zip(List.range(1, numPartitions)), numPartitions
+      sc, partitionStatistics(sortedRdd, statsAgg).collect().zip(List.range(0, numPartitions)), numPartitions
     )
     sortedRdd.zipPartitions(distPartitionStatistics){(partitionIt, partitionStatisticsIt) => {
       if (partitionIt.hasNext) {

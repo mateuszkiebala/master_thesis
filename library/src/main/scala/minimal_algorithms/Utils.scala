@@ -23,7 +23,7 @@ object Utils {
 
   /**
     * Creates RDD (with numPartitions partitions) from arr.
-    * Then shuffles rdd objects by sending them to machines [machineIndexLowerBound, numPartitions)
+    * Then shuffles rdd objects by sending them to machines (machineIndexLowerBound, numPartitions)
     * Method does NOT preserve order.
     * @param arr  Seq[(object, machineIndexLowerBound)]
     */
@@ -32,14 +32,14 @@ object Utils {
   }
 
   /**
-    * Shuffles rdd objects by sending them to machines [machineIndexLowerBound, numPartitions)
+    * Shuffles rdd objects by sending them to machines (machineIndexLowerBound, numPartitions)
     * Method does NOT preserve order.
     * @param rdd  RDD[(object, machineIndexLowerBound)]
     */
   def sendToAllHigherMachines[T](rdd: RDD[(T, Int)])(implicit rtag: ClassTag[T]): RDD[T] = {
     val numPartitions = rdd.getNumPartitions
     partitionByKey(rdd.mapPartitions(partition => {
-      partition.flatMap{case (o, lowerBound) => List.range(lowerBound, numPartitions).map{i => (i, o)}}
+      partition.flatMap{case (o, lowerBound) => List.range(lowerBound + 1, numPartitions).map{i => (i, o)}}
     }))
   }
 
