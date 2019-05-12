@@ -88,7 +88,7 @@ public class PhasePartitionStatistics {
         job.setNumReduceTasks(1);
         job.setMapperClass(PartitionPrefixMapper.class);
 
-        FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
+        FileInputFormat.setInputPaths(job, input + "/" + StatisticsConfig.SORTED_DATA_PATTERN);
         FileOutputFormat.setOutputPath(job, output);
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);

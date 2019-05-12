@@ -118,7 +118,7 @@ public class PhasePrefix {
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PrefixMapper.class);
 
-        FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
+        FileInputFormat.setInputPaths(job, input + "/" + StatisticsConfig.SORTED_DATA_PATTERN);
         FileOutputFormat.setOutputPath(job, output);
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);

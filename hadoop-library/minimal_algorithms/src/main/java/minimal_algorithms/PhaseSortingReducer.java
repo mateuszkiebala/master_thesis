@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.avro.Schema;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapred.AvroValue;
@@ -15,30 +17,34 @@ import org.apache.avro.mapreduce.AvroKeyInputFormat;
 import org.apache.avro.mapreduce.AvroKeyValueOutputFormat;
 import org.apache.avro.mapreduce.AvroMultipleOutputs;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.specific.SpecificData;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.avro.reflect.ReflectData;
 import minimal_algorithms.avro_types.terasort.*;
 import minimal_algorithms.config.BaseConfig;
+import minimal_algorithms.sending.AvroSender;
 
 /**
  *
- * @author jsroka
+ * @author jsroka, mateuszkiebala
  */
 public class PhaseSortingReducer {
 
-    public static final String COUNTS_TAG = "sortingCountsTag";
-    public static final String DATA_TAG = "sortingDataTag";
-    public static final String DATA_GLOB = "sortingDataTag-r-*.avro";
-    public static final String COUNTS_MERGED_FILENAME = "sorting_counts_filename.txt";
+    static final Log LOG = LogFactory.getLog(PhaseSortingReducer.class);
+
     public static final String SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS = "sampling_split_points.cache";
+
+    private static void setSchemas(Configuration conf) {
+        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+        MultipleMainObjects.setSchema(mainObjectSchema);
+    }
 
     public static class PartitioningMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, AvroKey<Integer>, AvroValue<GenericRecord>> {
 
@@ -46,8 +52,7 @@ public class PhaseSortingReducer {
         private Configuration conf;
         private Comparator<GenericRecord> cmp;
         private Schema mainObjectSchema;
-        private final AvroValue<GenericRecord> avVal = new AvroValue<>();
-        private final AvroKey<Integer> avKey = new AvroKey<>();
+        private AvroSender sender;
 
         @Override
         public void setup(Context ctx) {
@@ -55,14 +60,13 @@ public class PhaseSortingReducer {
             splitPoints = Utils.readMainObjectRecordsFromLocalFileAvro(conf, PhaseSortingReducer.SAMPLING_SPLIT_POINTS_CACHE_FILENAME_ALIAS);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
+            sender = new AvroSender(ctx);
         }
 
         @Override
         protected void map(AvroKey<GenericRecord> key, NullWritable value, Context context) throws IOException, InterruptedException {
-            int dummy = java.util.Arrays.binarySearch(splitPoints, SpecificData.get().deepCopy(mainObjectSchema, key.datum()), cmp);
-            avKey.datum((dummy >= 0) ? dummy : -dummy - 1);
-            avVal.datum(key.datum());
-            context.write(avKey, avVal);
+            int dummy = java.util.Arrays.binarySearch(splitPoints, Utils.deepCopy(mainObjectSchema, key.datum()), cmp);
+            sender.send(dummy >= 0 ? dummy : -dummy - 1, new AvroValue<GenericRecord>(key.datum()));
         }
     }
 
@@ -73,15 +77,15 @@ public class PhaseSortingReducer {
         private AvroMultipleOutputs amos;
         private Schema mainObjectSchema;
         private final AvroValue<Integer> aInt = new AvroValue<>();
-        private final AvroValue<MultipleMainObjects> avValueMultRecords = new AvroValue<>(null);
+        private final AvroValue<MultipleMainObjects> avValueMultRecords = new AvroValue<>();
         
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
+            setSchemas(conf);
             amos = new AvroMultipleOutputs(ctx);
             cmp = Utils.retrieveComparatorFromConf(conf);
             mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
-            MultipleMainObjects.setSchema(mainObjectSchema);
         }
 
         public void cleanup(Context ctx) throws IOException {
@@ -94,60 +98,52 @@ public class PhaseSortingReducer {
 
         @Override
         protected void reduce(AvroKey<Integer> avKey, Iterable<AvroValue<GenericRecord>> values, Context context) throws IOException, InterruptedException {
-            ArrayList<GenericRecord> l = new ArrayList<>();
-            
-            //TODO how to secondary sort in avro?
-            for (AvroValue<GenericRecord> t : values) {
-                //ten iterable zwraca za każdym razem ten sam obiekt tylko z podmienionymi wartościami; co więcej zanim się wszystkiego nie obejrzy nie wiadomo ile tego bedzie
-                l.add(SpecificData.get().deepCopy(mainObjectSchema, t.datum()));
+            ArrayList<GenericRecord> result = new ArrayList<>();
+            for (AvroValue<GenericRecord> record : values) {
+                result.add(Utils.deepCopy(mainObjectSchema, record.datum()));
             }
-            java.util.Collections.sort(l, cmp);
-            
-            //write size of the group
-            aInt.datum(l.size());
-            amos.write(COUNTS_TAG, avKey, aInt);
+            java.util.Collections.sort(result, cmp);
 
-            //write group of values
-            avValueMultRecords.datum(new MultipleMainObjects(l));
-            amos.write(DATA_TAG, avKey, avValueMultRecords);            
+            aInt.datum(result.size());
+            amos.write(BaseConfig.SORTED_COUNTS_TAG, avKey, aInt);
+
+            avValueMultRecords.datum(new MultipleMainObjects(result));
+            amos.write(BaseConfig.SORTED_DATA_TAG, avKey, avValueMultRecords);
         }
     }
 
     public static int runSorting(Path input, Path output, URI partitionsURI, BaseConfig config) throws IOException, InterruptedException, ClassNotFoundException {
-        SortAvroRecord.LOG.info("starting phase 2 sorting");
+        LOG.info("Starting phase sorting reducer");
         Configuration conf = config.getConf();
-        Schema mainObjectSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA);
-        MultipleMainObjects.setSchema(mainObjectSchema);
+        setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase two sorting");
+        Job job = Job.getInstance(conf, "JOB: Phase sorting reducer");
         job.setJarByClass(PhaseSortingReducer.class);
-        job.addCacheFile(partitionsURI);//now the file is accessible at location SortAvroRecordWithOffset.PARTITIONS_CACHE_FILENAME_ALIAS, since we specified it so after # in URI
+        job.addCacheFile(partitionsURI);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PartitioningMapper.class);
 
         FileInputFormat.setInputPaths(job, input);
         FileOutputFormat.setOutputPath(job, output);
-        //FileOutputFormat.setCompressOutput(job, true);
-        //FileOutputFormat.setOutputCompressorClass(job, SnappyCodec.class);
         
         job.setInputFormatClass(AvroKeyInputFormat.class);
-        AvroJob.setInputKeySchema(job, mainObjectSchema);
+        AvroJob.setInputKeySchema(job, config.getBaseSchema());
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, mainObjectSchema);
+        AvroJob.setMapOutputValueSchema(job, config.getBaseSchema());
 
         job.setReducerClass(SortingReducer.class);
-        //job.setOutputFormatClass(AvroKeyOutputFormat.class);//AvroKeyValueOutputFormat opakowuje klucz wartosc w pare - dziala dla AvroKey/Value oraz podstawowych Writable
-        //AvroJob.setOutputKeySchema(job, RecordWithOffset.getClassSchema());//Schema.create(Schema.Type.STRING));
-        //job.setOutputValueClass(NullWritable.class);
+        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleMainObjects.getClassSchema());
+        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
-        AvroMultipleOutputs.addNamedOutput(job, PhaseSortingReducer.DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleMainObjects.getClassSchema()); // if Schema is specified as null then the default output schema is used
-        AvroMultipleOutputs.addNamedOutput(job, PhaseSortingReducer.COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
-
+        LOG.info("Waiting for sorting reducer");
         int ret = (job.waitForCompletion(true) ? 0 : 1);
+
+        Counters counters = job.getCounters();
+        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+        LOG.info("Finished phase sorting reducer, processed " + total + " key/value pairs");
 
         return ret;
     }
-
 }

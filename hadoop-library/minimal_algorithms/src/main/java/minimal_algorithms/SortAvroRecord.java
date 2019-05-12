@@ -99,9 +99,9 @@ public class SortAvroRecord extends Configured implements Tool {
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
         PhaseSortingReducer.runSorting(input, sortingSuperdir, samplingBoundsURI, baseConfig);
         PhaseRanking.run(sortingSuperdir, rankingSuperdir, baseConfig);
-        PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
-        PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);
-        PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);
+        //PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
+        //PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);
+        //PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);
 
         return 0;
     }

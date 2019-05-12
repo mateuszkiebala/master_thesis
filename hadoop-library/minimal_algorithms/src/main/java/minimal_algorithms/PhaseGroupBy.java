@@ -154,7 +154,7 @@ public class PhaseGroupBy {
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(GroupByMapper.class);
 
-        FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
+        FileInputFormat.setInputPaths(job, input + "/" + GroupByConfig.SORTED_DATA_PATTERN);
         FileOutputFormat.setOutputPath(job, output);
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);

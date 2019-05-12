@@ -55,7 +55,7 @@ public class PhaseRanking {
             if (statusList != null) {
                 for (FileStatus fileStatus : statusList) {
                     String filename = fileStatus.getPath().getName();
-                    Pattern regex = Pattern.compile(PhaseSortingReducer.COUNTS_TAG + "-r-.*\\.avro");
+                    Pattern regex = Pattern.compile(BaseConfig.SORTED_COUNTS_TAG + "-r-.*\\.avro");
                     Matcher matcher = regex.matcher(filename);
 
                     if (matcher.find()) {
@@ -136,7 +136,7 @@ public class PhaseRanking {
         job.addCacheFile(partitionCountsCache);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
 
-        FileInputFormat.setInputPaths(job, input + "/" + PhaseSortingReducer.DATA_GLOB);
+        FileInputFormat.setInputPaths(job, input + "/" + BaseConfig.SORTED_DATA_PATTERN);
         FileOutputFormat.setOutputPath(job, output);
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);

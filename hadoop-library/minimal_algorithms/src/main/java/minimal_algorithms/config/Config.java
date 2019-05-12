@@ -9,12 +9,16 @@ public class Config {
 
     public static final String BASE_SCHEMA = "base.schema";
     public static final String STATISTICS_AGGREGATOR_SCHEMA = "statisticer.schema";
-    public static final String GROUP_BY_KEY_SCHEMA = "group_by_key.schema";
+    public static final String GROUP_BY_KEY_SCHEMA = "group.by.key.schema";
     public static final String MAIN_COMPARATOR_KEY = "main.comparator.key";
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
     public static final String NO_OF_VALUES_KEY = "no.of.values";
     public static final String NO_OF_STRIPS_KEY = "no.of.splits";
     public static final String RATIO_FOR_RANDOM_KEY = "ratio.for.random";
+
+    public static final String SORTED_COUNTS_TAG = "sortedCountsTag";
+    public static final String SORTED_DATA_TAG = "sortedDataTag";
+    public static final String SORTED_DATA_PATTERN = SORTED_DATA_TAG + "-r-*.avro";
 
     public static final int RATIO_FOR_RANDOM_DEFAULT = -1;
     public static final int NO_OF_KEYS_DEFAULT = -1;
