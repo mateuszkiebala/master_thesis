@@ -56,7 +56,7 @@ public class PhasePrefix {
         public void setup(Context ctx) {
             conf = ctx.getConfiguration();
             setSchemas(conf);
-            machinesCount = conf.getInt(StatisticsConfig.NO_OF_STRIPS_KEY, 0);
+            machinesCount = Utils.getStripsCount(conf);
             sender = new AvroSender(ctx);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA));
         }

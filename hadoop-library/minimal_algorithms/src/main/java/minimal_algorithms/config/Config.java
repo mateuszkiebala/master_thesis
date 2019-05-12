@@ -20,14 +20,12 @@ public class Config {
     public static final String SORTED_DATA_TAG = "sortedDataTag";
     public static final String SORTED_DATA_PATTERN = SORTED_DATA_TAG + "-r-*.avro";
 
-    public static final int RATIO_FOR_RANDOM_DEFAULT = -1;
-    public static final int NO_OF_KEYS_DEFAULT = -1;
-    public static final int NO_OF_VALUES_DEFAULT = -1;
-    public static final int NO_OF_REDUCE_TASKS_DEFAULT = 2;
-
     protected Configuration conf;
 
     public static boolean validateValuesPerStripNo(int valuesNo, int stripsNo) {
+        if (valuesNo <= 0 || stripsNo <= 0) {
+            return false;
+        }
         int valuesPerStripNo = 1 + valuesNo / stripsNo;
         return valuesPerStripNo / 20 > Integer.MAX_VALUE ? false : true;
     }

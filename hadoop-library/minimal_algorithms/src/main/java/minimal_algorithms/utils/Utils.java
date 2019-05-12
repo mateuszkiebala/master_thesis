@@ -70,6 +70,9 @@ public class Utils {
 
     public static Schema retrieveSchemaFromConf(Configuration conf, String key) {
         String schema = conf.get(key);
+        if (schema == null) {
+            throw new IllegalArgumentException("Can't find key (" + key + ") in configuration.");
+        }
         return new Schema.Parser().parse(schema);
     }
 
@@ -79,19 +82,42 @@ public class Utils {
 
     public static Path retrievePathFromConf(Configuration conf, String key) {
         String path = conf.get(key);
+        if (path == null) {
+            throw new IllegalArgumentException("Can't find key (" + key + ") in configuration.");
+        }
         return new Path(path);
     }
 
     public static int getStripsCount(Configuration conf) {
-        return conf.getInt(Config.NO_OF_STRIPS_KEY, Config.NO_OF_KEYS_DEFAULT);
+        int stripsNo = conf.getInt(Config.NO_OF_STRIPS_KEY, -1);
+        if (stripsNo == -1) {
+            throw new IllegalArgumentException("Number of strips is not set in configuration.");
+        }
+        return stripsNo;
     }
 
     public static int getTotalValuesCount(Configuration conf) {
-        return conf.getInt(Config.NO_OF_VALUES_KEY, Config.NO_OF_KEYS_DEFAULT);
+        int valuesNo = conf.getInt(Config.NO_OF_VALUES_KEY, -1);
+        if (valuesNo == -1) {
+            throw new IllegalArgumentException("Number of values is not set in configuration.");
+        }
+        return valuesNo;
     }
 
     public static int getReduceTasksCount(Configuration conf) {
-        return conf.getInt(Config.NO_OF_REDUCE_TASKS_KEY, Config.NO_OF_REDUCE_TASKS_DEFAULT);
+        int reducersNo = conf.getInt(Config.NO_OF_REDUCE_TASKS_KEY, -1);
+        if (reducersNo == -1) {
+            throw new IllegalArgumentException("Number of reduce tasks is not set in configuration.");
+        }
+        return reducersNo;
+    }
+
+    public static int getRatioForRandomKey(Configuration conf) {
+        int ratio = conf.getInt(Config.RATIO_FOR_RANDOM_KEY, -1);
+        if (ratio == -1) {
+            throw new IllegalArgumentException("Ratio for random key is not set in configuration.");
+        }
+        return ratio;
     }
 
     public static void mergeHDFSAvro(Configuration conf, Path inputDir, String filePattern, String outFileName) {

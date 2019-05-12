@@ -45,7 +45,7 @@ public class PhaseSampling {
         @Override
         public void setConf(Configuration conf) {
             this.conf = conf;
-            ratioForRandom = this.conf.getInt(BaseConfig.RATIO_FOR_RANDOM_KEY, BaseConfig.RATIO_FOR_RANDOM_DEFAULT);
+            ratioForRandom = Utils.getRatioForRandomKey(conf);
         }
 
         @Override
@@ -78,7 +78,7 @@ public class PhaseSampling {
             super.setup(ctx);
             noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
-            baseSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA);
+            baseSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), "DUPA");
             sender = new Sender(ctx);
         }
         
