@@ -50,6 +50,9 @@ public class SortAvroRecord extends Configured implements Tool {
             return -1;
         }
 
+        MinimalAlgorithm ma = new MinimalAlgorithm(getConf(), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
+        ma.teraSort(new Path(args[1]), new Path(args[0]), new Path(args[1] + SORTING_SUPERDIR), RWC4Cmps.firstCmp, Record4Float.getClassSchema());
+        /*
         Path input = new Path(args[0]);
         int valuesNo = Integer.parseInt(args[2]);
         int stripsNo = Integer.parseInt(args[3]);
@@ -102,7 +105,7 @@ public class SortAvroRecord extends Configured implements Tool {
         PhasePartitionStatistics.run(sortingSuperdir, partitionStatisticsSuperdir, statsConfig);
         PhasePrefix.run(sortingSuperdir, prefixSuperdir, statsConfig);
         PhaseGroupBy.run(sortingSuperdir, groupBySuperdir, groupByConfig);
-
+        */
         return 0;
     }
 

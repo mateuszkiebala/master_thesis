@@ -102,6 +102,9 @@ public class PhaseSampling {
     public static int run(Path input, Path output, BaseConfig config) throws IOException, InterruptedException, ClassNotFoundException {
         LOG.info("Starting phase sampling");
 
+        System.out.println(input);
+        System.out.println(output);
+
         Job job = Job.getInstance(config.getConf(), "JOB: Phase one sampling");
         job.setJarByClass(PhaseSampling.class);
         job.setNumReduceTasks(1);

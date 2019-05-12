@@ -218,4 +218,16 @@ public class Utils {
             throw new IllegalArgumentException("can't write avro file " + fileURI, ie);
         }
     }
+
+    public static void deleteDirFromHDFS(Configuration conf, URI dirURI, boolean isRecursive) {
+        deleteDirFromHDFS(conf, new Path(dirURI), isRecursive);
+    }
+
+    public static void deleteDirFromHDFS(Configuration conf, Path dirURIPath, boolean isRecursive) {
+        try (FileSystem hdfs = FileSystem.get(conf)) {
+            hdfs.delete(dirURIPath, isRecursive);
+        } catch (IOException ie) {
+            throw new IllegalArgumentException("can't delete " + dirURIPath, ie);
+        }
+    }
 }
