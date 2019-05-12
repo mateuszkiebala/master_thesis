@@ -51,7 +51,16 @@ public class SortAvroRecord extends Configured implements Tool {
         }
 
         MinimalAlgorithm ma = new MinimalAlgorithm(getConf(), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
-        ma.teraSort(new Path(args[1]), new Path(args[0]), new Path(args[1] + SORTING_SUPERDIR), RWC4Cmps.firstCmp, Record4Float.getClassSchema());
+        Config config = ma.getConfig();
+        BaseConfig baseConfig = new BaseConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema());
+        StatisticsConfig statsConfig = new StatisticsConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema());
+        GroupByConfig groupByConfig = new GroupByConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema(), IntKeyRecord4Float.getClassSchema());
+
+        ma.ranking(new Path(args[1]), new Path(args[0]), new Path(args[1] + RANKING_SUPERDIR), baseConfig);
+        ma.prefix(new Path(args[1]), new Path(args[0]), new Path(args[1] + PREFIX_SUPERDIR), statsConfig);
+        ma.partitionStatistics(new Path(args[1]), new Path(args[0]), new Path(args[1] + PARTITION_STATISTICS_SUPERDIR), statsConfig);
+        ma.group(new Path(args[1]), new Path(args[0]), new Path(args[1] + GROUP_BY_SUPERDIR), groupByConfig);
+
         /*
         Path input = new Path(args[0]);
         int valuesNo = Integer.parseInt(args[2]);
