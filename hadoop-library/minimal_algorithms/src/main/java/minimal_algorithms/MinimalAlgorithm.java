@@ -155,6 +155,19 @@ public class MinimalAlgorithm {
         return ret;
     }
 
+    public int semiJoin(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema keyRecordSchema) throws Exception {
+        SemiJoinConfig semiJoinConfig = new SemiJoinConfig(config, cmp, baseSchema, keyRecordSchema);
+        return semiJoin(homeDir, input, output, semiJoinConfig);
+    }
+
+    public int semiJoin(Path homeDir, Path input, Path output, SemiJoinConfig semiJoinConfig) throws Exception {
+        Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
+        int ret = teraSort(homeDir, input, sortingDir, semiJoinConfig);
+        ret = ret == 0 ? PhaseSemiJoin.run(sortingDir, output, semiJoinConfig) : ret;
+        Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
+    }
+
     public Configuration getConf() {
         return conf;
     }

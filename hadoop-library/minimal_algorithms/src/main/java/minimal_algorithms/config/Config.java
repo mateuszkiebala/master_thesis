@@ -9,7 +9,7 @@ public class Config {
 
     public static final String BASE_SCHEMA_KEY = "base.schema.key";
     public static final String STATISTICS_AGGREGATOR_SCHEMA_KEY = "statistics.aggregator.schema.key";
-    public static final String GROUP_BY_KEY_SCHEMA_KEY = "group.by.key.schema.key";
+    public static final String KEY_RECORD_SCHEMA_KEY = "key.record.schema.key";
     public static final String MAIN_COMPARATOR_KEY = "main.comparator.key";
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
     public static final String NO_OF_VALUES_KEY = "no.of.values";
@@ -64,5 +64,9 @@ public class Config {
 
     public Configuration getConf() {
         return conf;
+    }
+
+    public void setConf(Configuration conf) {
+        this.conf = conf;
     }
 }

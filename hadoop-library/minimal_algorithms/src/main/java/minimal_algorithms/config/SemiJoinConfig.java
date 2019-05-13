@@ -5,11 +5,11 @@ import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
 import minimal_algorithms.utils.Utils;
 
-public class GroupByConfig extends StatisticsConfig {
+public class SemiJoinConfig extends BaseConfig {
     protected Schema keyRecordSchema;
 
-    public GroupByConfig(Config config, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema, Schema keyRecordSchema) {
-        super(config, cmp, baseSchema, statisticsAggregatorSchema);
+    public SemiJoinConfig(Config config, Comparator cmp, Schema baseSchema, Schema keyRecordSchema) {
+        super(config, cmp, baseSchema);
         this.keyRecordSchema = keyRecordSchema;
         Utils.storeSchemaInConf(conf, keyRecordSchema, KEY_RECORD_SCHEMA_KEY);
     }

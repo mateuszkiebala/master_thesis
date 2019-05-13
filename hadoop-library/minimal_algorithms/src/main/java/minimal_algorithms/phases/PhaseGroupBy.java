@@ -39,7 +39,7 @@ public class PhaseGroupBy {
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.BASE_SCHEMA_KEY);
         Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
-        Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.GROUP_BY_KEY_SCHEMA_KEY);
+        Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.KEY_RECORD_SCHEMA_KEY);
 
         GroupByRecord.setSchema(statisticsAggregatorSchema, keyRecordSchema);
         MultipleGroupByRecords.setSchema(GroupByRecord.getClassSchema());
@@ -60,7 +60,7 @@ public class PhaseGroupBy {
             setSchemas(conf);
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
-            keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.GROUP_BY_KEY_SCHEMA_KEY);
+            keyRecordSchema = Utils.retrieveSchemaFromConf(conf, GroupByConfig.KEY_RECORD_SCHEMA_KEY);
             sender = new AvroSender(ctx);
         }
 

@@ -1,5 +1,5 @@
 [
-{"namespace": "minimal_algorithms.record",
+{"namespace": "minimal_algorithms.examples.types",
  "type": "record",
  "name": "Record4Float",
  "fields": [
@@ -9,7 +9,7 @@
             {"name": "fourth", "type": "float"}
            ]
 },
-{"namespace": "minimal_algorithms.avro_types.group_by",
+{"namespace": "minimal_algorithms.examples.types",
  "type": "record",
  "name": "IntKeyRecord4Float",
  "fields": [
