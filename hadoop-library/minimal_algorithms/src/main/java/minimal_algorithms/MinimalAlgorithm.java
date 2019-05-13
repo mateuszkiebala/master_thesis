@@ -103,6 +103,18 @@ public class MinimalAlgorithm {
         Utils.deleteDirFromHDFS(conf, rankingDir, true);
     }
 
+    public void perfectSortWithRanks(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
+        perfectSortWithRanks(homeDir, input, output, baseConfig);
+    }
+
+    public void perfectSortWithRanks(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
+        Path rankingDir = new Path(homeDir + "/tmp" + RANKING_DIR);
+        ranking(homeDir, input, rankingDir, baseConfig);
+        PhasePerfectSortWithRanks.run(rankingDir, output, baseConfig);
+        Utils.deleteDirFromHDFS(conf, rankingDir, true);
+    }
+
     public void partitionStatistics(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
         StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, baseSchema, statisticsAggregatorSchema);
         partitionStatistics(homeDir, input, output, statisticsConfig);

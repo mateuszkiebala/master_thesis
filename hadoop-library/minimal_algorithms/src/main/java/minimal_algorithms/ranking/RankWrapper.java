@@ -1,5 +1,6 @@
 package minimal_algorithms.ranking;
 
+import java.util.Comparator;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
@@ -25,6 +26,15 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
 
   public static RankWrapper deepCopy(RankWrapper record, Schema recordSchema) {
     return SpecificData.get().deepCopy(recordSchema, record);
+  }
+
+  public static Comparator<RankWrapper> cmp = new RankWrapperComparator();
+
+  public static class RankWrapperComparator implements Comparator<RankWrapper> {
+    @Override
+    public int compare(RankWrapper o1, RankWrapper o2) {
+      return o1.getRank() > o2.getRank() ? 1 : (o1.getRank() < o2.getRank() ? -1 : 0);
+    }
   }
 
   private long rank;
