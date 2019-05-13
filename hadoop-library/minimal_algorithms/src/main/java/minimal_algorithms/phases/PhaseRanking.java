@@ -26,6 +26,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.TaskCounter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -82,12 +84,12 @@ public class PhaseRanking {
     }
 
     public static int run(Path input, Path output, BaseConfig config) throws Exception {
-        LOG.info("starting ranking");
+        LOG.info("Starting phase Ranking");
         Configuration conf = config.getConf();
         Utils.mergeHDFSAvro(conf, input, BaseConfig.SORTED_COUNTS_TAG + "-r-.*\\.avro", PARTITION_SIZES_FILE);
         setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase ranking");
+        Job job = Job.getInstance(conf, "JOB: Phase Ranking");
         job.setJarByClass(PhaseRanking.class);
         job.addCacheFile(new URI(input + "/" + PARTITION_SIZES_FILE + "#" + PARTITION_SIZES_CACHE));
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
@@ -111,7 +113,13 @@ public class PhaseRanking {
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setOutputValueSchema(job, MultipleRankWrappers.getClassSchema());
 
+        LOG.info("Waiting for phase Ranking");
         int ret = job.waitForCompletion(true) ? 0 : 1;
+
+        Counters counters = job.getCounters();
+        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+        LOG.info("Finished phase Ranking, processed " + total + " key/value pairs");
+
         return ret;
     }
 }

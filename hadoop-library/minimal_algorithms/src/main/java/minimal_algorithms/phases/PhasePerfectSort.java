@@ -26,6 +26,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.TaskCounter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.utils.*;
@@ -115,11 +116,11 @@ public class PhasePerfectSort {
     }
 
     public static int run(Path input, Path output, BaseConfig config) throws Exception {
-        LOG.info("Starting Phase Perfect Sort");
+        LOG.info("Starting Phase PerfectSort");
         Configuration conf = config.getConf();
         setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase Perfect Sort");
+        Job job = Job.getInstance(conf, "JOB: Phase PerfectSort");
         job.setJarByClass(PhasePerfectSort.class);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PerfectBalanceMapper.class);
@@ -140,12 +141,12 @@ public class PhasePerfectSort {
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleBaseRecords.getClassSchema());
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
-        LOG.info("Waiting for perfect sort");
+        LOG.info("Waiting for phase PerfectSort");
         int ret = job.waitForCompletion(true) ? 0 : 1;
 
         Counters counters = job.getCounters();
         long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-        LOG.info("Finished phase perfect sort, processed " + total + " key/value pairs");
+        LOG.info("Finished phase PerfectSort, processed " + total + " key/value pairs");
 
         return ret;
     }

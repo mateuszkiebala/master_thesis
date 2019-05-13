@@ -23,6 +23,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.TaskCounter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.statistics.*;
@@ -100,13 +102,12 @@ public class PhasePrefix {
     }
 
     public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
-        LOG.info("starting prefix");
+        LOG.info("starting phase Prefix");
         Configuration conf = statsConfig.getConf();
         setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase prefix");
+        Job job = Job.getInstance(conf, "JOB: Phase Prefix");
         job.setJarByClass(PhasePrefix.class);
-        //job.setNumReduceTasks(0);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PrefixMapper.class);
 
@@ -129,7 +130,13 @@ public class PhasePrefix {
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setOutputValueSchema(job, MultipleStatisticRecords.getClassSchema());
 
-        int ret = (job.waitForCompletion(true) ? 0 : 1);
+        LOG.info("Waiting for phase Prefix");
+        int ret = job.waitForCompletion(true) ? 0 : 1;
+
+        Counters counters = job.getCounters();
+        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+        LOG.info("Finished phase Prefix, processed " + total + " key/value pairs");
+
         return ret;
     }
 }

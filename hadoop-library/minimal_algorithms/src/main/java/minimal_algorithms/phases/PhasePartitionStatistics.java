@@ -21,6 +21,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.TaskCounter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import minimal_algorithms.statistics.*;
@@ -77,12 +79,12 @@ public class PhasePartitionStatistics {
     }
 
     public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
-        LOG.info("starting partition statistics");
+        LOG.info("starting phase PartitionStatistics");
         Configuration conf = statsConfig.getConf();
         setSchemas(conf);
         Schema statisticsAggregatorSchema = statsConfig.getStatisticsAggregatorSchema();
 
-        Job job = Job.getInstance(conf, "JOB: Phase partition statistics");
+        Job job = Job.getInstance(conf, "JOB: Phase PartitionStatistics");
         job.setJarByClass(PhasePartitionStatistics.class);
         job.setNumReduceTasks(1);
         job.setMapperClass(PartitionPrefixMapper.class);
@@ -106,7 +108,13 @@ public class PhasePartitionStatistics {
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setOutputValueSchema(job, statisticsAggregatorSchema);
 
+        LOG.info("Waiting for phase PartitionStatistics");
         int ret = job.waitForCompletion(true) ? 0 : 1;
+
+        Counters counters = job.getCounters();
+        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+        LOG.info("Finished phase PartitionStatistics, processed " + total + " key/value pairs");
+
         return ret;
     }
 }

@@ -20,6 +20,8 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.hadoop.io.AvroKeyValue;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.TaskCounter;
+import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -117,11 +119,11 @@ public class PhaseSemiJoin {
     }
 
     public static int run(Path input, Path output, SemiJoinConfig semiJoinConfig) throws Exception {
-        LOG.info("starting PhaseSemiJoin");
+        LOG.info("Starting Phase SemiJoin");
         Configuration conf = semiJoinConfig.getConf();
         setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: PhaseSemiJoin");
+        Job job = Job.getInstance(conf, "JOB: Phase SemiJoin");
         job.setJarByClass(PhasePrefix.class);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(TBoundsMapper.class);
@@ -145,7 +147,13 @@ public class PhaseSemiJoin {
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setOutputValueSchema(job, MultipleBaseRecords.getClassSchema());
 
+        LOG.info("Waiting for phase SemiJoin");
         int ret = job.waitForCompletion(true) ? 0 : 1;
+
+        Counters counters = job.getCounters();
+        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+        LOG.info("Finished phase SemiJoin, processed " + total + " key/value pairs");
+
         return ret;
     }
 }

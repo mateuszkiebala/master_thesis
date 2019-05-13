@@ -125,12 +125,12 @@ public class PhaseSampling {
         AvroJob.setMapOutputValueSchema(job, baseSchema);
         AvroJob.setOutputKeySchema(job, baseSchema);
 
-        LOG.info("Waiting for phase sampling");
+        LOG.info("Waiting for phase Sampling");
         int ret = job.waitForCompletion(true) ? 0 : 1;
         
         Counters counters = job.getCounters();
         long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-        LOG.info("Finished phase sampling, processed " + total + " key/value pairs");
+        LOG.info("Finished phase Sampling, processed " + total + " key/value pairs");
 
         return ret;
     }

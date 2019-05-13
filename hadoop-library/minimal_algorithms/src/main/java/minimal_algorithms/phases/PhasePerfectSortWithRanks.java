@@ -110,11 +110,11 @@ public class PhasePerfectSortWithRanks {
     }
 
     public static int run(Path input, Path output, BaseConfig config) throws Exception {
-        LOG.info("Starting phase perfect sort with ranks");
+        LOG.info("Starting phase PerfectSortWithRanks");
         Configuration conf = config.getConf();
         setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase perfect sort with ranks");
+        Job job = Job.getInstance(conf, "JOB: Phase PerfectSortWithRanks");
         job.setJarByClass(PhasePerfectSortWithRanks.class);
         job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
         job.setMapperClass(PerfectBalanceMapper.class);
@@ -135,8 +135,13 @@ public class PhasePerfectSortWithRanks {
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleRankWrappers.getClassSchema());
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
-        LOG.info("Waiting for perfect sort with ranks");
+        LOG.info("Waiting for phase PerfectSortWithRanks");
         int ret = job.waitForCompletion(true) ? 0 : 1;
+
+        Counters counters = job.getCounters();
+        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+        LOG.info("Finished phase PerfectSortWithRanks, processed " + total + " key/value pairs");
+
         return ret;
     }
 }
