@@ -28,9 +28,9 @@ public class Ranking extends Configured implements Tool {
         MinimalAlgorithm ma = new MinimalAlgorithm(getConf(), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
         Config config = ma.getConfig();
         BaseConfig baseConfig = new BaseConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema());
-        ma.ranking(new Path(args[1]), new Path(args[0]), new Path(args[1] + RANKING_SUPERDIR), baseConfig);
+        int ret = ma.ranking(new Path(args[1]), new Path(args[0]), new Path(args[1] + RANKING_SUPERDIR), baseConfig);
 
-        return 0;
+        return ret;
     }
 
     public static void main(String[] args) throws Exception {

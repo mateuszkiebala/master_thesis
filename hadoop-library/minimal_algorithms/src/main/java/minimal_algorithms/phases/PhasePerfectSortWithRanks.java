@@ -136,6 +136,7 @@ public class PhasePerfectSortWithRanks {
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
         LOG.info("Waiting for perfect sort with ranks");
-        return (job.waitForCompletion(true) ? 0 : 1);
+        int ret = job.waitForCompletion(true) ? 0 : 1;
+        return ret;
     }
 }

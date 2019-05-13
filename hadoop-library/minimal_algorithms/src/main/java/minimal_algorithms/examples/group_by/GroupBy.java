@@ -29,8 +29,8 @@ public class GroupBy extends Configured implements Tool {
         Config config = ma.getConfig();
         GroupByConfig groupByConfig = new GroupByConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema(),
                                                         SumStatisticsAggregator.getClassSchema(), IntKeyRecord4Float.getClassSchema());
-        ma.group(new Path(args[1]), new Path(args[0]), new Path(args[1] + GROUP_BY_SUPERDIR), groupByConfig);
-        return 0;
+        int ret = ma.group(new Path(args[1]), new Path(args[0]), new Path(args[1] + GROUP_BY_SUPERDIR), groupByConfig);
+        return ret;
     }
 
     public static void main(String[] args) throws Exception {

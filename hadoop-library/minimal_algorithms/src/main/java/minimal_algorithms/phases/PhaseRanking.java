@@ -111,7 +111,7 @@ public class PhaseRanking {
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setOutputValueSchema(job, MultipleRankWrappers.getClassSchema());
 
-        int ret = (job.waitForCompletion(true) ? 0 : 1);
+        int ret = job.waitForCompletion(true) ? 0 : 1;
         return ret;
     }
 }

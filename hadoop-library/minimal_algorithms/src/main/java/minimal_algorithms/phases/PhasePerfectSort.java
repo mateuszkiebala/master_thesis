@@ -141,7 +141,7 @@ public class PhasePerfectSort {
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
         LOG.info("Waiting for perfect sort");
-        int ret = (job.waitForCompletion(true) ? 0 : 1);
+        int ret = job.waitForCompletion(true) ? 0 : 1;
 
         Counters counters = job.getCounters();
         long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();

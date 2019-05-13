@@ -30,9 +30,6 @@ public class MinimalAlgorithm {
     private final String SAMPLING_DIR = "/sampling_output";
     private final String SORTING_DIR = "/sorting_output";
     private final String RANKING_DIR = "/ranking_output";
-    private final String PARTITION_STATISTICS_DIR = "/partition_statistics_output";
-    private final String PREFIX_DIR = "/prefix_output";
-    private final String GROUP_BY_DIR = "/group_by_output";
 
     public MinimalAlgorithm(Configuration conf, int valuesNo, int stripsNo, int reduceTasksNo) {
         this.valuesNo = valuesNo;
@@ -43,12 +40,12 @@ public class MinimalAlgorithm {
         this.conf.setBoolean(MRJobConfig.MAPREDUCE_JOB_USER_CLASSPATH_FIRST, true);
     }
 
-    public void teraSort(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
+    public int teraSort(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
         BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        teraSort(homeDir, input, output, baseConfig);
+        return teraSort(homeDir, input, output, baseConfig);
     }
 
-    public void teraSort(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
+    public int teraSort(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
         validateArgs();
         Path samplingSuperdir = new Path(homeDir + "/tmp" + SAMPLING_DIR);
         Utils.deleteDirFromHDFS(conf, samplingSuperdir, true);
@@ -62,7 +59,8 @@ public class MinimalAlgorithm {
         //         so that they divide the sample in such a way: ..., sp1, ..., sp2, ..., sp_noOfSplitPoints, ...
         //output: avro file with RecordWithCount4
         //        containing split points
-        PhaseSampling.run(input, samplingSuperdir, baseConfig);
+        int ret = PhaseSampling.run(input, samplingSuperdir, baseConfig);
+        ret = ret == 0 ? PhaseSortingReducer.run(input, samplingSuperdir, output, baseConfig) : ret;
         //-------------------------------SORTING--------------------------------
         //input: avro file with RecordWithCount4
         //       containing whole input
@@ -75,80 +73,86 @@ public class MinimalAlgorithm {
         //output:  avro files with pairs in AvroKeyValueOutputFormat
         //         PhaseSortingReducer.COUNTS_TAG - count of values in this group
         //         PhaseSortingReducer.DATA_TAG - all the values in MultipleRecordsWithCoun4 object with a list inside
-        PhaseSortingReducer.run(input, samplingSuperdir, output, baseConfig);
         Utils.deleteDirFromHDFS(conf, samplingSuperdir, true);
+        return ret;
     }
 
-    public void ranking(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
+    public int ranking(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
         BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        ranking(homeDir, input, output, baseConfig);
+        return ranking(homeDir, input, output, baseConfig);
     }
 
-    public void ranking(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
+    public int ranking(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
-        teraSort(homeDir, input, sortingDir, baseConfig);
-        PhaseRanking.run(sortingDir, output, baseConfig);
+        int ret = teraSort(homeDir, input, sortingDir, baseConfig);
+        ret = ret == 0 ? PhaseRanking.run(sortingDir, output, baseConfig) : ret;
         Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
     }
 
-    public void perfectSort(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
+    public int perfectSort(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
         BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        perfectSort(homeDir, input, output, baseConfig);
+        return perfectSort(homeDir, input, output, baseConfig);
     }
 
-    public void perfectSort(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
+    public int perfectSort(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
         Path rankingDir = new Path(homeDir + "/tmp" + RANKING_DIR);
-        ranking(homeDir, input, rankingDir, baseConfig);
-        PhasePerfectSort.run(rankingDir, output, baseConfig);
+        int ret = ranking(homeDir, input, rankingDir, baseConfig);
+        ret = ret == 0 ? PhasePerfectSort.run(rankingDir, output, baseConfig) : ret;
         Utils.deleteDirFromHDFS(conf, rankingDir, true);
+        return ret;
     }
 
-    public void perfectSortWithRanks(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
+    public int perfectSortWithRanks(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
         BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        perfectSortWithRanks(homeDir, input, output, baseConfig);
+        return perfectSortWithRanks(homeDir, input, output, baseConfig);
     }
 
-    public void perfectSortWithRanks(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
+    public int perfectSortWithRanks(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
         Path rankingDir = new Path(homeDir + "/tmp" + RANKING_DIR);
-        ranking(homeDir, input, rankingDir, baseConfig);
-        PhasePerfectSortWithRanks.run(rankingDir, output, baseConfig);
+        int ret = ranking(homeDir, input, rankingDir, baseConfig);
+        ret = ret == 0 ? PhasePerfectSortWithRanks.run(rankingDir, output, baseConfig) : ret;
         Utils.deleteDirFromHDFS(conf, rankingDir, true);
+        return ret;
     }
 
-    public void partitionStatistics(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
+    public int partitionStatistics(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
         StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, baseSchema, statisticsAggregatorSchema);
-        partitionStatistics(homeDir, input, output, statisticsConfig);
+        return partitionStatistics(homeDir, input, output, statisticsConfig);
     }
 
-    public void partitionStatistics(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
+    public int partitionStatistics(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
-        teraSort(homeDir, input, sortingDir, statisticsConfig);
-        PhasePartitionStatistics.run(sortingDir, output, statisticsConfig);
+        int ret = teraSort(homeDir, input, sortingDir, statisticsConfig);
+        ret = ret == 0 ? PhasePartitionStatistics.run(sortingDir, output, statisticsConfig) : ret;
         Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
     }
 
-    public void prefix(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
+    public int prefix(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
         StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, baseSchema, statisticsAggregatorSchema);
-        prefix(homeDir, input, output, statisticsConfig);
+        return prefix(homeDir, input, output, statisticsConfig);
     }
 
-    public void prefix(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
+    public int prefix(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
-        teraSort(homeDir, input, sortingDir, statisticsConfig);
-        PhasePrefix.run(sortingDir, output, statisticsConfig);
+        int ret = teraSort(homeDir, input, sortingDir, statisticsConfig);
+        ret = ret == 0 ? PhasePrefix.run(sortingDir, output, statisticsConfig) : ret;
         Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
     }
 
-    public void group(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
+    public int group(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
         GroupByConfig groupByConfig = new GroupByConfig(config, cmp, baseSchema, statisticsAggregatorSchema, keyRecordSchema);
-        group(homeDir, input, output, groupByConfig);
+        return group(homeDir, input, output, groupByConfig);
     }
 
-    public void group(Path homeDir, Path input, Path output, GroupByConfig groupByConfig) throws Exception {
+    public int group(Path homeDir, Path input, Path output, GroupByConfig groupByConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
-        teraSort(homeDir, input, sortingDir, groupByConfig);
-        PhaseGroupBy.run(sortingDir, output, groupByConfig);
+        int ret = teraSort(homeDir, input, sortingDir, groupByConfig);
+        ret = ret == 0 ? PhaseGroupBy.run(sortingDir, output, groupByConfig) : ret;
         Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
     }
 
     public Configuration getConf() {

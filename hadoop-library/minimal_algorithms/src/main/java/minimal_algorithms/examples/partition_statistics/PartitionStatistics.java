@@ -29,9 +29,9 @@ public class PartitionStatistics extends Configured implements Tool {
         MinimalAlgorithm ma = new MinimalAlgorithm(getConf(), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
         Config config = ma.getConfig();
         StatisticsConfig statsConfig = new StatisticsConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema(), SumStatisticsAggregator.getClassSchema());
-        ma.partitionStatistics(new Path(args[1]), new Path(args[0]), new Path(args[1] + PARTITION_STATISTICS_SUPERDIR), statsConfig);
+        int ret = ma.partitionStatistics(new Path(args[1]), new Path(args[0]), new Path(args[1] + PARTITION_STATISTICS_SUPERDIR), statsConfig);
 
-        return 0;
+        return ret;
     }
 
     public static void main(String[] args) throws Exception {
