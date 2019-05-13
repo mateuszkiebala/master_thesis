@@ -1,4 +1,4 @@
-package minimal_algorithms.examples.types;
+package minimal_algorithms.examples.input;
 
 import java.io.IOException;
 import org.apache.avro.Schema;
@@ -24,14 +24,15 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import minimal_algorithms.examples.types.*;
 
 /**
  *
- * @author jsroka
+ * @author jsroka, mateuszkiebala
  */
-public class InputPreprocessing4TextToAvro extends Configured implements Tool {
+public class Record4FloatInputToAvro extends Configured implements Tool {
 
-    static final Log LOG = LogFactory.getLog(InputPreprocessing4TextToAvro.class);
+    static final Log LOG = LogFactory.getLog(Record4FloatInputToAvro.class);
     static final String DELIMETER = " ";
 
     public static class ParsingMapper extends Mapper<LongWritable, Text, AvroKey<Record4Float>, NullWritable> {
@@ -43,7 +44,7 @@ public class InputPreprocessing4TextToAvro extends Configured implements Tool {
 
         @Override
         protected void map(LongWritable offset, Text line, Mapper.Context context) throws IOException, InterruptedException {
-            String[] numbers = line.toString().split(InputPreprocessing4TextToAvro.DELIMETER);
+            String[] numbers = line.toString().split(Record4FloatInputToAvro.DELIMETER);
             if (numbers.length != howManyFields) {
                 LOG.error("found record with " + numbers.length + " fields at offset " + offset);
             }
@@ -59,7 +60,7 @@ public class InputPreprocessing4TextToAvro extends Configured implements Tool {
 
     public int run(String[] args) throws Exception {
         if (args.length != 2) {
-            System.err.println("Usage: InputPreprocessing4TextToAvro <input> <output>");
+            System.err.println("Usage: Record4FloatInputToAvro <input> <output>");
             return -1;
         }
         
@@ -67,11 +68,11 @@ public class InputPreprocessing4TextToAvro extends Configured implements Tool {
         Path output = new Path(args[1]);
 
         Configuration conf = getConf();
-        conf.setBoolean(MRJobConfig.MAPREDUCE_JOB_USER_CLASSPATH_FIRST, true);//potrzebne zeby hadoop bral odpowiednie jary avro        
+        conf.setBoolean(MRJobConfig.MAPREDUCE_JOB_USER_CLASSPATH_FIRST, true);
 
         LOG.info("starting input preprocessing");
         Job job = Job.getInstance(conf, "JOB: input preprocessing");
-        job.setJarByClass(InputPreprocessing4TextToAvro.class);
+        job.setJarByClass(Record4FloatInputToAvro.class);
         job.setNumReduceTasks(0);
 
         FileInputFormat.setInputPaths(job, input);
@@ -79,7 +80,7 @@ public class InputPreprocessing4TextToAvro extends Configured implements Tool {
         FileOutputFormat.setCompressOutput(job, true);
         FileOutputFormat.setOutputCompressorClass(job, SnappyCodec.class);   
 
-        job.setMapperClass(InputPreprocessing4TextToAvro.ParsingMapper.class);
+        job.setMapperClass(Record4FloatInputToAvro.ParsingMapper.class);
 
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(AvroKeyOutputFormat.class);
@@ -103,7 +104,7 @@ public class InputPreprocessing4TextToAvro extends Configured implements Tool {
     }
 
     public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new InputPreprocessing4TextToAvro(), args);//to configuration jest tu potrzebne zeby odczytac -libjars (http://stackoverflow.com/questions/28520821/how-to-add-external-jar-to-hadoop-job)
+        int res = ToolRunner.run(new Configuration(), new Record4FloatInputToAvro(), args);
         System.exit(res);
     }
 }
