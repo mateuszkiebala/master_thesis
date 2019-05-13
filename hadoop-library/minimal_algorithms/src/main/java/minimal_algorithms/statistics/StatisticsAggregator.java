@@ -10,6 +10,16 @@ public abstract class StatisticsAggregator extends SpecificRecordBase implements
     public abstract void init(GenericRecord record);
     public abstract StatisticsAggregator merge(StatisticsAggregator that);
 
+    public static StatisticsAggregator safeMerge(StatisticsAggregator a, StatisticsAggregator b) {
+        if (a == null) {
+            return b;
+        } else if (b == null) {
+            return a;
+        } else {
+            return a.merge(b);
+        }
+    }
+
     public static StatisticsAggregator create(Schema statisticsAggregatorSchema, GenericRecord record) {
         StatisticsAggregator statisticsAggregator = null;
         try {
