@@ -35,7 +35,6 @@ import minimal_algorithms.config.StatisticsConfig;
 public class PhasePrefix {
 
     static final Log LOG = LogFactory.getLog(PhasePrefix.class);
-    public static final String PARTITION_STATISTICS_CACHE = "partition_statistics.cache";
 
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);

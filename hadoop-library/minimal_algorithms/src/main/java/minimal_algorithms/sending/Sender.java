@@ -34,7 +34,13 @@ public class Sender {
 
     public <V> void sendToRangeMachines(V value, int lowerBound, int upperBound) throws IOException, InterruptedException {
         for (int i = lowerBound; i < upperBound; i++) {
-            send(i, value);
+            sendBounded(i, value);
+        }
+    }
+
+    public <V> void sendBounded(int key, V value) throws IOException, InterruptedException {
+        if (key >= 0 && key <= Utils.getStripsCount(getConf())) {
+            send(key, value);
         }
     }
 

@@ -24,6 +24,10 @@ public class StatisticsUtils {
         this.statisticsAggregatorSchema = statisticsAggregatorSchema;
     }
 
+    public StatisticsAggregator createStatisticsAggregator(GenericRecord record) {
+        return StatisticsAggregator.create(statisticsAggregatorSchema, record);
+    }
+
     public List<StatisticsAggregator> scanLeftAggregators(List<GenericRecord> aggregators) {
         return scanLeftAggregators(aggregators, null);
     }

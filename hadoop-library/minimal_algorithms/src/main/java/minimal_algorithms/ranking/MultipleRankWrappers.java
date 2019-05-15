@@ -1,9 +1,11 @@
 package minimal_algorithms.ranking;
 
 import java.util.List;
+import java.util.ArrayList;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
+import org.apache.avro.generic.GenericRecord;
 
 public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   public static Schema SCHEMA$;
@@ -50,6 +52,14 @@ public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecor
     case 0: records = (List<RankWrapper>)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
+  }
+
+  public List<GenericRecord> getBaseRecords() {
+    List<GenericRecord> baseRecords = new ArrayList<>();
+    for (RankWrapper rw : records) {
+      baseRecords.add(rw.getValue());
+    }
+    return baseRecords;
   }
 
   public List<RankWrapper> getRecords() {
