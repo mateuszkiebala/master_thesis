@@ -10,18 +10,14 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
-    SCHEMA$ = generateSchema(schema, "RankWrapper");
-  }
-
-  public static Schema getClassSchema() { return SCHEMA$; }
-
-  public static Schema generateSchema(Schema schema, String name) {
-    return SchemaBuilder.record(name).namespace("minimal_algorithms.ranking")
+    SCHEMA$ = SchemaBuilder.record("RankWrapper").namespace("minimal_algorithms.ranking")
             .fields()
             .name("rank").type().longType().noDefault()
             .name("record").type(schema).noDefault()
             .endRecord();
   }
+
+  public static Schema getClassSchema() { return SCHEMA$; }
 
   public static RankWrapper deepCopy(RankWrapper record) {
     return SpecificData.get().deepCopy(getClassSchema(), record);

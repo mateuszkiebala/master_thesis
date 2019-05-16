@@ -39,7 +39,7 @@ public class Sender {
     }
 
     public <V> void sendBounded(int key, V value) throws IOException, InterruptedException {
-        if (key >= 0 && key <= Utils.getStripsCount(getConf())) {
+        if (key >= 0 && key < Utils.getStripsCount(getConf())) {
             send(key, value);
         }
     }

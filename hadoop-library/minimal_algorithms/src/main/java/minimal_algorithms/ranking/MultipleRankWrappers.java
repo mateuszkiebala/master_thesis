@@ -56,8 +56,8 @@ public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecor
 
   public List<GenericRecord> getBaseRecords() {
     List<GenericRecord> baseRecords = new ArrayList<>();
-    for (RankWrapper rw : records) {
-      baseRecords.add(rw.getValue());
+    for (RankWrapper record : records) {
+      baseRecords.add(record.getValue());
     }
     return baseRecords;
   }

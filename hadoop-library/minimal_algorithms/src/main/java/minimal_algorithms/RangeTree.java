@@ -55,6 +55,11 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
 
     public RangeTree() {}
 
+    public RangeTree(int elementsNo) {
+        BASE = computeBASE(elementsNo);
+        nodes = new StatisticsAggregator[2 * BASE];
+    }
+
     public RangeTree(List<Pair<StatisticsAggregator, Integer>> elements) {
         BASE = computeBASE(elements.size());
         nodes = new StatisticsAggregator[2 * BASE];

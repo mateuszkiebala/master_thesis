@@ -12,15 +12,12 @@ public class SendWrapper extends SpecificRecordBase implements SpecificRecord {
     public static Schema SCHEMA$;
 
     static public void setSchema(Schema record1Schema, Schema record2Schema) {
-        System.out.println(record1Schema);
-        System.out.println(record2Schema);
         SCHEMA$ = SchemaBuilder
                 .record("SendWrapper").namespace("minimal_algorithms.sending")
                 .fields()
                 .name("record1").type().optional().type(record1Schema)
                 .name("record2").type().optional().type(record2Schema)
                 .endRecord();
-        System.out.println(SCHEMA$);
     }
 
     public static Schema getClassSchema() { return SCHEMA$; }

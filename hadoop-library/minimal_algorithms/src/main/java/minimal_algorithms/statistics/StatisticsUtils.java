@@ -87,8 +87,7 @@ public class StatisticsUtils {
         if (records != null) {
             statsMerger = start;
             for (GenericRecord record : records) {
-                StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
-                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                statsMerger = StatisticsAggregator.safeMerge(statsMerger, StatisticsAggregator.create(statisticsAggregatorSchema, record));
             }
         }
         return statsMerger;
