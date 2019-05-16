@@ -1,0 +1,779 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>MinimalAlgorithm - minimal_algorithms.MinimalAlgorithm</title>
+          <meta name="description" content="MinimalAlgorithm - minimal algorithms.MinimalAlgorithm" />
+          <meta name="keywords" content="MinimalAlgorithm minimal algorithms.MinimalAlgorithm" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../lib/template.js"></script>
+      <script type="text/javascript" src="../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../index.html';
+            var hash = 'minimal_algorithms.MinimalAlgorithm';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img alt="Class" src="../lib/class_big.png" />
+        <p id="owner"><a href="package.html" class="extype" name="minimal_algorithms">minimal_algorithms</a></p>
+        <h1>MinimalAlgorithm</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="minimal_algorithms">package minimal_algorithms</a>
+          </div></span></h3><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MinimalAlgorithm</span><span class="tparams">[<span name="T">T &lt;: <a href="MinimalAlgorithmObject.html" class="extype" name="minimal_algorithms.MinimalAlgorithmObject">MinimalAlgorithmObject</a>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Class implementing base functions required to create a minimal algorithm.</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>T &lt;: MinimalAlgorithmObject[T] : ClassTag</p></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">Known Subclasses</span>
+            <div class="subClasses hiddenContent"><a href="group_by/MinimalGroupBy.html" class="extype" name="minimal_algorithms.group_by.MinimalGroupBy">MinimalGroupBy</a>, <a href="MinimalSemiJoin.html" class="extype" name="minimal_algorithms.MinimalSemiJoin">MinimalSemiJoin</a>, <a href="sliding_aggregation/MinimalSlidingAggregation.html" class="extype" name="minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation">MinimalSlidingAggregation</a>, <a href="StatisticsMinimalAlgorithm.html" class="extype" name="minimal_algorithms.StatisticsMinimalAlgorithm">StatisticsMinimalAlgorithm</a></div>
+          </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="minimal_algorithms.MinimalAlgorithm"><span>MinimalAlgorithm</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="minimal_algorithms.MinimalAlgorithm#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(spark:org.apache.spark.sql.SparkSession,numOfPartitions:Int)(implicitevidence$1:scala.reflect.ClassTag[T]):minimal_algorithms.MinimalAlgorithm[T]"></a>
+      <a id="&lt;init&gt;:MinimalAlgorithm[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">MinimalAlgorithm</span><span class="params">(<span name="spark">spark: <span class="extype" name="org.apache.spark.sql.SparkSession">SparkSession</span></span>, <span name="numOfPartitions">numOfPartitions: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@&lt;init&gt;(spark:org.apache.spark.sql.SparkSession,numOfPartitions:Int)(implicitevidence$1:scala.reflect.ClassTag[T]):minimal_algorithms.MinimalAlgorithm[T]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">spark</dt><dd class="cmt"><p>SparkSession object</p></dd><dt class="param">numOfPartitions</dt><dd class="cmt"><p>Number of partitions.</p></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@##():Int" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm.KeyPartitioner" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="KeyPartitioner"></a>
+      <a id="KeyPartitioner:KeyPartitioner"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalAlgorithm$KeyPartitioner$.html"><span class="name">KeyPartitioner</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@KeyPartitioner" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.MinimalAlgorithm.PerfectPartitioner" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PerfectPartitioner"></a>
+      <a id="PerfectPartitioner:PerfectPartitioner"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="MinimalAlgorithm$PerfectPartitioner$.html"><span class="name">PerfectPartitioner</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@PerfectPartitioner" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@clone():Object" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#computeRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computeRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="computeRanking(RDD[T]):RDD[(Int,T)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">computeRanking</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@computeRanking(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Applies ranking algorithm on given RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Applies ranking algorithm on given RDD. Order for equal objects is picked randomly.
+Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#computeRanking" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="computeRanking:org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="computeRanking:RDD[(Int,T)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">computeRanking</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@computeRanking:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Applies ranking algorithm on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies ranking algorithm on imported objects. Order for equal objects is picked randomly.
+Each object has unique ranking. Ranking starts from 0 index.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>RDD of pairs (ranking, object)</p></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@finalize():Unit" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#getPartitionSizes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getPartitionSizes[K](rdd:org.apache.spark.rdd.RDD[K])(implicitevidence$3:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[Int]"></a>
+      <a id="getPartitionSizes[K](RDD[K])(ClassTag[K]):RDD[Int]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getPartitionSizes</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.getPartitionSizes.K">K</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.getPartitionSizes.K">K</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="scala.Int">Int</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@getPartitionSizes[K](rdd:org.apache.spark.rdd.RDD[K])(implicitevidence$3:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[Int]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns number of elements on each partition.</p><div class="fullcomment"><div class="comment cmt"><p>Returns number of elements on each partition.</p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>Type of RDD's objects.</p></dd><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Number of elements on each partition</p></dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@hashCode():Int" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#importObjects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="importObjects(rdd:org.apache.spark.rdd.RDD[T]):MinimalAlgorithm.this.type"></a>
+      <a id="importObjects(RDD[T]):MinimalAlgorithm.this.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">importObjects</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>)</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>.this.type</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@importObjects(rdd:org.apache.spark.rdd.RDD[T]):MinimalAlgorithm.this.type" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Imports objects.</p><div class="fullcomment"><div class="comment cmt"><p>Imports objects.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>Objects to be processed by minimal algorithm.</p></dd><dt>returns</dt><dd class="cmt"><p>this</p></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#itemsCntByPartition" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="itemsCntByPartition:Int"></a>
+      <a id="itemsCntByPartition:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">itemsCntByPartition</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@itemsCntByPartition:Int" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@notify():Unit" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#objects" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="objects:org.apache.spark.rdd.RDD[T]"></a>
+      <a id="objects:RDD[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">objects</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@objects:org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="minimal_algorithms.MinimalAlgorithm#perfectSort" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="perfectSort:org.apache.spark.rdd.RDD[T]"></a>
+      <a id="perfectSort:RDD[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">perfectSort</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@perfectSort:org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Sorts and perfectly balances imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances imported objects. Function affects imported objects.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>this</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#perfectlySorted" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="perfectlySorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]"></a>
+      <a id="perfectlySorted(RDD[T]):RDD[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">perfectlySorted</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@perfectlySorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Sorts and perfectly balances provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances provided RDD.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Perfectly balanced RDD of objects</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#perfectlySortedWithRanks" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="perfectlySortedWithRanks(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="perfectlySortedWithRanks(RDD[T]):RDD[(Int,T)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">perfectlySortedWithRanks</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@perfectlySortedWithRanks(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Sorts and perfectly balances provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances provided RDD.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD with objects to process.</p></dd><dt>returns</dt><dd class="cmt"><p>Perfectly balanced RDD of pairs (ranking, object)</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#perfectlySortedWithRanks" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="perfectlySortedWithRanks:org.apache.spark.rdd.RDD[(Int,T)]"></a>
+      <a id="perfectlySortedWithRanks:RDD[(Int,T)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">perfectlySortedWithRanks</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@perfectlySortedWithRanks:org.apache.spark.rdd.RDD[(Int,T)]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Sorts and perfectly balances imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Sorts and perfectly balances imported objects.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>Perfectly balanced RDD of pairs (ranking, object)</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#sc" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sc:org.apache.spark.SparkContext"></a>
+      <a id="sc:SparkContext"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sc</span><span class="result">: <span class="extype" name="org.apache.spark.SparkContext">SparkContext</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@sc:org.apache.spark.SparkContext" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#sendToMachines" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sendToMachines[K](rdd:org.apache.spark.rdd.RDD[(K,List[Int])])(implicitevidence$2:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[K]"></a>
+      <a id="sendToMachines[K](RDD[(K,List[Int])])(ClassTag[K]):RDD[K]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sendToMachines</span><span class="tparams">[<span name="K">K</span>]</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[(<span class="extype" name="minimal_algorithms.MinimalAlgorithm.sendToMachines.K">K</span>, <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Int">Int</span>])]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.ClassTag">ClassTag</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.sendToMachines.K">K</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.sendToMachines.K">K</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@sendToMachines[K](rdd:org.apache.spark.rdd.RDD[(K,List[Int])])(implicitevidence$2:scala.reflect.ClassTag[K]):org.apache.spark.rdd.RDD[K]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Shuffles rdd objects by sending them to given machine indices.</p><div class="fullcomment"><div class="comment cmt"><p>Shuffles rdd objects by sending them to given machine indices.</p></div><dl class="paramcmts block"><dt class="tparam">K</dt><dd class="cmt"><p>[K : ClassTag]</p></dd><dt class="param">rdd</dt><dd class="cmt"><p>RDD of pairs (object, List[destination machine index])</p></dd><dt>returns</dt><dd class="cmt"><p>RDD of reshuffled objects</p></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#teraSort" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="teraSort:MinimalAlgorithm.this.type"></a>
+      <a id="teraSort:MinimalAlgorithm.this.type"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">teraSort</span><span class="result">: <a href="" class="extype" name="minimal_algorithms.MinimalAlgorithm">MinimalAlgorithm</a>.this.type</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@teraSort:MinimalAlgorithm.this.type" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Applies Tera Sort algorithm on imported objects.</p><div class="fullcomment"><div class="comment cmt"><p>Applies Tera Sort algorithm on imported objects. Function affects imported objects.</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>this</p></dd></dl></div>
+    </li><li name="minimal_algorithms.MinimalAlgorithm#teraSorted" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="teraSorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]"></a>
+      <a id="teraSorted(RDD[T]):RDD[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">teraSorted</span><span class="params">(<span name="rdd">rdd: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="org.apache.spark.rdd.RDD">RDD</span>[<span class="extype" name="minimal_algorithms.MinimalAlgorithm.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@teraSorted(rdd:org.apache.spark.rdd.RDD[T]):org.apache.spark.rdd.RDD[T]" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Applies Tera Sort algorithm on provided RDD.</p><div class="fullcomment"><div class="comment cmt"><p>Applies Tera Sort algorithm on provided RDD. Provided RDD will not be affected.</p></div><dl class="paramcmts block"><dt class="param">rdd</dt><dd class="cmt"><p>RDD on which Tera Sort will be performed.</p></dd><dt>returns</dt><dd class="cmt"><p>Sorted RDD.</p></dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@toString():String" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@wait():Unit" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../index.html#minimal_algorithms.MinimalAlgorithm@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
