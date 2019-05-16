@@ -82,8 +82,7 @@ public class PhaseGroupBy {
                 for (GroupByRecord record : groupByRecords) {
                     KeyRecord keyRecord = record.getKey();
                     if (grouped.containsKey(keyRecord)) {
-                        StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
-                        grouped.put(keyRecord, mapStatisticsAggregator.merge(record.getStatisticsAggregator()));
+                        grouped.put(keyRecord, StatisticsAggregator.safeMerge(grouped.get(keyRecord), record.getStatisticsAggregator()));
                     } else {
                         grouped.put(keyRecord, record.getStatisticsAggregator());
                     }
@@ -125,8 +124,7 @@ public class PhaseGroupBy {
                     GroupByRecord record = GroupByRecord.deepCopy(value.datum());
                     KeyRecord keyRecord = record.getKey();
                     if (grouped.containsKey(keyRecord)) {
-                        StatisticsAggregator mapStatisticsAggregator = grouped.get(keyRecord);
-                        grouped.put(keyRecord, mapStatisticsAggregator.merge(record.getStatisticsAggregator()));
+                        grouped.put(keyRecord, StatisticsAggregator.safeMerge(grouped.get(keyRecord), record.getStatisticsAggregator()));
                     } else {
                         grouped.put(keyRecord, record.getStatisticsAggregator());
                     }

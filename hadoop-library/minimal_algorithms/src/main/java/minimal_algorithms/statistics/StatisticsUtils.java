@@ -37,8 +37,7 @@ public class StatisticsUtils {
         if (aggregators != null) {
             StatisticsAggregator statsMerger = start;
             for (GenericRecord record : aggregators) {
-                StatisticsAggregator statisticsAggregator = (StatisticsAggregator) record;
-                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                statsMerger = StatisticsAggregator.safeMerge(statsMerger, (StatisticsAggregator) record);
                 result.add(StatisticsAggregator.deepCopy(statsMerger, statisticsAggregatorSchema));
             }
         }
@@ -54,8 +53,7 @@ public class StatisticsUtils {
         if (records != null) {
             StatisticsAggregator statsMerger = start;
             for (GenericRecord record : records) {
-                StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
-                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                statsMerger = StatisticsAggregator.safeMerge(statsMerger, StatisticsAggregator.create(statisticsAggregatorSchema, record));
                 result.add(StatisticsAggregator.deepCopy(statsMerger, statisticsAggregatorSchema));
             }
         }
@@ -71,8 +69,7 @@ public class StatisticsUtils {
         if (aggregators != null) {
             statsMerger = start;
             for (GenericRecord record : aggregators) {
-                StatisticsAggregator statisticsAggregator = (StatisticsAggregator) record;
-                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                statsMerger = StatisticsAggregator.safeMerge(statsMerger, (StatisticsAggregator) record);
             }
         }
         return statsMerger;
