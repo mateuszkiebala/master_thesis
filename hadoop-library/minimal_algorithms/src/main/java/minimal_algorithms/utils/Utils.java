@@ -69,11 +69,7 @@ public class Utils {
     }
 
     public static Schema retrieveSchemaFromConf(Configuration conf, String key) {
-        String schema = conf.get(key);
-        if (schema == null) {
-            throw new IllegalArgumentException("Can't find key (" + key + ") in configuration.");
-        }
-        return new Schema.Parser().parse(schema);
+        return new Schema.Parser().parse(getSafeString(conf, key));
     }
 
     public static void storePathInConf(Configuration conf, Path path, String key) {
@@ -81,11 +77,15 @@ public class Utils {
     }
 
     public static Path retrievePathFromConf(Configuration conf, String key) {
-        String path = conf.get(key);
-        if (path == null) {
+        return new Path(getSafeString(conf, key));
+    }
+
+    public static String getSafeString(Configuration conf, String key) {
+        String result = conf.get(key);
+        if (result == null) {
             throw new IllegalArgumentException("Can't find key (" + key + ") in configuration.");
         }
-        return new Path(path);
+        return result;
     }
 
     public static int getMachinesNo(Configuration conf) {
@@ -93,43 +93,45 @@ public class Utils {
     }
 
     public static int getStripsCount(Configuration conf) {
-        int stripsNo = conf.getInt(Config.NO_OF_STRIPS_KEY, -1);
-        if (stripsNo == -1) {
-            throw new IllegalArgumentException("Number of strips is not set in configuration.");
-        }
-        return stripsNo;
+        return getSafeInt(conf, Config.NO_OF_STRIPS_KEY);
     }
 
     public static long getTotalValuesCount(Configuration conf) {
-        long valuesNo = conf.getLong(Config.NO_OF_VALUES_KEY, -1);
-        if (valuesNo == -1) {
-            throw new IllegalArgumentException("Number of values is not set in configuration.");
-        }
-        return valuesNo;
+        return getSafeLong(conf, Config.NO_OF_VALUES_KEY);
     }
 
     public static int getReduceTasksCount(Configuration conf) {
-        int reducersNo = conf.getInt(Config.NO_OF_REDUCE_TASKS_KEY, -1);
-        if (reducersNo == -1) {
-            throw new IllegalArgumentException("Number of reduce tasks is not set in configuration.");
-        }
-        return reducersNo;
+        return getSafeInt(conf, Config.NO_OF_REDUCE_TASKS_KEY);
     }
 
     public static long getItemsNoByMachines(Configuration conf) {
-        long itemsNo = conf.getLong(Config.NO_OF_ITEMS_BY_MACHINE, -1);
-        if (itemsNo == -1) {
-            throw new IllegalArgumentException("Number of items by machine is not set in configuration.");
-        }
-        return itemsNo;
+        return getSafeLong(conf, Config.NO_OF_ITEMS_BY_MACHINE);
     }
 
     public static int getRatioForRandomKey(Configuration conf) {
-        int ratio = conf.getInt(Config.RATIO_FOR_RANDOM_KEY, -1);
-        if (ratio == -1) {
-            throw new IllegalArgumentException("Ratio for random key is not set in configuration.");
+        return getSafeInt(conf, Config.RATIO_FOR_RANDOM_KEY);
+    }
+
+    public static int getSafeInt(Configuration conf, String key) {
+        int result = conf.getInt(key, -1);
+        if (result == -1) {
+            result = conf.getInt(key, -2);
+            if (result == -2) {
+                throw new IllegalArgumentException("Can't find key (" + key + ") in configuration.");
+            }
         }
-        return ratio;
+        return result;
+    }
+
+    public static long getSafeLong(Configuration conf, String key) {
+        long result = conf.getLong(key, -1);
+        if (result == -1) {
+            result = conf.getLong(key, -2);
+            if (result == -2) {
+                throw new IllegalArgumentException("Can't find key (" + key + ") in configuration.");
+            }
+        }
+        return result;
     }
 
     public static void mergeHDFSAvro(Configuration conf, Path inputDir, String filePattern, String outFileName) {
