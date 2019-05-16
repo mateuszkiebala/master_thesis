@@ -40,12 +40,12 @@ public class PhasePrefix {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);
         Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
         StatisticsRecord.setSchema(statisticsAggregatorSchema, baseSchema);
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
         SendWrapper.setSchema(baseSchema, statisticsAggregatorSchema);
     }
 
-    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
+    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
         private StatisticsAggregator[] partitionPrefixedStatistics;
@@ -61,7 +61,7 @@ public class PhasePrefix {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleBaseRecords> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
             SendWrapper wrapperedPartitionStatistics = new SendWrapper();
             wrapperedPartitionStatistics.setRecord2(partitionStatistics);
@@ -115,7 +115,7 @@ public class PhasePrefix {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);

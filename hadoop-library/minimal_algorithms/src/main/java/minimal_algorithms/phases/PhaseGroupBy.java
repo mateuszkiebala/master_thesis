@@ -45,10 +45,10 @@ public class PhaseGroupBy {
 
         GroupByRecord.setSchema(statisticsAggregatorSchema, keyRecordSchema);
         MultipleGroupByRecords.setSchema(GroupByRecord.getClassSchema());
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
     }
 
-    public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<GroupByRecord>> {
+    public static class GroupByMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<GroupByRecord>> {
 
         private Configuration conf;
         private Schema statisticsAggregatorSchema;
@@ -67,10 +67,10 @@ public class PhaseGroupBy {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleBaseRecords> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
             try {
                 List<GroupByRecord> groupByRecords = new ArrayList<>();
-                for (GenericRecord record : MultipleBaseRecords.deepCopy(value.datum()).getRecords()) {
+                for (GenericRecord record : MultipleRecords.deepCopy(value.datum()).getRecords()) {
                     StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
                     KeyRecord keyRecord = KeyRecord.create(keyRecordSchema, record);
                     groupByRecords.add(new GroupByRecord(statisticsAggregator, keyRecord));
@@ -159,7 +159,7 @@ public class PhaseGroupBy {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);

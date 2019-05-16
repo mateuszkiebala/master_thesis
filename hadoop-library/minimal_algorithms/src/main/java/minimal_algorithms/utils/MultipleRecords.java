@@ -6,12 +6,12 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 
-public class MultipleBaseRecords extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+public class MultipleRecords extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
     SCHEMA$ = SchemaBuilder
-            .record("MultipleBaseRecords").namespace("minimal_algorithms.utils")
+            .record("MultipleRecords").namespace("minimal_algorithms.utils")
             .fields()
             .name("records").type().array().items(schema).noDefault()
             .endRecord();
@@ -19,19 +19,19 @@ public class MultipleBaseRecords extends org.apache.avro.specific.SpecificRecord
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
-  public static MultipleBaseRecords deepCopy(MultipleBaseRecords record) {
+  public static MultipleRecords deepCopy(MultipleRecords record) {
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static MultipleBaseRecords deepCopy(MultipleBaseRecords record, Schema recordSchema) {
+  public static MultipleRecords deepCopy(MultipleRecords record, Schema recordSchema) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 
   private List<GenericRecord> records;
 
-  public MultipleBaseRecords() {}
+  public MultipleRecords() {}
 
-  public MultipleBaseRecords(List<GenericRecord> records) {
+  public MultipleRecords(List<GenericRecord> records) {
     this.records = records;
   }
 

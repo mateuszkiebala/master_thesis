@@ -31,10 +31,6 @@ import minimal_algorithms.utils.*;
 import minimal_algorithms.config.BaseConfig;
 import minimal_algorithms.sending.AvroSender;
 
-/**
- *
- * @author jsroka, mateuszkiebala
- */
 public class PhaseSortingReducer {
 
     static final Log LOG = LogFactory.getLog(PhaseSortingReducer.class);
@@ -43,7 +39,7 @@ public class PhaseSortingReducer {
 
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
     }
 
     public static class PartitioningMapper extends Mapper<AvroKey<GenericRecord>, NullWritable, AvroKey<Integer>, AvroValue<GenericRecord>> {
@@ -70,14 +66,14 @@ public class PhaseSortingReducer {
         }
     }
 
-    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<GenericRecord>, AvroKey<Integer>, AvroValue<MultipleBaseRecords>> {
+    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<GenericRecord>, AvroKey<Integer>, AvroValue<MultipleRecords>> {
 
         private Configuration conf;
         private Comparator<GenericRecord> cmp;
         private AvroMultipleOutputs amos;
         private Schema baseSchema;
         private final AvroValue<Integer> aInt = new AvroValue<>();
-        private final AvroValue<MultipleBaseRecords> avValueMultRecords = new AvroValue<>();
+        private final AvroValue<MultipleRecords> avValueMultRecords = new AvroValue<>();
         
         @Override
         public void setup(Context ctx) {
@@ -107,7 +103,7 @@ public class PhaseSortingReducer {
             aInt.datum(result.size());
             amos.write(BaseConfig.SORTED_COUNTS_TAG, avKey, aInt);
 
-            avValueMultRecords.datum(new MultipleBaseRecords(result));
+            avValueMultRecords.datum(new MultipleRecords(result));
             amos.write(BaseConfig.SORTED_DATA_TAG, avKey, avValueMultRecords);
         }
     }
@@ -134,7 +130,7 @@ public class PhaseSortingReducer {
         AvroJob.setMapOutputValueSchema(job, config.getBaseSchema());
 
         job.setReducerClass(SortingReducer.class);
-        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleBaseRecords.getClassSchema());
+        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleRecords.getClassSchema());
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
         LOG.info("Waiting for sorting reducer");
