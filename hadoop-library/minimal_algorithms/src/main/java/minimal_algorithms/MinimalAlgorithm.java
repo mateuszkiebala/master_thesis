@@ -30,6 +30,7 @@ public class MinimalAlgorithm {
     private final String SAMPLING_DIR = "/sampling_output";
     private final String SORTING_DIR = "/sorting_output";
     private final String RANKING_DIR = "/ranking_output";
+    private final String PERFECT_SORT_WITH_RANKS_DIR = "/perfect_sort_with_ranks_output";
 
     public MinimalAlgorithm(Configuration conf, int valuesNo, int stripsNo, int reduceTasksNo) {
         this.valuesNo = valuesNo;
@@ -165,6 +166,17 @@ public class MinimalAlgorithm {
         int ret = teraSort(homeDir, input, sortingDir, semiJoinConfig);
         ret = ret == 0 ? PhaseSemiJoin.run(sortingDir, output, semiJoinConfig) : ret;
         Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
+    }
+
+    public int slidingAggregation(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema,
+                                  Schema statisticsAggregatorSchema, long windowLength) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
+        Path perfectSortWithRanksDir = new Path(homeDir + "/tmp" + PERFECT_SORT_WITH_RANKS_DIR);
+        int ret = perfectSortWithRanks(homeDir, input, perfectSortWithRanksDir, baseConfig);
+        SlidingAggregationConfig saConfig = new SlidingAggregationConfig(config, cmp, baseSchema, statisticsAggregatorSchema, windowLength);
+        ret = ret == 0 ? PhaseSlidingAggregation.run(perfectSortWithRanksDir, output, saConfig) : ret;
+        Utils.deleteDirFromHDFS(conf, perfectSortWithRanksDir, true);
         return ret;
     }
 

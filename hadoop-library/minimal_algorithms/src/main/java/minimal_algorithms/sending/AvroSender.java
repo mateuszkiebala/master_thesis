@@ -48,8 +48,17 @@ public class AvroSender extends Sender {
     public <V> void sendToRangeMachines(AvroValue<V> avVal, int lowerBound, int upperBound) throws IOException, InterruptedException {
         final AvroKey<Integer> avKey = new AvroKey<>();
         for (int i = lowerBound; i < upperBound; i++) {
-            avKey.datum(i);
-            super.send(avKey, avVal);
+            sendBounded(i, avVal);
+        }
+    }
+
+    public <V> void sendBounded(int key, V value) throws IOException, InterruptedException {
+        sendBounded(key, new AvroValue<V>(value));
+    }
+
+    public <V> void sendBounded(int key, AvroValue<V> avVal) throws IOException, InterruptedException {
+        if (key >= 0 && key < Utils.getStripsCount(getConf())) {
+            super.send(new AvroKey<Integer>(key), avVal);
         }
     }
 

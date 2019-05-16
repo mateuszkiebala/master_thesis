@@ -24,6 +24,10 @@ public class StatisticsUtils {
         this.statisticsAggregatorSchema = statisticsAggregatorSchema;
     }
 
+    public StatisticsAggregator createStatisticsAggregator(GenericRecord record) {
+        return StatisticsAggregator.create(statisticsAggregatorSchema, record);
+    }
+
     public List<StatisticsAggregator> scanLeftAggregators(List<GenericRecord> aggregators) {
         return scanLeftAggregators(aggregators, null);
     }
@@ -83,8 +87,7 @@ public class StatisticsUtils {
         if (records != null) {
             statsMerger = start;
             for (GenericRecord record : records) {
-                StatisticsAggregator statisticsAggregator = StatisticsAggregator.create(statisticsAggregatorSchema, record);
-                statsMerger = statsMerger == null ? statisticsAggregator : statsMerger.merge(statisticsAggregator);
+                statsMerger = StatisticsAggregator.safeMerge(statsMerger, StatisticsAggregator.create(statisticsAggregatorSchema, record));
             }
         }
         return statsMerger;

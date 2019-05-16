@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.avro.mapred.AvroValue;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.specific.SpecificData;
 
 
 public class SendingUtils {

@@ -10,11 +10,10 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
-    SCHEMA$ = SchemaBuilder
-            .record("RankWrapper").namespace("minimal_algorithms.ranking")
+    SCHEMA$ = SchemaBuilder.record("RankWrapper").namespace("minimal_algorithms.ranking")
             .fields()
             .name("rank").type().longType().noDefault()
-            .name("baseRecord").type(schema).noDefault()
+            .name("record").type(schema).noDefault()
             .endRecord();
   }
 
@@ -34,6 +33,17 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
     @Override
     public int compare(RankWrapper o1, RankWrapper o2) {
       return o1.getRank() > o2.getRank() ? 1 : (o1.getRank() < o2.getRank() ? -1 : 0);
+    }
+  }
+
+  public static Comparator<GenericRecord> genericRecordCmp = new GenericRecordComparator();
+
+  public static class GenericRecordComparator implements Comparator<GenericRecord> {
+    @Override
+    public int compare(GenericRecord o1, GenericRecord o2) {
+      RankWrapper rw1 = (RankWrapper) o1;
+      RankWrapper rw2 = (RankWrapper) o2;
+      return rw1.getRank() > rw2.getRank() ? 1 : (rw1.getRank() < rw2.getRank() ? -1 : 0);
     }
   }
 
