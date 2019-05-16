@@ -116,12 +116,15 @@ public class PhaseSlidingAggregation {
         }
 
         private RangeTree getPartitionsTree(List<GenericRecord> partitionStatisticsRecords) {
-            RangeTree tree = new RangeTree(partitionStatisticsRecords.size());
-            for (GenericRecord record : partitionStatisticsRecords) {
-                IndexedStatisticsRecord isr = (IndexedStatisticsRecord) record;
-                int machineIndex = isr.getIndex().intValue();
-                StatisticsAggregator baseStatistics = statsUtiler.createStatisticsAggregator(isr.getRecord());
-                tree.insert(baseStatistics, machineIndex);
+            RangeTree tree = new RangeTree();
+            if (partitionStatisticsRecords != null) {
+                tree = new RangeTree(partitionStatisticsRecords.size());
+                for (GenericRecord record : partitionStatisticsRecords) {
+                    IndexedStatisticsRecord isr = (IndexedStatisticsRecord) record;
+                    int machineIndex = isr.getIndex().intValue();
+                    StatisticsAggregator baseStatistics = statsUtiler.createStatisticsAggregator(isr.getRecord());
+                    tree.insert(baseStatistics, machineIndex);
+                }
             }
             return tree;
         }

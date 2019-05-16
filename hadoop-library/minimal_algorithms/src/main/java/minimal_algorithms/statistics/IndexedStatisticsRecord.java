@@ -23,7 +23,7 @@ public class IndexedStatisticsRecord extends org.apache.avro.specific.SpecificRe
         return SpecificData.get().deepCopy(getClassSchema(), record);
     }
 
-    public static IndexedStatisticsRecord deepCopy(IndexedStatisticsRecord record, Schema recordSchema) {
+    public static IndexedStatisticsRecord deepCopy(Schema recordSchema, IndexedStatisticsRecord record) {
         return SpecificData.get().deepCopy(recordSchema, record);
     }
 

@@ -23,7 +23,7 @@ public class MultipleRecords extends org.apache.avro.specific.SpecificRecordBase
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static MultipleRecords deepCopy(MultipleRecords record, Schema recordSchema) {
+  public static MultipleRecords deepCopy(Schema recordSchema, MultipleRecords record) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 

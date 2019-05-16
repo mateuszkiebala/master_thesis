@@ -32,11 +32,11 @@ public abstract class StatisticsAggregator extends SpecificRecordBase implements
         return statisticsAggregator;
     }
 
-    public static StatisticsAggregator deepCopy(GenericRecord record, Schema recordSchema) {
+    public static StatisticsAggregator deepCopy(Schema recordSchema, GenericRecord record) {
         return (StatisticsAggregator) SpecificData.get().deepCopy(recordSchema, record);
     }
 
-    public static StatisticsAggregator deepCopy(StatisticsAggregator record, Schema recordSchema) {
+    public static StatisticsAggregator deepCopy(Schema recordSchema, StatisticsAggregator record) {
         return SpecificData.get().deepCopy(recordSchema, record);
     }
 }

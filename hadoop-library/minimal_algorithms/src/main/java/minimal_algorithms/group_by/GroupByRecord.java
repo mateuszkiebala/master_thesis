@@ -24,7 +24,7 @@ public class GroupByRecord extends org.apache.avro.specific.SpecificRecordBase i
         return SpecificData.get().deepCopy(getClassSchema(), record);
     }
 
-    public static GroupByRecord deepCopy(GroupByRecord record, Schema recordSchema) {
+    public static GroupByRecord deepCopy(Schema recordSchema, GroupByRecord record) {
         return SpecificData.get().deepCopy(recordSchema, record);
     }
 

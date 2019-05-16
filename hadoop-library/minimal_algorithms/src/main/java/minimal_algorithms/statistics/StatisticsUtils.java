@@ -38,7 +38,7 @@ public class StatisticsUtils {
             StatisticsAggregator statsMerger = start;
             for (GenericRecord record : aggregators) {
                 statsMerger = StatisticsAggregator.safeMerge(statsMerger, (StatisticsAggregator) record);
-                result.add(StatisticsAggregator.deepCopy(statsMerger, statisticsAggregatorSchema));
+                result.add(StatisticsAggregator.deepCopy(statisticsAggregatorSchema, statsMerger));
             }
         }
         return result;
@@ -54,7 +54,7 @@ public class StatisticsUtils {
             StatisticsAggregator statsMerger = start;
             for (GenericRecord record : records) {
                 statsMerger = StatisticsAggregator.safeMerge(statsMerger, StatisticsAggregator.create(statisticsAggregatorSchema, record));
-                result.add(StatisticsAggregator.deepCopy(statsMerger, statisticsAggregatorSchema));
+                result.add(StatisticsAggregator.deepCopy(statisticsAggregatorSchema, statsMerger));
             }
         }
         return result;

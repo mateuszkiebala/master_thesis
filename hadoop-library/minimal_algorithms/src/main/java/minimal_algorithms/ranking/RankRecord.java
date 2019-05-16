@@ -23,7 +23,7 @@ public class RankRecord extends org.apache.avro.specific.SpecificRecordBase impl
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static RankRecord deepCopy(RankRecord record, Schema recordSchema) {
+  public static RankRecord deepCopy(Schema recordSchema, RankRecord record) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 

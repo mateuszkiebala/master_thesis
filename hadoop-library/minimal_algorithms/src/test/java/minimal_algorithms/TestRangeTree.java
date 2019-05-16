@@ -16,6 +16,29 @@ public class TestRangeTree {
     public ExpectedException expectedEx = ExpectedException.none();
 
     @org.junit.Test
+    public void testEmptyTree() {
+        RangeTree tree = new RangeTree();
+        Assert.assertEquals(0, tree.getBASE());
+        Assert.assertArrayEquals(new StatisticsAggregator[0], tree.getNodes());
+    }
+
+    @org.junit.Test
+    public void testEmptyTreeInsert() throws AvroRuntimeException {
+        RangeTree tree = new RangeTree();
+        expectedEx.expect(AvroRuntimeException.class);
+        expectedEx.expectMessage("Position out of range: 0");
+        tree.insert(new SumStatisticsAggregator(10), 0);
+    }
+
+    @org.junit.Test
+    public void testEmptyTreeQuery() throws AvroRuntimeException {
+        RangeTree tree = new RangeTree();
+        expectedEx.expect(AvroRuntimeException.class);
+        expectedEx.expectMessage("Position (start) out of range: 0");
+        tree.query(0, 1);
+    }
+
+    @org.junit.Test
     public void testOneNodeTree() {
         List<Pair<StatisticsAggregator, Integer>> elements = new ArrayList<>();
         elements.add(new Pair(new SumStatisticsAggregator(10), 0));

@@ -13,7 +13,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
                 .namespace("minimal_algorithms.statistics")
                 .fields()
                 .name("statisticsAggregator").type(statisticsAggregatorSchema).noDefault()
-                .name("baseRecord").type(baseSchema).noDefault()
+                .name("record").type(baseSchema).noDefault()
                 .endRecord();
     }
 
@@ -23,18 +23,18 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
         return SpecificData.get().deepCopy(getClassSchema(), record);
     }
 
-    public static StatisticsRecord deepCopy(StatisticsRecord record, Schema recordSchema) {
+    public static StatisticsRecord deepCopy(Schema recordSchema, StatisticsRecord record) {
         return SpecificData.get().deepCopy(recordSchema, record);
     }
 
     private StatisticsAggregator statisticsAggregator;
-    private GenericRecord baseRecord;
+    private GenericRecord record;
 
     public StatisticsRecord() {}
 
-    public StatisticsRecord(StatisticsAggregator statisticsAggregator, GenericRecord baseRecord) {
+    public StatisticsRecord(StatisticsAggregator statisticsAggregator, GenericRecord record) {
         this.statisticsAggregator = statisticsAggregator;
-        this.baseRecord = baseRecord;
+        this.record = record;
     }
 
     public Schema getSchema() { return SCHEMA$; }
@@ -43,7 +43,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     public Object get(int field$) {
         switch (field$) {
             case 0: return statisticsAggregator;
-            case 1: return baseRecord;
+            case 1: return record;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
@@ -52,7 +52,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
     public void put(int field$, Object value$) {
         switch (field$) {
             case 0: statisticsAggregator = (StatisticsAggregator)value$; break;
-            case 1: baseRecord = (GenericRecord)value$; break;
+            case 1: record = (GenericRecord)value$; break;
             default: throw new org.apache.avro.AvroRuntimeException("Bad index");
         }
     }
@@ -65,11 +65,11 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
         this.statisticsAggregator = statisticsAggregator;
     }
 
-    public GenericRecord getBaseRecord() {
-        return baseRecord;
+    public GenericRecord getRecord() {
+        return record;
     }
 
-    public void setBaseRecord(GenericRecord baseRecord) {
-        this.baseRecord = baseRecord;
+    public void setRecord(GenericRecord record) {
+        this.record = record;
     }
 }

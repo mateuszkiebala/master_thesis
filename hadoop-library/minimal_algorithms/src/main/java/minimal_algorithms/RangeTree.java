@@ -42,18 +42,21 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
         }
     }
 
-    public static RangeTree deepCopy(RangeTree record) {
-        return SpecificData.get().deepCopy(getClassSchema(), record);
+    public static RangeTree deepCopy(RangeTree tree) {
+        return SpecificData.get().deepCopy(getClassSchema(), tree);
     }
 
-    public static RangeTree deepCopy(RangeTree record, Schema recordSchema) {
-        return SpecificData.get().deepCopy(recordSchema, record);
+    public static RangeTree deepCopy(Schema treeSchema, RangeTree tree) {
+        return SpecificData.get().deepCopy(treeSchema, tree);
     }
 
     private int BASE;
     private StatisticsAggregator[] nodes;
 
-    public RangeTree() {}
+    public RangeTree() {
+        BASE = 0;
+        nodes = new StatisticsAggregator[0];
+    }
 
     public RangeTree(int elementsNo) {
         BASE = computeBASE(elementsNo);
@@ -83,6 +86,12 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
     public StatisticsAggregator query(int start, int end) {
         if (start > end)
             throw new org.apache.avro.AvroRuntimeException("Start (" + start + ") greater than end (" + end + ")");
+
+        if (start >= BASE)
+            throw new org.apache.avro.AvroRuntimeException("Position (start) out of range: " + start);
+
+        if (end >= BASE)
+            throw new org.apache.avro.AvroRuntimeException("Position (end) out of range: " + end);
 
         int vs = BASE + start;
         int ve = BASE + end;

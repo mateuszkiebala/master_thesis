@@ -34,10 +34,6 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import minimal_algorithms.config.Config;
 
-/**
- *
- * @authors jsroka, mateuszkiebala
- */
 public class Utils {
 
     public static GenericRecord deepCopy(Schema schema, GenericRecord record) {

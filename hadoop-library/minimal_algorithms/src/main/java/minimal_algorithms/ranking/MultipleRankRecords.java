@@ -24,7 +24,7 @@ public class MultipleRankRecords extends org.apache.avro.specific.SpecificRecord
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static MultipleRankRecords deepCopy(MultipleRankRecords record, Schema recordSchema) {
+  public static MultipleRankRecords deepCopy(Schema recordSchema, MultipleRankRecords record) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 
