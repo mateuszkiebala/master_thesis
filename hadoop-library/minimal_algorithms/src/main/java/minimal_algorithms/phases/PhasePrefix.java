@@ -48,7 +48,6 @@ public class PhasePrefix {
     public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
-        private StatisticsAggregator[] partitionPrefixedStatistics;
         private AvroSender sender;
         private StatisticsUtils statsUtiler;
 
@@ -63,15 +62,9 @@ public class PhasePrefix {
         @Override
         protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
-            SendWrapper wrapperedPartitionStatistics = new SendWrapper();
-            wrapperedPartitionStatistics.setRecord2(partitionStatistics);
-            sender.sendToAllHigherMachines(wrapperedPartitionStatistics, key.datum());
-
-            List<SendWrapper> toSend = new ArrayList<>();
+            sender.sendToAllHigherMachines(new SendWrapper(null, partitionStatistics), key.datum());
             for (GenericRecord record : value.datum().getRecords()) {
-                SendWrapper sw = new SendWrapper();
-                sw.setRecord1(record);
-                sender.send(key, sw);
+                sender.send(key, new SendWrapper(record, null));
             }
         }
     }
@@ -101,7 +94,7 @@ public class PhasePrefix {
     }
 
     public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
-        LOG.info("starting phase Prefix");
+        LOG.info("Starting Phase Prefix");
         Configuration conf = statsConfig.getConf();
         setSchemas(conf);
 
@@ -129,12 +122,12 @@ public class PhasePrefix {
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
         AvroJob.setOutputValueSchema(job, MultipleStatisticRecords.getClassSchema());
 
-        LOG.info("Waiting for phase Prefix");
+        LOG.info("Waiting for Phase Prefix");
         int ret = job.waitForCompletion(true) ? 0 : 1;
 
         Counters counters = job.getCounters();
         long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-        LOG.info("Finished phase Prefix, processed " + total + " key/value pairs");
+        LOG.info("Finished Phase Prefix, processed " + total + " key/value pairs");
 
         return ret;
     }
