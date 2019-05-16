@@ -39,11 +39,11 @@ public class PhaseSemiJoin {
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, SemiJoinConfig.BASE_SCHEMA_KEY);
         Schema keyRecordSchema = Utils.retrieveSchemaFromConf(conf, SemiJoinConfig.KEY_RECORD_SCHEMA_KEY);
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
         SendWrapper.setSchema(keyRecordSchema, baseSchema);
     }
 
-    public static class TBoundsMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
+    public static class TBoundsMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
         private Schema keyRecordSchema;
@@ -58,7 +58,7 @@ public class PhaseSemiJoin {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleBaseRecords> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
             KeyRecord minTKey = null;
             KeyRecord maxTKey = null;
             for (GenericRecord record : value.datum().getRecords()) {
@@ -78,7 +78,7 @@ public class PhaseSemiJoin {
         }
     }
 
-    public static class SemiJoinReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleBaseRecords>> {
+    public static class SemiJoinReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleRecords>> {
 
         private Configuration conf;
         private Schema keyRecordSchema;
@@ -114,7 +114,7 @@ public class PhaseSemiJoin {
                     result.add(record);
                 }
             }
-            sender.send(key, new MultipleBaseRecords(result));
+            sender.send(key, new MultipleRecords(result));
         }
     }
 
@@ -133,7 +133,7 @@ public class PhaseSemiJoin {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
@@ -145,7 +145,7 @@ public class PhaseSemiJoin {
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setOutputValueSchema(job, MultipleRecords.getClassSchema());
 
         LOG.info("Waiting for phase SemiJoin");
         int ret = job.waitForCompletion(true) ? 0 : 1;

@@ -37,10 +37,10 @@ public class PhasePartitionStatistics {
 
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
     }
 
-    public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
+    public static class PartitionPrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<StatisticsAggregator>> {
 
         private Configuration conf;
         private StatisticsUtils statsUtiler;
@@ -55,7 +55,7 @@ public class PhasePartitionStatistics {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleBaseRecords> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
             sender.send(key, statsUtiler.foldLeftRecords(value.datum().getRecords()));
         }
     }
@@ -94,7 +94,7 @@ public class PhasePartitionStatistics {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);

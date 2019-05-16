@@ -34,17 +34,13 @@ import minimal_algorithms.ranking.*;
 import minimal_algorithms.config.BaseConfig;
 import minimal_algorithms.sending.AvroSender;
 
-/**
- *
- * @author mateuszkiebala
- */
 public class PhasePerfectSort {
 
     static final Log LOG = LogFactory.getLog(PhasePerfectSort.class);
 
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
         RankWrapper.setSchema(baseSchema);
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
     }
@@ -73,14 +69,14 @@ public class PhasePerfectSort {
         }
     }
 
-    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<RankWrapper>, AvroKey<Integer>, AvroValue<MultipleBaseRecords>> {
+    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<RankWrapper>, AvroKey<Integer>, AvroValue<MultipleRecords>> {
 
         private Configuration conf;
         private Comparator<GenericRecord> cmp;
         private AvroMultipleOutputs amos;
         private Schema baseSchema;
         private final AvroValue<Integer> aInt = new AvroValue<>();
-        private final AvroValue<MultipleBaseRecords> avValueMultRecords = new AvroValue<>();
+        private final AvroValue<MultipleRecords> avValueMultRecords = new AvroValue<>();
 
         @Override
         public void setup(Context ctx) {
@@ -110,7 +106,7 @@ public class PhasePerfectSort {
             aInt.datum(objects.size());
             amos.write(BaseConfig.SORTED_COUNTS_TAG, avKey, aInt);
 
-            avValueMultRecords.datum(new MultipleBaseRecords(objects));
+            avValueMultRecords.datum(new MultipleRecords(objects));
             amos.write(BaseConfig.SORTED_DATA_TAG, avKey, avValueMultRecords);
         }
     }
@@ -138,7 +134,7 @@ public class PhasePerfectSort {
         AvroJob.setMapOutputValueSchema(job, RankWrapper.getClassSchema());
 
         job.setReducerClass(SortingReducer.class);
-        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleBaseRecords.getClassSchema());
+        AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleRecords.getClassSchema());
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_COUNTS_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), Schema.create(Schema.Type.INT));
 
         LOG.info("Waiting for phase PerfectSort");

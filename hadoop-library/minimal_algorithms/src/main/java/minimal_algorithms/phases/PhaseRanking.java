@@ -44,12 +44,12 @@ public class PhaseRanking {
 
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
-        MultipleBaseRecords.setSchema(baseSchema);
+        MultipleRecords.setSchema(baseSchema);
         RankWrapper.setSchema(baseSchema);
         MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
     }
 
-    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleBaseRecords>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
+    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
 
         private Long[] prefixedPartitionSizes;
         private Configuration conf;
@@ -67,11 +67,11 @@ public class PhaseRanking {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleBaseRecords>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleRecords>> values, Context context) throws IOException, InterruptedException {
             int partitionIndex = key.datum();
             ArrayList<RankWrapper> result = new ArrayList<>();
-            for (AvroValue<MultipleBaseRecords> o : values) {
-                MultipleBaseRecords baseRecords = MultipleBaseRecords.deepCopy(o.datum());
+            for (AvroValue<MultipleRecords> o : values) {
+                MultipleRecords baseRecords = MultipleRecords.deepCopy(o.datum());
                 int i = 0;
                 for (GenericRecord record : baseRecords.getRecords()) {
                     long rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
@@ -99,12 +99,12 @@ public class PhaseRanking {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, MultipleBaseRecords.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, MultipleRecords.getClassSchema());
 
         job.setReducerClass(RankingReducer.class);
         job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
