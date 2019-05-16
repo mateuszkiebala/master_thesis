@@ -26,11 +26,11 @@ public class AvroSender extends Sender {
     }
 
     public <V> void sendToAllHigherMachines(V value, int lowerBound) throws IOException, InterruptedException {
-        sendToRangeMachines(new AvroValue<V>(value), lowerBound + 1, Utils.getStripsCount(getConf()));
+        sendToRangeMachines(new AvroValue<V>(value), lowerBound + 1, Utils.getMachinesNo(getConf()));
     }
 
     public <V> void sendToAllHigherMachines(AvroValue<V> avVal, int lowerBound) throws IOException, InterruptedException {
-        sendToRangeMachines(avVal, lowerBound + 1, Utils.getStripsCount(getConf()));
+        sendToRangeMachines(avVal, lowerBound + 1, Utils.getMachinesNo(getConf()));
     }
 
     public <V> void sendToAllMachines(V value) throws IOException, InterruptedException {
@@ -38,7 +38,7 @@ public class AvroSender extends Sender {
     }
 
     public <V> void sendToAllMachines(AvroValue<V> avVal) throws IOException, InterruptedException {
-        sendToRangeMachines(avVal, 0, Utils.getStripsCount(getConf()));
+        sendToRangeMachines(avVal, 0, Utils.getMachinesNo(getConf()));
     }
 
     public <V> void sendToRangeMachines(V value, int lowerBound, int upperBound) throws IOException, InterruptedException {
@@ -57,7 +57,7 @@ public class AvroSender extends Sender {
     }
 
     public <V> void sendBounded(int key, AvroValue<V> avVal) throws IOException, InterruptedException {
-        if (key >= 0 && key < Utils.getStripsCount(getConf())) {
+        if (key >= 0 && key < Utils.getMachinesNo(getConf())) {
             super.send(new AvroKey<Integer>(key), avVal);
         }
     }

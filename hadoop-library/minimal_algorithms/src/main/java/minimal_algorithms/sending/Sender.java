@@ -25,11 +25,11 @@ public class Sender {
     }
 
     public <V> void sendToAllHigherMachines(V value, int lowerBound) throws IOException, InterruptedException {
-        sendToRangeMachines(value, lowerBound + 1, Utils.getStripsCount(getConf()));
+        sendToRangeMachines(value, lowerBound + 1, Utils.getMachinesNo(getConf()));
     }
 
     public <V> void sendToAllMachines(V value) throws IOException, InterruptedException {
-        sendToRangeMachines(value, 0, Utils.getStripsCount(getConf()));
+        sendToRangeMachines(value, 0, Utils.getMachinesNo(getConf()));
     }
 
     public <V> void sendToRangeMachines(V value, int lowerBound, int upperBound) throws IOException, InterruptedException {
@@ -39,7 +39,7 @@ public class Sender {
     }
 
     public <V> void sendBounded(int key, V value) throws IOException, InterruptedException {
-        if (key >= 0 && key < Utils.getStripsCount(getConf())) {
+        if (key >= 0 && key < Utils.getMachinesNo(getConf())) {
             send(key, value);
         }
     }

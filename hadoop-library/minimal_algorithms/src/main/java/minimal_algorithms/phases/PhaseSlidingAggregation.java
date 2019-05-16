@@ -64,7 +64,7 @@ public class PhaseSlidingAggregation {
             sender = new AvroSender(ctx);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, SlidingAggregationConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
             itemsNoByMachine = Utils.getItemsNoByMachines(conf);
-            machinesNo = Utils.getStripsCount(conf);
+            machinesNo = Utils.getMachinesNo(conf);
             windowLength = conf.getLong(SlidingAggregationConfig.WINDOW_LENGTH_KEY, 0);
         }
 

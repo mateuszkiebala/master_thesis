@@ -88,6 +88,10 @@ public class Utils {
         return new Path(path);
     }
 
+    public static int getMachinesNo(Configuration conf) {
+        return getStripsCount(conf);
+    }
+
     public static int getStripsCount(Configuration conf) {
         int stripsNo = conf.getInt(Config.NO_OF_STRIPS_KEY, -1);
         if (stripsNo == -1) {
