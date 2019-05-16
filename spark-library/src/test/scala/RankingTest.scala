@@ -1,9 +1,6 @@
-package ranking
-
-import minimal_algorithms.examples.ranking.RankingObject
 import minimal_algorithms.MinimalAlgorithm
+import minimal_algorithms.examples.ranking.RankingObject
 import org.scalatest.{FunSuite, Matchers}
-import setup.SharedSparkContext
 
 class RankingTest extends FunSuite with SharedSparkContext with Matchers {
   test("Ranking") {

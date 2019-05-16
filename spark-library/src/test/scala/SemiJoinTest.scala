@@ -1,10 +1,7 @@
-package semi_join
-
 import minimal_algorithms.MinimalSemiJoin
 import minimal_algorithms.examples.semi_join.SemiJoinType
 import minimal_algorithms.semi_join.SemiJoinSetTypeEnum
 import org.scalatest.{FunSuite, Matchers}
-import setup.SharedSparkContext
 
 class SemiJoinTest extends FunSuite with SharedSparkContext with Matchers {
   test("SemiJoin") {

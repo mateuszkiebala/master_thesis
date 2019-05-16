@@ -1,8 +1,6 @@
-package range_tree
-import org.scalatest.FunSuite
 import minimal_algorithms.RangeTree
 import minimal_algorithms.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
-import minimal_algorithms.statistics_aggregators._
+import org.scalatest.FunSuite
 
 class RangeTreeTest extends FunSuite {
   def sumWrapInsert(elements: Array[(Double, Int)]): Array[(SumAggregator, Int)] = {

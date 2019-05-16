@@ -1,18 +1,18 @@
-[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(semi_join.SemiJoinTest, org.scalatest.tools.Framework$$anon$1@1d5cd4c, false, [SuiteSelector])[0m
-[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(sliding_aggregation.SlidingAggregationTest, org.scalatest.tools.Framework$$anon$1@1d5cd4c, false, [SuiteSelector])[0m
-[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(prefix.PrefixTest, org.scalatest.tools.Framework$$anon$1@1d5cd4c, false, [SuiteSelector])[0m
-[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(range_tree.RangeTreeTest, org.scalatest.tools.Framework$$anon$1@1d5cd4c, false, [SuiteSelector])[0m
-[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(group_by.GroupByTest, org.scalatest.tools.Framework$$anon$1@1d5cd4c, false, [SuiteSelector])[0m
-[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(ranking.RankingTest, org.scalatest.tools.Framework$$anon$1@1d5cd4c, false, [SuiteSelector])[0m
-[0m[[0m[0minfo[0m] [0m[0m[36mRun completed in 6 seconds, 749 milliseconds.[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(RangeTreeTest, org.scalatest.tools.Framework$$anon$1@2b59ba55, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(SemiJoinTest, org.scalatest.tools.Framework$$anon$1@2b59ba55, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(GroupByTest, org.scalatest.tools.Framework$$anon$1@2b59ba55, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(SlidingAggregationTest, org.scalatest.tools.Framework$$anon$1@2b59ba55, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(RankingTest, org.scalatest.tools.Framework$$anon$1@2b59ba55, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(PrefixTest, org.scalatest.tools.Framework$$anon$1@2b59ba55, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mRun completed in 6 seconds, 903 milliseconds.[0m[0m
 [0m[[0m[0minfo[0m] [0m[0m[36mTotal number of tests run: 26[0m[0m
 [0m[[0m[0minfo[0m] [0m[0m[36mSuites: completed 6, aborted 0[0m[0m
 [0m[[0m[0minfo[0m] [0m[0m[36mTests: succeeded 26, failed 0, canceled 0, ignored 0, pending 0[0m[0m
 [0m[[0m[0minfo[0m] [0m[0m[32mAll tests passed.[0m[0m
 [0m[[0m[0mdebug[0m] [0m[0mPassed tests:[0m
-[0m[[0m[0mdebug[0m] [0m[0m	sliding_aggregation.SlidingAggregationTest[0m
-[0m[[0m[0mdebug[0m] [0m[0m	ranking.RankingTest[0m
-[0m[[0m[0mdebug[0m] [0m[0m	range_tree.RangeTreeTest[0m
-[0m[[0m[0mdebug[0m] [0m[0m	prefix.PrefixTest[0m
-[0m[[0m[0mdebug[0m] [0m[0m	group_by.GroupByTest[0m
-[0m[[0m[0mdebug[0m] [0m[0m	semi_join.SemiJoinTest[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RankingTest[0m
+[0m[[0m[0mdebug[0m] [0m[0m	RangeTreeTest[0m
+[0m[[0m[0mdebug[0m] [0m[0m	PrefixTest[0m
+[0m[[0m[0mdebug[0m] [0m[0m	GroupByTest[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SlidingAggregationTest[0m
+[0m[[0m[0mdebug[0m] [0m[0m	SemiJoinTest[0m

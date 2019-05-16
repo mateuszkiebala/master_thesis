@@ -1,8 +1,14 @@
 #Successful Tests
-#Sun May 12 22:39:00 CEST 2019
-prefix.PrefixTest=1557693539237
-sliding_aggregation.SlidingAggregationTest=1557693540166
-range_tree.RangeTreeTest=1557693533992
-semi_join.SemiJoinTest=1557693538484
-ranking.RankingTest=1557693538954
-group_by.GroupByTest=1557693540028
+#Fri May 17 01:05:23 CEST 2019
+sliding_aggregation.SlidingAggregationTest=1558047350391
+PrefixTest=1558047922739
+RangeTreeTest=1558047916753
+range_tree.RangeTreeTest=1558047345384
+RankingTest=1558047920928
+semi_join.SemiJoinTest=1558047349000
+SlidingAggregationTest=1558047923226
+group_by.GroupByTest=1558047350171
+GroupByTest=1558047922939
+SemiJoinTest=1558047921549
+prefix.PrefixTest=1558047349627
+ranking.RankingTest=1558047349589

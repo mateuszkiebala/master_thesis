@@ -17,7 +17,21 @@ object Utils {
     */
   def sendToMachines[T](rdd: RDD[(T, Seq[Int])])(implicit rtag: ClassTag[T]): RDD[T] = {
     partitionByKey[T](rdd.mapPartitionsWithIndex((pIndex, partition) => {
-      partition.flatMap{case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.map{i => (i, o)}}
+      partition.flatMap{case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.filter(i => i >= 0).map{i => (i, o)}}
+    }))
+  }
+
+  /**
+    * Shuffles rdd objects by sending them to given machine indices but not greater than maxPartition.
+    * Method does NOT preserve order.
+    * @param rdd  RDD of pairs (object, List[destination machine index])
+    * @param maxPartition  maximum available partition index
+    * @tparam T [T : ClassTag]
+    * @return RDD of reshuffled objects
+    */
+  def sendToMachinesBounded[T](rdd: RDD[(T, Seq[Int])], maxPartition: Int)(implicit rtag: ClassTag[T]): RDD[T] = {
+    partitionByKey[T](rdd.mapPartitionsWithIndex((pIndex, partition) => {
+      partition.flatMap{case (o, indices) => if (indices.isEmpty) List((pIndex, o)) else indices.filter(i => i >= 0 && i <= maxPartition).map{i => (i, o)}}
     }))
   }
 
@@ -59,8 +73,9 @@ object Utils {
     * @param rdd  RDD[(object, machineIndexUpperBound)]
     */
   def sendToAllLowerMachines[T](rdd: RDD[(T, Int)])(implicit rtag: ClassTag[T]): RDD[T] = {
+    val numPartitions = rdd.getNumPartitions
     partitionByKey[T](rdd.mapPartitions(partition => {
-      partition.flatMap{case (o, upperBound) => List.range(0, upperBound).map{i => (i, o)}}
+      partition.flatMap{case (o, upperBound) => List.range(0, Math.min(upperBound, numPartitions)).map{i => (i, o)}}
     }))
   }
 
@@ -80,8 +95,9 @@ object Utils {
     * @param rdd  RDD[(object, machineIndexLowerBound, machineIndexUpperBound)]
     */
   def sendToRangeMachines[T](rdd: RDD[(T, Int, Int)])(implicit rtag: ClassTag[T]): RDD[T] = {
+    val numPartitions = rdd.getNumPartitions
     partitionByKey[T](rdd.mapPartitions(partition => {
-      partition.flatMap{case (o, lowerBound, upperBound) => List.range(lowerBound, upperBound).map{i => (i, o)}}
+      partition.flatMap{case (o, lowerBound, upperBound) => List.range(lowerBound, Math.min(upperBound, numPartitions)).map{i => (i, o)}}
     }))
   }
 

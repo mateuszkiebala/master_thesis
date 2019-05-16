@@ -1,10 +1,7 @@
-package prefix
-
 import minimal_algorithms.MinimalAlgorithm
 import minimal_algorithms.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import org.apache.spark.rdd.RDD
 import org.scalatest.{FunSuite, Matchers}
-import setup.SharedSparkContext
 
 class TestPrefixObject(weight: Double) extends Serializable {
   override def toString: String = "Weight: " + this.weight

@@ -1,10 +1,7 @@
-package sliding_aggregation
-
 import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.sliding_aggregation._
 import org.apache.spark.rdd.RDD
 import org.scalatest.{FunSuite, Matchers}
-import setup.SharedSparkContext
 
 class TestSlidingObject(key: Int, weight: Double) extends Serializable {
   override def toString: String = "Key: " + this.key + " | Weight: " + this.weight

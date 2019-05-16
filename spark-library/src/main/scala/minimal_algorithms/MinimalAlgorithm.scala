@@ -13,7 +13,7 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
-  def computeItemsCntByPartition[T](rdd: RDD[T], itemsCnt: Int = -1): (Int, Int) = {
+  def computeItemsNoByPartition[T](rdd: RDD[T], itemsCnt: Int = -1): (Int, Int) = {
     val cnt = if (itemsCnt < 0) rdd.count().toInt else itemsCnt
     ((cnt + numPartitions - 1) / numPartitions, cnt)
   }
@@ -46,7 +46,7 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
 
   def perfectSortWithRanks[T, K](rdd: RDD[T], cmpKey: T => K, itemsCnt: Int = -1)
                                 (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[(Int, T)] = {
-    rank(rdd, cmpKey).partitionBy(new PerfectPartitioner(numPartitions, computeItemsCntByPartition(rdd, itemsCnt)._1))
+    rank(rdd, cmpKey).partitionBy(new PerfectPartitioner(numPartitions, computeItemsNoByPartition(rdd, itemsCnt)._1))
   }
 
   def prefix[T, K, S <: StatisticsAggregator[S]]

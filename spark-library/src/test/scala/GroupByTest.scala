@@ -1,10 +1,7 @@
-package group_by
-
 import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.group_by.MinimalGroupBy
 import org.apache.spark.rdd.RDD
 import org.scalatest.{FunSuite, Matchers}
-import setup.SharedSparkContext
 
 class TestGroupBy(key: Int, weight: Double) extends Serializable {
   def getKey: Int = this.key

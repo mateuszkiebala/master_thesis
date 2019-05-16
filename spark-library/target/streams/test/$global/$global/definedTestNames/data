@@ -1,1 +1,1 @@
-["sliding_aggregation.SlidingAggregationTest","ranking.RankingTest","range_tree.RangeTreeTest","prefix.PrefixTest","group_by.GroupByTest","semi_join.SemiJoinTest"]
+["RankingTest","RangeTreeTest","PrefixTest","GroupByTest","SlidingAggregationTest","SemiJoinTest"]

@@ -1,5 +1,3 @@
-package setup
-
 import org.apache.spark.sql.SparkSession
 
 trait SharedSparkContext {
