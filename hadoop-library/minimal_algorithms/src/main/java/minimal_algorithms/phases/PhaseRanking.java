@@ -45,11 +45,11 @@ public class PhaseRanking {
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
         MultipleRecords.setSchema(baseSchema);
-        RankWrapper.setSchema(baseSchema);
-        MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
+        RankRecord.setSchema(baseSchema);
+        MultipleRankRecords.setSchema(RankRecord.getClassSchema());
     }
 
-    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<MultipleRankWrappers>> {
+    public static class RankingReducer extends Reducer<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<MultipleRankRecords>> {
 
         private Long[] prefixedPartitionSizes;
         private Configuration conf;
@@ -69,17 +69,17 @@ public class PhaseRanking {
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<MultipleRecords>> values, Context context) throws IOException, InterruptedException {
             int partitionIndex = key.datum();
-            ArrayList<RankWrapper> result = new ArrayList<>();
+            ArrayList<RankRecord> result = new ArrayList<>();
             for (AvroValue<MultipleRecords> o : values) {
                 MultipleRecords baseRecords = MultipleRecords.deepCopy(o.datum());
                 int i = 0;
                 for (GenericRecord record : baseRecords.getRecords()) {
                     long rank = partitionIndex == 0 ? i : prefixedPartitionSizes[partitionIndex-1] + i;
-                    result.add(new RankWrapper(rank, record));
+                    result.add(new RankRecord(rank, record));
                     i++;
                 }
             }
-            sender.send(key, new MultipleRankWrappers(result));
+            sender.send(key, new MultipleRankRecords(result));
         }
     }
 
@@ -111,7 +111,7 @@ public class PhaseRanking {
         job.setOutputKeyClass(AvroKey.class);
         job.setOutputValueClass(AvroValue.class);
         AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultipleRankWrappers.getClassSchema());
+        AvroJob.setOutputValueSchema(job, MultipleRankRecords.getClassSchema());
 
         LOG.info("Waiting for phase Ranking");
         int ret = job.waitForCompletion(true) ? 0 : 1;

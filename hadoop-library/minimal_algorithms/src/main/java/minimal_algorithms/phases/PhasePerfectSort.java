@@ -41,11 +41,11 @@ public class PhasePerfectSort {
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, BaseConfig.BASE_SCHEMA_KEY);
         MultipleRecords.setSchema(baseSchema);
-        RankWrapper.setSchema(baseSchema);
-        MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
+        RankRecord.setSchema(baseSchema);
+        MultipleRankRecords.setSchema(RankRecord.getClassSchema());
     }
 
-    public static class PerfectBalanceMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRankWrappers>, AvroKey<Integer>, AvroValue<RankWrapper>> {
+    public static class PerfectBalanceMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRankRecords>, AvroKey<Integer>, AvroValue<RankRecord>> {
 
         private Configuration conf;
         private AvroSender sender;
@@ -60,16 +60,16 @@ public class PhasePerfectSort {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleRankWrappers> value, Context context) throws IOException, InterruptedException {
-            MultipleRankWrappers baseRecords = MultipleRankWrappers.deepCopy(value.datum());
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleRankRecords> value, Context context) throws IOException, InterruptedException {
+            MultipleRankRecords baseRecords = MultipleRankRecords.deepCopy(value.datum());
             for (GenericRecord record : baseRecords.getRecords()) {
-                long rank = ((RankWrapper) record).getRank();
+                long rank = ((RankRecord) record).getRank();
                 sender.send(rank / itemsNoByMachines, record);
             }
         }
     }
 
-    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<RankWrapper>, AvroKey<Integer>, AvroValue<MultipleRecords>> {
+    public static class SortingReducer extends Reducer<AvroKey<Integer>, AvroValue<RankRecord>, AvroKey<Integer>, AvroValue<MultipleRecords>> {
 
         private Configuration conf;
         private Comparator<GenericRecord> cmp;
@@ -96,10 +96,10 @@ public class PhasePerfectSort {
         }
 
         @Override
-        protected void reduce(AvroKey<Integer> avKey, Iterable<AvroValue<RankWrapper>> values, Context context) throws IOException, InterruptedException {
+        protected void reduce(AvroKey<Integer> avKey, Iterable<AvroValue<RankRecord>> values, Context context) throws IOException, InterruptedException {
             ArrayList<GenericRecord> objects = new ArrayList<>();
-            for (AvroValue<RankWrapper> record : values) {
-                objects.add(Utils.deepCopy(baseSchema, record.datum().getValue()));
+            for (AvroValue<RankRecord> record : values) {
+                objects.add(Utils.deepCopy(baseSchema, record.datum().getRecord()));
             }
             java.util.Collections.sort(objects, cmp);
 
@@ -126,12 +126,12 @@ public class PhasePerfectSort {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleRankWrappers.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRankRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);
         AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, RankWrapper.getClassSchema());
+        AvroJob.setMapOutputValueSchema(job, RankRecord.getClassSchema());
 
         job.setReducerClass(SortingReducer.class);
         AvroMultipleOutputs.addNamedOutput(job, BaseConfig.SORTED_DATA_TAG, AvroKeyValueOutputFormat.class, Schema.create(Schema.Type.INT), MultipleRecords.getClassSchema());

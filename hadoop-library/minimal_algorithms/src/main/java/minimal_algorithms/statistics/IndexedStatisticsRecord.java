@@ -36,7 +36,7 @@ public class IndexedStatisticsRecord extends org.apache.avro.specific.SpecificRe
         }
     }
 
-    public static Comparator<GenericRecord> genericRecordCmp = new GenericRecordComparator();
+    public static Comparator<GenericRecord> genericCmp = new GenericRecordComparator();
 
     public static class GenericRecordComparator implements Comparator<GenericRecord> {
         @Override

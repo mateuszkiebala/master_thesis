@@ -40,15 +40,15 @@ public class PhaseSlidingAggregation {
     private static void setSchemas(Configuration conf) {
         Schema baseSchema = Utils.retrieveSchemaFromConf(conf, SlidingAggregationConfig.BASE_SCHEMA_KEY);
         Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, SlidingAggregationConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
-        RankWrapper.setSchema(baseSchema);
+        RankRecord.setSchema(baseSchema);
         IndexedStatisticsRecord.setSchema(statisticsAggregatorSchema);
-        MultipleRankWrappers.setSchema(RankWrapper.getClassSchema());
-        SendWrapper.setSchema(RankWrapper.getClassSchema(), IndexedStatisticsRecord.getClassSchema());
+        MultipleRankRecords.setSchema(RankRecord.getClassSchema());
+        SendWrapper.setSchema(RankRecord.getClassSchema(), IndexedStatisticsRecord.getClassSchema());
         StatisticsRecord.setSchema(statisticsAggregatorSchema, baseSchema);
         MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
     }
 
-    public static class RemotelyRelevantMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRankWrappers>, AvroKey<Integer>, AvroValue<SendWrapper>> {
+    public static class RemotelyRelevantMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRankRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
 
         private Configuration conf;
         private AvroSender sender;
@@ -69,14 +69,14 @@ public class PhaseSlidingAggregation {
         }
 
         @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleRankWrappers> value, Context context) throws IOException, InterruptedException {
+        protected void map(AvroKey<Integer> key, AvroValue<MultipleRankRecords> value, Context context) throws IOException, InterruptedException {
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getBaseRecords(), null);
             sender.sendToAllMachines(new SendWrapper(null, new IndexedStatisticsRecord(new Long(key.datum()), partitionStatistics)));
             distributeDataToRemotelyRelevantPartitions(key.datum(), value.datum().getRecords());
         }
 
-        private void distributeDataToRemotelyRelevantPartitions(int machineIndex, List<RankWrapper> records) throws IOException, InterruptedException {
-            for (RankWrapper record : records) {
+        private void distributeDataToRemotelyRelevantPartitions(int machineIndex, List<RankRecord> records) throws IOException, InterruptedException {
+            for (RankRecord record : records) {
                 SendWrapper sw = new SendWrapper(record, null);
                 if (windowLength <= itemsNoByMachine) {
                     sender.sendBounded(machineIndex + 1, sw);
@@ -127,21 +127,21 @@ public class PhaseSlidingAggregation {
         }
 
         private void computeWindowValues(int machineIndex, List<GenericRecord> records, RangeTree partitionsTree) throws IOException, InterruptedException {
-            java.util.Collections.sort(records, RankWrapper.genericRecordCmp);
+            java.util.Collections.sort(records, RankRecord.genericCmp);
             HashMap<Long, Integer> rankToIndex = new HashMap<>();
             RangeTree tree = new RangeTree(records.size());
             for (int i = 0; i < records.size(); i++) {
-                RankWrapper rankWrapper = (RankWrapper) records.get(i);
-                rankToIndex.put(rankWrapper.getRank(), i);
-                tree.insert(statsUtiler.createStatisticsAggregator(rankWrapper.getValue()), i);
+                RankRecord rankRecord = (RankRecord) records.get(i);
+                rankToIndex.put(rankRecord.getRank(), i);
+                tree.insert(statsUtiler.createStatisticsAggregator(rankRecord.getRecord()), i);
             }
 
             List<StatisticsRecord> slidingResult = new ArrayList<>();
             long baseLowerBound = machineIndex * itemsNoByMachine;
             long baseUpperBound = (machineIndex+1) * itemsNoByMachine - 1;
             for (int i = 0; i < records.size(); i++) {
-                RankWrapper rankWrapper = (RankWrapper) records.get(i);
-                long rank = rankWrapper.getRank();
+                RankRecord rankRecord = (RankRecord) records.get(i);
+                long rank = rankRecord.getRank();
                 if (rank >= baseLowerBound && rank <= baseUpperBound) {
                     long windowStart = (rank - windowLength + 1) < 0 ? 0 : rank - windowLength + 1;
                     int a = (int) (((rank + 1 - windowLength + itemsNoByMachine) / itemsNoByMachine) - 1);
@@ -155,7 +155,7 @@ public class PhaseSlidingAggregation {
                     } else {
                         result = tree.query(rankToIndex.get(windowStart), rankToIndex.get(rank));
                     }
-                    slidingResult.add(new StatisticsRecord(result, rankWrapper.getValue()));
+                    slidingResult.add(new StatisticsRecord(result, rankRecord.getRecord()));
                 }
             }
             sender.send(machineIndex, new MultipleStatisticRecords(slidingResult));
@@ -177,7 +177,7 @@ public class PhaseSlidingAggregation {
 
         job.setInputFormatClass(AvroKeyValueInputFormat.class);
         AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleRankWrappers.getClassSchema());
+        AvroJob.setInputValueSchema(job, MultipleRankRecords.getClassSchema());
 
         job.setMapOutputKeyClass(AvroKey.class);
         job.setMapOutputValueClass(AvroValue.class);

@@ -6,11 +6,11 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 
-public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+public class RankRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
-    SCHEMA$ = SchemaBuilder.record("RankWrapper").namespace("minimal_algorithms.ranking")
+    SCHEMA$ = SchemaBuilder.record("RankRecord").namespace("minimal_algorithms.ranking")
             .fields()
             .name("rank").type().longType().noDefault()
             .name("record").type(schema).noDefault()
@@ -19,42 +19,42 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
-  public static RankWrapper deepCopy(RankWrapper record) {
+  public static RankRecord deepCopy(RankRecord record) {
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static RankWrapper deepCopy(RankWrapper record, Schema recordSchema) {
+  public static RankRecord deepCopy(RankRecord record, Schema recordSchema) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 
-  public static Comparator<RankWrapper> cmp = new RankWrapperComparator();
+  public static Comparator<RankRecord> cmp = new RankRecordComparator();
 
-  public static class RankWrapperComparator implements Comparator<RankWrapper> {
+  public static class RankRecordComparator implements Comparator<RankRecord> {
     @Override
-    public int compare(RankWrapper o1, RankWrapper o2) {
+    public int compare(RankRecord o1, RankRecord o2) {
       return o1.getRank() > o2.getRank() ? 1 : (o1.getRank() < o2.getRank() ? -1 : 0);
     }
   }
 
-  public static Comparator<GenericRecord> genericRecordCmp = new GenericRecordComparator();
+  public static Comparator<GenericRecord> genericCmp = new GenericRecordComparator();
 
   public static class GenericRecordComparator implements Comparator<GenericRecord> {
     @Override
     public int compare(GenericRecord o1, GenericRecord o2) {
-      RankWrapper rw1 = (RankWrapper) o1;
-      RankWrapper rw2 = (RankWrapper) o2;
-      return rw1.getRank() > rw2.getRank() ? 1 : (rw1.getRank() < rw2.getRank() ? -1 : 0);
+      RankRecord rw1 = (RankRecord) o1;
+      RankRecord rw2 = (RankRecord) o2;
+      return new RankRecordComparator().compare(rw1, rw2);
     }
   }
 
   private long rank;
-  private GenericRecord value;
+  private GenericRecord record;
 
-  public RankWrapper() {}
+  public RankRecord() {}
 
-  public RankWrapper(java.lang.Long rank, GenericRecord value) {
+  public RankRecord(java.lang.Long rank, GenericRecord record) {
     this.rank = rank;
-    this.value = value;
+    this.record = record;
   }
 
   public Schema getSchema() { return SCHEMA$; }
@@ -62,7 +62,7 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
   public Object get(int field$) {
     switch (field$) {
     case 0: return rank;
-    case 1: return value;
+    case 1: return record;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -71,7 +71,7 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
     case 0: rank = (Long)value$; break;
-    case 1: value = (GenericRecord)value$; break;
+    case 1: record = (GenericRecord)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -84,11 +84,11 @@ public class RankWrapper extends org.apache.avro.specific.SpecificRecordBase imp
     this.rank = value;
   }
 
-  public GenericRecord getValue() {
-    return value;
+  public GenericRecord getRecord() {
+    return record;
   }
 
-  public void setValue(GenericRecord value) {
-    this.value = value;
+  public void setRecord(GenericRecord record) {
+    this.record = record;
   }
 }

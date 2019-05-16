@@ -7,12 +7,12 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 
-public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
+public class MultipleRankRecords extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
     SCHEMA$ = SchemaBuilder
-            .record("MultipleRankWrappers").namespace("minimal_algorithms.ranking")
+            .record("MultipleRankRecords").namespace("minimal_algorithms.ranking")
             .fields()
             .name("records").type().array().items(schema).noDefault()
             .endRecord();
@@ -20,19 +20,19 @@ public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecor
 
   public static Schema getClassSchema() { return SCHEMA$; }
 
-  public static MultipleRankWrappers deepCopy(MultipleRankWrappers record) {
+  public static MultipleRankRecords deepCopy(MultipleRankRecords record) {
     return SpecificData.get().deepCopy(getClassSchema(), record);
   }
 
-  public static MultipleRankWrappers deepCopy(MultipleRankWrappers record, Schema recordSchema) {
+  public static MultipleRankRecords deepCopy(MultipleRankRecords record, Schema recordSchema) {
     return SpecificData.get().deepCopy(recordSchema, record);
   }
 
-  private List<RankWrapper> records;
+  private List<RankRecord> records;
 
-  public MultipleRankWrappers() {}
+  public MultipleRankRecords() {}
 
-  public MultipleRankWrappers(List<RankWrapper> records) {
+  public MultipleRankRecords(List<RankRecord> records) {
     this.records = records;
   }
 
@@ -49,24 +49,24 @@ public class MultipleRankWrappers extends org.apache.avro.specific.SpecificRecor
   @Override
   public void put(int field$, Object value$) {
     switch (field$) {
-    case 0: records = (List<RankWrapper>)value$; break;
+    case 0: records = (List<RankRecord>)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
 
   public List<GenericRecord> getBaseRecords() {
     List<GenericRecord> baseRecords = new ArrayList<>();
-    for (RankWrapper record : records) {
-      baseRecords.add(record.getValue());
+    for (RankRecord record : records) {
+      baseRecords.add(record.getRecord());
     }
     return baseRecords;
   }
 
-  public List<RankWrapper> getRecords() {
+  public List<RankRecord> getRecords() {
     return records;
   }
 
-  public void setRecords(List<RankWrapper> value) {
+  public void setRecords(List<RankRecord> value) {
     this.records = value;
   }
 }
