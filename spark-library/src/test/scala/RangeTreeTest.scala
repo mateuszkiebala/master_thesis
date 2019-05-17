@@ -27,77 +27,81 @@ class RangeTreeTest extends FunSuite {
     elements.map{e => if (e == null) Double.MinValue else e.getValue}
   }
 
-  test("RangeTree.init one node tree") {
-      // given
-    val elements = sumWrapInsert(Array((1.0, 0)))
-
-      // when
+  test("RangeTree.init zero nodes tree") {
+    val elements = sumWrapInsert(Array())
     val rangeTree = new RangeTree(elements)
+    assert(0 == rangeTree.BASE)
+    assert(rangeTree.nodes.isEmpty)
+  }
 
-      // then
+  test("RangeTree.init zero nodes tree insert") {
+    val elements = sumWrapInsert(Array())
+    val rangeTree = new RangeTree(elements)
+    val caught = intercept[Exception] {
+      rangeTree.insert(new SumAggregator(0), 0)
+    }
+    assert(caught.getMessage == "Position out of range: 0")
+  }
+
+  test("RangeTree.init zero nodes tree query") {
+    val elements = sumWrapInsert(Array())
+    val rangeTree = new RangeTree(elements)
+    val caught = intercept[Exception] {
+      rangeTree.query(0, 1)
+    }
+    assert(caught.getMessage == "Position (start) out of range: 0")
+  }
+
+  test("RangeTree.init zero nodes tree query subzero start") {
+    val elements = sumWrapInsert(Array())
+    val rangeTree = new RangeTree(elements)
+    val caught = intercept[Exception] {
+      rangeTree.query(-1, 1)
+    }
+    assert(caught.getMessage == "Position (start) out of range: -1")
+  }
+
+  test("RangeTree.init one node tree") {
+    val elements = sumWrapInsert(Array((1.0, 0)))
+    val rangeTree = new RangeTree(elements)
     assert(1 == rangeTree.BASE)
     assert(Array(0.0, 1.0).sameElements(sumUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init position out of range") {
-      // given
     val elements = sumWrapInsert(Array((1.0, 0), (2.0, 4), (3.0, 2), (4.0, 3)))
-
-      // when, then
     val caught = intercept[Exception] {
         new RangeTree(elements)
       }
-
     assert(caught.getMessage == "Position out of range: 4")
   }
 
   test("RangeTree.init start > end") {
-      // given
     val elements = sumWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (3.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     val caught = intercept[Exception] {
         rangeTree.query(3, 2)
       }
-
     assert(caught.getMessage == "Start (3) greater than end (2)")
   }
 
   test("RangeTree.init base sum") {
-      // given
     val elements = sumWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (4.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(4 == rangeTree.BASE)
     assert(Array(0.0, 10.0, 3.0, 7.0, 1.0, 2.0, 3.0, 4.0).sameElements(sumUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init not equal power of two sum") {
-      // given
     val elements = sumWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(8 == rangeTree.BASE)
     assert(Array(0, 20, 18, 2, 4, 14, 2, 0, 3, 1, 4, 10, 2, 0, 0, 0).map(x => x.toDouble).sameElements(sumUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init query sum") {
-      // given
     val elements = sumWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(new SumAggregator(3.0) == rangeTree.query(0, 0))
     assert(new SumAggregator(8.0) == rangeTree.query(0, 2))
     assert(new SumAggregator(18.0) == rangeTree.query(0, 3))
@@ -108,37 +112,22 @@ class RangeTreeTest extends FunSuite {
   }
 
   test("RangeTree.init base min") {
-      // given
     val elements = minWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (4.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(4 == rangeTree.BASE)
     assert(Array(Double.MaxValue, 1, 1, 3, 1, 2, 3, 4).sameElements(minUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init not equal power of two min") {
-      // given
     val elements = minWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (-4.0, 2), (10.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(8 == rangeTree.BASE)
     assert(Array(Double.MaxValue, -4, -4, 2, 1, -4, 2, Double.MaxValue, 3, 1, -4, 10, 2, Double.MaxValue, Double.MaxValue, Double.MaxValue).sameElements(minUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init query min") {
-      // given
     val elements = minWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(new MinAggregator(3.0) == rangeTree.query(0, 0))
     assert(new MinAggregator(1.0) == rangeTree.query(0, 2))
     assert(new MinAggregator(1.0) == rangeTree.query(0, 3))
@@ -149,50 +138,30 @@ class RangeTreeTest extends FunSuite {
   }
 
   test("RangeTree.init base max") {
-      // given
     val elements = maxWrapInsert(Array((1.0, 0), (2.0, 1), (3.0, 2), (4.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(4 == rangeTree.BASE)
     assert(Array(Double.MinValue, 4, 2, 4, 1, 2, 3, 4).sameElements(maxUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init all negative numbers max") {
-      // given
     val elements = maxWrapInsert(Array((-1.0, 0), (-2.0, 1), (-3.0, 2), (-4.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(4 == rangeTree.BASE)
     assert(Array(Double.MinValue, -1, -1, -3, -1, -2, -3, -4).sameElements(maxUnwrap(rangeTree.nodes)))
   }
 
 
   test("RangeTree.init not equal power of two max") {
-      // given
     val elements = maxWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(8 == rangeTree.BASE)
     assert(Array(Double.MinValue, 10, 10, 2, 3, 10, 2, Double.MinValue, 3, 1, 4, 10, 2, Double.MinValue, Double.MinValue, Double.MinValue).sameElements(maxUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init query max") {
-      // given
     val elements = maxWrapInsert(Array((1.0, 1), (2.0, 4), (3.0, 0), (4.0, 2), (10.0, 3)))
-
-      // when
     val rangeTree = new RangeTree(elements)
-
-      // then
     assert(new MaxAggregator(3.0) == rangeTree.query(0, 0))
     assert(new MaxAggregator(4.0) == rangeTree.query(0, 2))
     assert(new MaxAggregator(10.0) == rangeTree.query(0, 3))

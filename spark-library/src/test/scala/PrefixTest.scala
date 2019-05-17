@@ -18,43 +18,28 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   }
 
   test("Prefix sum") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalAlgorithm = new MinimalAlgorithm(spark, 2)
     val statsAgg = (o: TestPrefixObject) => new SumAggregator(o.getWeight)
-
-      // when
     val result = minimalAlgorithm.prefix(createRDD(spark), cmpKey, statsAgg).collect()
-
-      // then
     val expected = Array(-10, -17, -16, -15, -14, -12, -10, -5, 5, 17)
     assert(expected sameElements result.map(o => o._1.getValue))
   }
 
   test("Prefix min") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalAlgorithm = new MinimalAlgorithm(spark, 2)
     val statsAgg = (o: TestPrefixObject) => new MinAggregator(o.getWeight)
-
-      // when
     val result = minimalAlgorithm.prefix(createRDD(spark), cmpKey, statsAgg).collect()
-
-      // then
     val expected = Array(-10, -10, -10, -10, -10, -10, -10, -10, -10, -10)
     assert(expected sameElements result.map(o => o._1.getValue))
   }
 
   test("Prefix max") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalAlgorithm = new MinimalAlgorithm(spark, 2)
     val statsAgg = (o: TestPrefixObject) => new MaxAggregator(o.getWeight)
-
-      // when
     val result = minimalAlgorithm.prefix(createRDD(spark), cmpKey, statsAgg).collect()
-
-      // then
     val expected = Array(-10, -7, 1, 1, 1, 2, 2, 5, 10, 12)
     assert(expected sameElements result.map(o => o._1.getValue))
   }

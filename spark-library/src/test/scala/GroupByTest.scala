@@ -20,54 +20,34 @@ class GroupByTest extends FunSuite with SharedSparkContext with Matchers {
   }
 
   test("GroupBy sum") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalGroupBy = new MinimalGroupBy(spark, 2)
     val statsAgg = (o: TestGroupBy) => new SumAggregator(o.getWeight)
-
-      // when
     val result = minimalGroupBy.groupBy(createRDD(spark), cmpKey, statsAgg)
-
-      // then
     assert(Set((1, -3.0), (2, 11.0), (5, 3.0), (10, 12.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 
   test("GroupBy min") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalGroupBy = new MinimalGroupBy(spark, 2)
     val statsAgg = (o: TestGroupBy) => new MinAggregator(o.getWeight)
-
-      // when
     val result = minimalGroupBy.groupBy(createRDD(spark), cmpKey, statsAgg, 11)
-
-      // then
     assert(Set((1, -10.0), (2, 1.0), (5, 1.0), (10, -7.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 
   test("GroupBy max") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalGroupBy = new MinimalGroupBy(spark, 2)
     val statsAgg = (o: TestGroupBy) => new MaxAggregator(o.getWeight)
-
-      // when
     val result =  minimalGroupBy.groupBy(createRDD(spark), cmpKey, statsAgg, 11)
-
-      // then
     assert(Set((1, 5.0), (2, 10.0), (5, 2.0), (10, 12.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 
   test("GroupBy average") {
-      // given
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val minimalGroupBy = new MinimalGroupBy(spark, 2)
     val statsAgg = (o: TestGroupBy) => new AvgAggregator(o.getWeight, 1)
-
-      // when
     val result = minimalGroupBy.groupBy(createRDD(spark), cmpKey, statsAgg)
-
-      // then
     assert(Set((1, -1.0), (2, 5.5), (5, 1.5), (10, 3.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 }
