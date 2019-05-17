@@ -1,6 +1,8 @@
+import com.holdenkarau.spark.testing.SharedSparkContext
 import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
 import minimal_algorithms.sliding_aggregation._
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import org.scalatest.{FunSuite, Matchers}
 
 class TestSlidingObject(key: Int, weight: Double) extends Serializable {
@@ -10,13 +12,18 @@ class TestSlidingObject(key: Int, weight: Double) extends Serializable {
 }
 
 class SlidingAggregationTest extends FunSuite with SharedSparkContext with Matchers {
-  val rdd: RDD[TestSlidingObject] = spark.sparkContext.parallelize(
-      Array((1, 2), (3, 5), (2, -10), (4, 1), (7, 2), (6, 1), (5, 12), (8, 10), (10, -7), (9, 2), (11, 5)
-    ).map{e => new TestSlidingObject(e._1, e._2)})
   val cmpKey = (o: TestSlidingObject) => o.getKey
+
+  def createRDD(spark: SparkSession): RDD[TestSlidingObject] = {
+    spark.sparkContext.parallelize(
+      Array((1, 2), (3, 5), (2, -10), (4, 1), (7, 2), (6, 1), (5, 12), (8, 10), (10, -7), (9, 2), (11, 5))
+    ).map{e => new TestSlidingObject(e._1, e._2)}
+  }
 
   test("SlidingAggregation sum") {
       // given
+    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val rdd = createRDD(spark)
     val statsAgg = (o: TestSlidingObject) => new SumAggregator(o.getWeight)
 
       // when
@@ -29,6 +36,8 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation min") {
       // given
+    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val rdd = createRDD(spark)
     val statsAgg = (o: TestSlidingObject) => new MinAggregator(o.getWeight)
 
       // when
@@ -41,6 +50,8 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation max") {
       // given
+    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val rdd = createRDD(spark)
     val statsAgg = (o: TestSlidingObject) => new MaxAggregator(o.getWeight)
 
       // when
@@ -54,6 +65,8 @@ class SlidingAggregationTest extends FunSuite with SharedSparkContext with Match
 
   test("SlidingAggregation average") {
       // given
+    val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
+    val rdd = createRDD(spark)
     val statsAgg = (o: TestSlidingObject) => new AvgAggregator(o.getWeight, 1)
 
       // when
