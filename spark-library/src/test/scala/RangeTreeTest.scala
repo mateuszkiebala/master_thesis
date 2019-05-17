@@ -43,6 +43,15 @@ class RangeTreeTest extends FunSuite {
     assert(caught.getMessage == "Position out of range: 0")
   }
 
+  test("RangeTree.init zero nodes tree insert negative pos") {
+    val elements = sumWrapInsert(Array())
+    val rangeTree = new RangeTree(elements)
+    val caught = intercept[Exception] {
+      rangeTree.insert(new SumAggregator(0), -10)
+    }
+    assert(caught.getMessage == "Position out of range: -10")
+  }
+
   test("RangeTree.init zero nodes tree query") {
     val elements = sumWrapInsert(Array())
     val rangeTree = new RangeTree(elements)
@@ -52,7 +61,7 @@ class RangeTreeTest extends FunSuite {
     assert(caught.getMessage == "Position (start) out of range: 0")
   }
 
-  test("RangeTree.init zero nodes tree query subzero start") {
+  test("RangeTree.init zero nodes tree query negative start") {
     val elements = sumWrapInsert(Array())
     val rangeTree = new RangeTree(elements)
     val caught = intercept[Exception] {

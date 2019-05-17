@@ -72,7 +72,7 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
     }
 
     public void insert(StatisticsAggregator element, int start) {
-        if (start >= BASE)
+        if (start < 0 || start >= BASE)
             throw new org.apache.avro.AvroRuntimeException("Position out of range: " + start);
 
         int pos = BASE + start;
@@ -87,10 +87,10 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
         if (start > end)
             throw new org.apache.avro.AvroRuntimeException("Start (" + start + ") greater than end (" + end + ")");
 
-        if (start >= BASE)
+        if (start < 0 || start >= BASE)
             throw new org.apache.avro.AvroRuntimeException("Position (start) out of range: " + start);
 
-        if (end >= BASE)
+        if (end < 0 || end >= BASE)
             throw new org.apache.avro.AvroRuntimeException("Position (end) out of range: " + end);
 
         int vs = BASE + start;
@@ -116,7 +116,7 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
     }
 
     private int computeBASE(int n) {
-        return (int) Math.pow(2.0, Math.ceil(log2(((double) n))));
+        return n <= 0 ? 0 : (int) Math.pow(2.0, Math.ceil(log2(((double) n))));
     }
 
     private double log2(double x) {

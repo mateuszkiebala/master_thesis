@@ -31,11 +31,27 @@ public class TestRangeTree {
     }
 
     @org.junit.Test
+    public void testEmptyTreeInsertNegativePos() throws AvroRuntimeException {
+        RangeTree tree = new RangeTree();
+        expectedEx.expect(AvroRuntimeException.class);
+        expectedEx.expectMessage("Position out of range: -2");
+        tree.insert(new SumStatisticsAggregator(10), -2);
+    }
+
+    @org.junit.Test
     public void testEmptyTreeQuery() throws AvroRuntimeException {
         RangeTree tree = new RangeTree();
         expectedEx.expect(AvroRuntimeException.class);
         expectedEx.expectMessage("Position (start) out of range: 0");
         tree.query(0, 1);
+    }
+
+    @org.junit.Test
+    public void testEmptyTreeQueryNegativeStart() throws AvroRuntimeException {
+        RangeTree tree = new RangeTree();
+        expectedEx.expect(AvroRuntimeException.class);
+        expectedEx.expectMessage("Position (start) out of range: -1");
+        tree.query(-1, 1);
     }
 
     @org.junit.Test
