@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics_aggregators
+package minimal_algorithms.statistics
 
 /**
   * Interface responsible for implementing aggregator for statistics

@@ -1,10 +1,10 @@
 package minimal_algorithms.sliding_aggregation
 
-import minimal_algorithms.statistics_aggregators.StatisticsAggregator
+import minimal_algorithms.statistics.StatisticsAggregator
 import minimal_algorithms.{MinimalAlgorithm, RangeTree, Utils}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import minimal_algorithms.statistics_aggregators.StatisticsUtils.{safeMerge, partitionStatistics}
+import minimal_algorithms.statistics.StatisticsUtils.{safeMerge, partitionStatistics}
 
 import scala.reflect.ClassTag
 

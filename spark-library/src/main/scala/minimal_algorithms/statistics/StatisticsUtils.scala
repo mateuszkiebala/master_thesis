@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics_aggregators
+package minimal_algorithms.statistics
 
 import org.apache.spark.rdd.RDD
 

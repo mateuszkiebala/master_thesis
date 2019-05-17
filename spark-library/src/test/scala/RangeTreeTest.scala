@@ -36,7 +36,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(1 == rangeTree.BASE)
-    assert(Array(0.0, 1.0).sameElements(sumUnwrap(rangeTree.tree)))
+    assert(Array(0.0, 1.0).sameElements(sumUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init position out of range") {
@@ -75,7 +75,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(Array(0.0, 10.0, 3.0, 7.0, 1.0, 2.0, 3.0, 4.0).sameElements(sumUnwrap(rangeTree.tree)))
+    assert(Array(0.0, 10.0, 3.0, 7.0, 1.0, 2.0, 3.0, 4.0).sameElements(sumUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init not equal power of two sum") {
@@ -87,7 +87,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(8 == rangeTree.BASE)
-    assert(Array(0, 20, 18, 2, 4, 14, 2, 0, 3, 1, 4, 10, 2, 0, 0, 0).map(x => x.toDouble).sameElements(sumUnwrap(rangeTree.tree)))
+    assert(Array(0, 20, 18, 2, 4, 14, 2, 0, 3, 1, 4, 10, 2, 0, 0, 0).map(x => x.toDouble).sameElements(sumUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init query sum") {
@@ -116,7 +116,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(Array(Double.MaxValue, 1, 1, 3, 1, 2, 3, 4).sameElements(minUnwrap(rangeTree.tree)))
+    assert(Array(Double.MaxValue, 1, 1, 3, 1, 2, 3, 4).sameElements(minUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init not equal power of two min") {
@@ -128,7 +128,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(8 == rangeTree.BASE)
-    assert(Array(Double.MaxValue, -4, -4, 2, 1, -4, 2, Double.MaxValue, 3, 1, -4, 10, 2, Double.MaxValue, Double.MaxValue, Double.MaxValue).sameElements(minUnwrap(rangeTree.tree)))
+    assert(Array(Double.MaxValue, -4, -4, 2, 1, -4, 2, Double.MaxValue, 3, 1, -4, 10, 2, Double.MaxValue, Double.MaxValue, Double.MaxValue).sameElements(minUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init query min") {
@@ -157,7 +157,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(Array(Double.MinValue, 4, 2, 4, 1, 2, 3, 4).sameElements(maxUnwrap(rangeTree.tree)))
+    assert(Array(Double.MinValue, 4, 2, 4, 1, 2, 3, 4).sameElements(maxUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init all negative numbers max") {
@@ -169,7 +169,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(4 == rangeTree.BASE)
-    assert(Array(Double.MinValue, -1, -1, -3, -1, -2, -3, -4).sameElements(maxUnwrap(rangeTree.tree)))
+    assert(Array(Double.MinValue, -1, -1, -3, -1, -2, -3, -4).sameElements(maxUnwrap(rangeTree.nodes)))
   }
 
 
@@ -182,7 +182,7 @@ class RangeTreeTest extends FunSuite {
 
       // then
     assert(8 == rangeTree.BASE)
-    assert(Array(Double.MinValue, 10, 10, 2, 3, 10, 2, Double.MinValue, 3, 1, 4, 10, 2, Double.MinValue, Double.MinValue, Double.MinValue).sameElements(maxUnwrap(rangeTree.tree)))
+    assert(Array(Double.MinValue, 10, 10, 2, 3, 10, 2, Double.MinValue, 3, 1, 4, 10, 2, Double.MinValue, Double.MinValue, Double.MinValue).sameElements(maxUnwrap(rangeTree.nodes)))
   }
 
   test("RangeTree.init query max") {

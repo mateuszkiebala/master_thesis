@@ -1,7 +1,7 @@
 package minimal_algorithms
 
-import minimal_algorithms.statistics_aggregators.StatisticsAggregator
-import minimal_algorithms.statistics_aggregators.StatisticsUtils.{partitionStatistics, foldLeft, scanLeft}
+import minimal_algorithms.statistics.StatisticsAggregator
+import minimal_algorithms.statistics.StatisticsUtils.{partitionStatistics, foldLeft, scanLeft}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession

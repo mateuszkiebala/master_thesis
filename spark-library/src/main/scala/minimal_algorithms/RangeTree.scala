@@ -1,7 +1,7 @@
 package minimal_algorithms
 
-import minimal_algorithms.statistics_aggregators.StatisticsAggregator
-import minimal_algorithms.statistics_aggregators.StatisticsUtils.safeMerge
+import minimal_algorithms.statistics.StatisticsAggregator
+import minimal_algorithms.statistics.StatisticsUtils.safeMerge
 
 import scala.reflect.ClassTag
 
@@ -14,7 +14,7 @@ import scala.reflect.ClassTag
 class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit stag: ClassTag[S]) extends Serializable {
   val log2: Double => Double = (x: Double) => math.log10(x) / math.log10(2.0)
   val BASE: Int = math.pow(2.0, math.ceil(log2(elements.length.toDouble))).toInt
-  var tree: Array[S] = new Array[S](2 * BASE)
+  var nodes: Array[S] = new Array[S](2 * BASE)
   elements.foreach{ case(element, pos) => insert(element, pos) }
 
   def insert(element: S, start: Int): Unit = {
@@ -22,10 +22,10 @@ class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit 
       throw new IndexOutOfBoundsException("Position out of range: " + start)
 
     var pos = BASE + start
-    tree(pos) = safeMerge(tree(pos), element)
+    nodes(pos) = safeMerge(nodes(pos), element)
     while(pos != 1) {
       pos = pos / 2
-      tree(pos) = safeMerge(tree(2 * pos), tree(2 * pos + 1))
+      nodes(pos) = safeMerge(nodes(2 * pos), nodes(2 * pos + 1))
     }
   }
 
@@ -38,14 +38,18 @@ class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit 
   def query(start: Int, end: Int): S = {
     if (start > end)
       throw new Exception("Start (" + start + ") greater than end (" + end + ")")
+    if (start < 0 || start >= BASE)
+      throw new IndexOutOfBoundsException("Position (start) out of range: " + start)
+    if (end < 0 || end >= BASE)
+      throw new IndexOutOfBoundsException("Position (end) out of range: " + end)
 
     var vs = BASE + start
     var ve = BASE + end
-    var result = tree(vs)
-    if (vs != ve) result = safeMerge(result, tree(ve))
+    var result = nodes(vs)
+    if (vs != ve) result = safeMerge(result, nodes(ve))
     while (vs / 2 != ve / 2) {
-      if (vs % 2 == 0) result = safeMerge(result, tree(vs + 1))
-      if (ve % 2 == 1) result = safeMerge(result, tree(ve - 1))
+      if (vs % 2 == 0) result = safeMerge(result, nodes(vs + 1))
+      if (ve % 2 == 1) result = safeMerge(result, nodes(ve - 1))
       vs /= 2
       ve /= 2
     }

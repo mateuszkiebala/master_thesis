@@ -1,6 +1,6 @@
 package minimal_algorithms.examples.statistics_aggregators
 
-import minimal_algorithms.statistics_aggregators.StatisticsAggregator
+import minimal_algorithms.statistics.StatisticsAggregator
 
 class AvgAggregator(sum: Double, count: Int) extends StatisticsAggregator[AvgAggregator] {
   def getSum: Double = sum
