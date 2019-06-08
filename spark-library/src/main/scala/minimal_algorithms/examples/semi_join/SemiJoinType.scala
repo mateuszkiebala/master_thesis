@@ -1,16 +1,10 @@
 package minimal_algorithms.examples.semi_join
 
-import minimal_algorithms.semi_join.SemiJoinObject
-import minimal_algorithms.semi_join.SemiJoinSetTypeEnum.SemiJoinSetTypeEnum
-
-class SemiJoinType(key: Int, weight: Double, setType: SemiJoinSetTypeEnum) extends SemiJoinObject {
+class SemiJoinType(key: Int, weight: Double, setType: Boolean) extends Serializable {
   override def toString: String = this.key + " " + this.weight.toInt
-
-  override def getSetType: SemiJoinSetTypeEnum = this.setType
-
   def getKey: Int = this.key
-
   def getWeight: Double = this.weight
+  def getSetType: Boolean = this.setType
 }
 
 object SemiJoinType {

@@ -1,7 +1,6 @@
 package minimal_algorithms.examples.semi_join
 
 import minimal_algorithms.MinimalSemiJoin
-import minimal_algorithms.semi_join.SemiJoinSetTypeEnum
 import org.apache.spark.sql.SparkSession
 
 object ExampleSemiJoin {
@@ -15,15 +14,16 @@ object ExampleSemiJoin {
     val inputR = spark.sparkContext.textFile(inputPathR)
     val inputMappedR = inputR.map(line => {
       val p = line.split(' ')
-      new SemiJoinType(p(0).toInt, p(1).toDouble, SemiJoinSetTypeEnum.RType)})
+      new SemiJoinType(p(0).toInt, p(1).toDouble, true)})
 
     val inputT = spark.sparkContext.textFile(inputPathT)
     val inputMappedT = inputT.map(line => {
       val p = line.split(' ')
-      new SemiJoinType(p(0).toInt, p(1).toDouble, SemiJoinSetTypeEnum.TType)})
+      new SemiJoinType(p(0).toInt, p(1).toDouble, false)})
 
+    val isRType = ((o: SemiJoinType) => o.getSetType)
     val minimalAlgorithm = new MinimalSemiJoin(spark, numOfPartitions)
-    val result = minimalAlgorithm.semiJoin(inputMappedR, inputMappedT, SemiJoinType.cmpKey)
+    val result = minimalAlgorithm.semiJoin(inputMappedR, inputMappedT, SemiJoinType.cmpKey, isRType)
     minimalAlgorithm.perfectSort(result, SemiJoinType.cmpKey).map(res => res.toString).saveAsTextFile(outputPath)
     spark.stop()
   }
