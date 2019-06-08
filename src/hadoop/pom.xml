@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>mateuszkiebala.minimal_algorithms</groupId>
-  <artifactId>minimal_algorithms</artifactId>
+  <artifactId>hadoop_minimal_algorithms</artifactId>
   <version>1.0.0</version>
 
-  <name>minimal_algorithms</name>
+  <name>hadoop_minimal_algorithms</name>
   <url>https://github.com/mateuszkiebala/master_thesis</url>
 
   <properties>
