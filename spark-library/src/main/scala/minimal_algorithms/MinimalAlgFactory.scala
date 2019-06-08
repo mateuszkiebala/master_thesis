@@ -30,6 +30,11 @@ class MinimalAlgFactory[T](spark: SparkSession, numPartitions: Int, input: RDD[T
     new MinimalAlgorithm(spark, numPartitions).prefix(input, cmpKey, statsAgg);
   }
 
+  def semiJoin[K](rddT: RDD[T], cmpKey: T => K, isRType: T => Boolean)
+      (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
+    new MinimalSemiJoin(spark, numPartitions).semiJoin(input, rddT, cmpKey, isRType, itemsCnt)
+  }
+
   def groupBy[K, S <: StatisticsAggregator[S]](cmpKey: T => K, statsAgg: T => S)
       (implicit ord: Ordering[K], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(K, S)] = {
     new MinimalGroupBy(spark, numPartitions).groupBy(input, cmpKey, statsAgg, itemsCnt);
