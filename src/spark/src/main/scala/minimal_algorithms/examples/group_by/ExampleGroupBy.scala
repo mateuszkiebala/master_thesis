@@ -1,7 +1,7 @@
-package minimal_algorithms.examples.group_by
+package minimal_algorithms.spark.examples.group_by
 
-import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
-import minimal_algorithms.group_by.MinimalGroupBy
+import minimal_algorithms.spark.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
+import minimal_algorithms.spark.group_by.MinimalGroupBy
 import org.apache.spark.sql.SparkSession
 
 class InputObject(key: Int, weight: Double) extends Serializable {

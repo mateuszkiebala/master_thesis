@@ -1,7 +1,7 @@
-package minimal_algorithms
+package minimal_algorithms.spark
 
-import minimal_algorithms.statistics.StatisticsAggregator
-import minimal_algorithms.statistics.StatisticsUtils.safeMerge
+import minimal_algorithms.spark.statistics.StatisticsAggregator
+import minimal_algorithms.spark.statistics.StatisticsUtils.safeMerge
 
 import scala.reflect.ClassTag
 

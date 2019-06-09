@@ -1,6 +1,6 @@
 import com.holdenkarau.spark.testing.SharedSparkContext
-import minimal_algorithms.MinimalAlgFactory
-import minimal_algorithms.examples.ranking.RankingObject
+import minimal_algorithms.spark.SparkMinAlgFactory
+import minimal_algorithms.spark.examples.ranking.RankingObject
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{FunSuite, Matchers}
 
@@ -12,7 +12,7 @@ class RankingTest extends FunSuite with SharedSparkContext with Matchers {
       .map{e => new RankingObject(e._1, e._2)}
     val rdd = spark.sparkContext.parallelize(elements)
 
-    val result = new MinimalAlgFactory(spark, 2, rdd).rank(RankingObject.cmpKey).collect()
+    val result = new SparkMinAlgFactory(spark, 2, rdd).rank(RankingObject.cmpKey).collect()
     elements = elements.sortBy(RankingObject.cmpKey)
     assert(elements.sameElements(result.map{e => e._2}))
   }

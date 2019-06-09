@@ -1,7 +1,7 @@
-package minimal_algorithms.examples.sliding_aggregation
+package minimal_algorithms.spark.examples.sliding_aggregation
 
-import minimal_algorithms.examples.statistics_aggregators.SumAggregator
-import minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation
+import minimal_algorithms.spark.examples.statistics_aggregators.SumAggregator
+import minimal_algorithms.spark.sliding_aggregation.MinimalSlidingAggregation
 import org.apache.spark.sql.SparkSession
 
 class InputObject(key: Int, weight: Int) extends Serializable {

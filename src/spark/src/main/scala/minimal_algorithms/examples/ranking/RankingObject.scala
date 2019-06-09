@@ -1,4 +1,4 @@
-package minimal_algorithms.examples.ranking
+package minimal_algorithms.spark.examples.ranking
 
 class RankingObject(key: Int, weight: Double) extends Serializable {
   override def toString: String = {

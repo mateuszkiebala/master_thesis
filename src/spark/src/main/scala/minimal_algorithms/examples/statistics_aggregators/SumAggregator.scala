@@ -1,6 +1,6 @@
-package minimal_algorithms.examples.statistics_aggregators
+package minimal_algorithms.spark.examples.statistics_aggregators
 
-import minimal_algorithms.statistics.StatisticsAggregator
+import minimal_algorithms.spark.statistics.StatisticsAggregator
 
 class SumAggregator(value: Double) extends StatisticsAggregator[SumAggregator] {
   def getValue: Double = value

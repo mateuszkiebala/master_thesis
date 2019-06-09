@@ -1,13 +1,13 @@
-package minimal_algorithms
+package minimal_algorithms.spark
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import scala.reflect.ClassTag
-import minimal_algorithms.statistics.StatisticsAggregator
-import minimal_algorithms.group_by.MinimalGroupBy
-import minimal_algorithms.sliding_aggregation.MinimalSlidingAggregation
+import minimal_algorithms.spark.statistics.StatisticsAggregator
+import minimal_algorithms.spark.group_by.MinimalGroupBy
+import minimal_algorithms.spark.sliding_aggregation.MinimalSlidingAggregation
 
-class MinimalAlgFactory[T](spark: SparkSession, numPartitions: Int, input: RDD[T], itemsCnt: Int = -1)(implicit ttag: ClassTag[T]) {
+class SparkMinAlgFactory[T](spark: SparkSession, numPartitions: Int, input: RDD[T], itemsCnt: Int = -1)(implicit ttag: ClassTag[T]) {
 
   def teraSort[K](cmpKey: T => K)(implicit ord: Ordering[K], ktag: ClassTag[K]): RDD[T] = {
     new MinimalAlgorithm(spark, numPartitions).teraSort(input, cmpKey);

@@ -1,6 +1,6 @@
-package minimal_algorithms.examples.semi_join
+package minimal_algorithms.spark.examples.semi_join
 
-import minimal_algorithms.MinimalSemiJoin
+import minimal_algorithms.spark.MinimalSemiJoin
 import org.apache.spark.sql.SparkSession
 
 object ExampleSemiJoin {

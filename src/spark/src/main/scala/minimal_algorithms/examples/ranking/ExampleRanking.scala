@@ -1,6 +1,6 @@
-package minimal_algorithms.examples.ranking
+package minimal_algorithms.spark.examples.ranking
 
-import minimal_algorithms.MinimalAlgorithm
+import minimal_algorithms.spark.MinimalAlgorithm
 import org.apache.spark.sql.SparkSession
 
 object ExampleRanking {

@@ -14,7 +14,7 @@
   <artifactId>hadoop</artifactId>
 
   <name>Hadoop Minimal Algorithm API</name>
-  <description>An org.matkie.minimal_algorithms.hadoop compatible API for using Minimal Algorithms in Hadoop</description>
+  <description>An minimal_algorithms.hadoop compatible API for using Minimal Algorithms in Hadoop</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

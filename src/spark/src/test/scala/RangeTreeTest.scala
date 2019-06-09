@@ -1,5 +1,5 @@
-import minimal_algorithms.RangeTree
-import minimal_algorithms.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
+import minimal_algorithms.spark.RangeTree
+import minimal_algorithms.spark.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import org.scalatest.FunSuite
 
 class RangeTreeTest extends FunSuite {

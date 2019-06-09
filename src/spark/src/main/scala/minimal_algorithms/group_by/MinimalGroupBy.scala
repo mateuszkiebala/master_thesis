@@ -1,10 +1,10 @@
-package minimal_algorithms.group_by
+package minimal_algorithms.spark.group_by
 
-import minimal_algorithms.statistics._
-import minimal_algorithms.{MinimalAlgorithm, Utils}
+import minimal_algorithms.spark.statistics._
+import minimal_algorithms.spark.{MinimalAlgorithm, Utils}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import minimal_algorithms.statistics.StatisticsUtils._
+import minimal_algorithms.spark.statistics.StatisticsUtils._
 
 import scala.reflect.ClassTag
 

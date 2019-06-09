@@ -1,9 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>mateuszkiebala.minimal_algorithms</groupId>
-    <artifactId>spark_minimal_algorithms</artifactId>
-    <version>1.0.0</version>
+
+    <parent>
+        <artifactId>minimal_algorithms-parent</artifactId>
+        <groupId>minimal_algorithms</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+
+    <artifactId>spark</artifactId>
+
+    <name>Spark Minimal Algorithm API</name>
+    <description>An minimal_algorithms.spark compatible API for using Minimal Algorithms in Spark</description>
+
 
     <properties>
         <encoding>UTF-8</encoding>

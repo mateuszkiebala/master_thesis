@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics
+package minimal_algorithms.spark.statistics
 
 /**
   * Interface responsible for implementing aggregator for statistics

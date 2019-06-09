@@ -1,4 +1,4 @@
-package minimal_algorithms.examples.semi_join
+package minimal_algorithms.spark.examples.semi_join
 
 class SemiJoinType(key: Int, weight: Double, setType: Boolean) extends Serializable {
   override def toString: String = this.key + " " + this.weight.toInt

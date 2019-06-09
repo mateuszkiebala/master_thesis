@@ -1,6 +1,6 @@
 import com.holdenkarau.spark.testing.SharedSparkContext
-import minimal_algorithms.MinimalAlgFactory
-import minimal_algorithms.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
+import minimal_algorithms.spark.SparkMinAlgFactory
+import minimal_algorithms.spark.examples.statistics_aggregators.{MaxAggregator, MinAggregator, SumAggregator}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{FunSuite, Matchers}
@@ -20,7 +20,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   test("Prefix sum") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestPrefixObject) => new SumAggregator(o.getWeight)
-    val result = new MinimalAlgFactory(spark, 2, createRDD(spark)).prefix(cmpKey, statsAgg).collect()
+    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark)).prefix(cmpKey, statsAgg).collect()
     val expected = Array(-10, -17, -16, -15, -14, -12, -10, -5, 5, 17)
     assert(expected sameElements result.map(o => o._1.getValue))
   }
@@ -28,7 +28,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   test("Prefix min") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestPrefixObject) => new MinAggregator(o.getWeight)
-    val result = new MinimalAlgFactory(spark, 2, createRDD(spark)).prefix(cmpKey, statsAgg).collect()
+    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark)).prefix(cmpKey, statsAgg).collect()
     val expected = Array(-10, -10, -10, -10, -10, -10, -10, -10, -10, -10)
     assert(expected sameElements result.map(o => o._1.getValue))
   }
@@ -36,7 +36,7 @@ class PrefixTest extends FunSuite with SharedSparkContext with Matchers {
   test("Prefix max") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestPrefixObject) => new MaxAggregator(o.getWeight)
-    val result = new MinimalAlgFactory(spark, 2, createRDD(spark)).prefix(cmpKey, statsAgg).collect()
+    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark)).prefix(cmpKey, statsAgg).collect()
     val expected = Array(-10, -7, 1, 1, 1, 2, 2, 5, 10, 12)
     assert(expected sameElements result.map(o => o._1.getValue))
   }
