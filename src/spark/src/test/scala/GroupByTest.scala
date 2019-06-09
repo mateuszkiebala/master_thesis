@@ -22,28 +22,28 @@ class GroupByTest extends FunSuite with SharedSparkContext with Matchers {
   test("GroupBy sum") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestGroupBy) => new SumAggregator(o.getWeight)
-    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark)).groupBy(cmpKey, statsAgg)
+    val result = new SparkMinAlgFactory(spark, 2).groupBy(createRDD(spark), cmpKey, statsAgg)
     assert(Set((1, -3.0), (2, 11.0), (5, 3.0), (10, 12.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 
   test("GroupBy min") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestGroupBy) => new MinAggregator(o.getWeight)
-    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark), 11).groupBy(cmpKey, statsAgg)
+    val result = new SparkMinAlgFactory(spark, 2).groupBy(createRDD(spark), cmpKey, statsAgg, 11)
     assert(Set((1, -10.0), (2, 1.0), (5, 1.0), (10, -7.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 
   test("GroupBy max") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestGroupBy) => new MaxAggregator(o.getWeight)
-    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark), 11).groupBy(cmpKey, statsAgg)
+    val result = new SparkMinAlgFactory(spark, 2).groupBy(createRDD(spark), cmpKey, statsAgg, 11)
     assert(Set((1, 5.0), (2, 10.0), (5, 2.0), (10, 12.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 
   test("GroupBy average") {
     val spark = SparkSession.builder.config(sc.getConf).getOrCreate()
     val statsAgg = (o: TestGroupBy) => new AvgAggregator(o.getWeight, 1)
-    val result = new SparkMinAlgFactory(spark, 2, createRDD(spark)).groupBy(cmpKey, statsAgg)
+    val result = new SparkMinAlgFactory(spark, 2).groupBy(createRDD(spark), cmpKey, statsAgg)
     assert(Set((1, -1.0), (2, 5.5), (5, 1.5), (10, 3.0)) == result.collect().map{case(k, v) => (k, v.getValue)}.toSet)
   }
 }

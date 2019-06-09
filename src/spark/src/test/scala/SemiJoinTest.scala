@@ -14,7 +14,7 @@ class SemiJoinTest extends FunSuite with SharedSparkContext with Matchers {
     val rddT = spark.sparkContext.parallelize(setT.map{e => new SemiJoinType(e._1, e._2, false)})
     val isRType = ((o: SemiJoinType) => o.getSetType)
 
-    val result = new SparkMinAlgFactory(spark, 2, rddR).semiJoin(rddT, SemiJoinType.cmpKey, isRType).collect
+    val result = new SparkMinAlgFactory(spark, 2).semiJoin(rddR, rddT, SemiJoinType.cmpKey, isRType).collect
     val expected = Set(setR(0), setR(1), setR(3), setR(5))
     assert(expected.map(o => (o._1, o._2, true)) == result.map(o => (o.getKey, o.getWeight, o.getSetType)).toSet)
   }

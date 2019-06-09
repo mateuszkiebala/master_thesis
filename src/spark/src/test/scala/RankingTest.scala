@@ -12,7 +12,7 @@ class RankingTest extends FunSuite with SharedSparkContext with Matchers {
       .map{e => new RankingObject(e._1, e._2)}
     val rdd = spark.sparkContext.parallelize(elements)
 
-    val result = new SparkMinAlgFactory(spark, 2, rdd).rank(RankingObject.cmpKey).collect()
+    val result = new SparkMinAlgFactory(spark, 2).rank(rdd, RankingObject.cmpKey).collect()
     elements = elements.sortBy(RankingObject.cmpKey)
     assert(elements.sameElements(result.map{e => e._2}))
   }

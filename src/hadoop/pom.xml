@@ -100,15 +100,6 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
   	    </plugin>
-        <!-- SET JAVA COMPILER PATH -->
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.1</version>
-          <configuration>
-            <fork>true</fork>
-            <executable>/home/mati/hadoop/library/tmp/jdk1.8.0_202/bin/javac</executable>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
