@@ -1,4 +1,4 @@
-package minimal_algorithms.semi_join;
+package minimal_algorithms.hadoop.semi_join;
 
 import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificData;

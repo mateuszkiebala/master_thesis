@@ -1,13 +1,13 @@
-package minimal_algorithms.examples.types;
+package minimal_algorithms.hadoop.examples.types;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
-import minimal_algorithms.statistics.*;
+import minimal_algorithms.hadoop.statistics.*;
 
 public class SumStatisticsAggregator extends StatisticsAggregator {
     public static final Schema SCHEMA$ = SchemaBuilder
-            .record("SumStatisticsAggregator").namespace("minimal_algorithms.examples.types")
+            .record("SumStatisticsAggregator").namespace("minimal_algorithms.hadoop.examples.types")
             .fields().name("sum").type().intType().noDefault().endRecord();
 
     public static Schema getClassSchema() { return SCHEMA$; }

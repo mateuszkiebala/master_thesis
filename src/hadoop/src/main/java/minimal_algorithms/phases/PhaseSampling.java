@@ -1,4 +1,4 @@
-package minimal_algorithms.phases;
+package minimal_algorithms.hadoop.phases;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,9 +24,9 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import minimal_algorithms.config.BaseConfig;
-import minimal_algorithms.sending.Sender;
-import minimal_algorithms.utils.Utils;
+import minimal_algorithms.hadoop.config.BaseConfig;
+import minimal_algorithms.hadoop.sending.Sender;
+import minimal_algorithms.hadoop.utils.Utils;
 
 /**
  *

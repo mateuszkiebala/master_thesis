@@ -6,9 +6,9 @@ import javafx.util.Pair;
 import org.junit.Assert;
 import org.junit.rules.ExpectedException;
 import org.apache.avro.AvroRuntimeException;
-import minimal_algorithms.examples.types.SumStatisticsAggregator;
-import minimal_algorithms.statistics.StatisticsAggregator;
-import minimal_algorithms.RangeTree;
+import minimal_algorithms.hadoop.examples.types.SumStatisticsAggregator;
+import minimal_algorithms.hadoop.statistics.StatisticsAggregator;
+import minimal_algorithms.hadoop.RangeTree;
 
 public class TestRangeTree {
 

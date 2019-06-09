@@ -1,4 +1,4 @@
-package minimal_algorithms.sending;
+package minimal_algorithms.hadoop.sending;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -13,7 +13,7 @@ public class SendWrapper extends SpecificRecordBase implements SpecificRecord {
 
     static public void setSchema(Schema record1Schema, Schema record2Schema) {
         SCHEMA$ = SchemaBuilder
-                .record("SendWrapper").namespace("minimal_algorithms.sending")
+                .record("SendWrapper").namespace("minimal_algorithms.hadoop.sending")
                 .fields()
                 .name("record1").type().optional().type(record1Schema)
                 .name("record2").type().optional().type(record2Schema)

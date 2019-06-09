@@ -1,4 +1,4 @@
-package minimal_algorithms;
+package minimal_algorithms.hadoop;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,9 +13,9 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import minimal_algorithms.config.*;
-import minimal_algorithms.utils.*;
-import minimal_algorithms.phases.*;
+import minimal_algorithms.hadoop.config.*;
+import minimal_algorithms.hadoop.utils.*;
+import minimal_algorithms.hadoop.phases.*;
 
 public class MinimalAlgorithm {
 

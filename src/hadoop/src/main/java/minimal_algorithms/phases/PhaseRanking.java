@@ -1,4 +1,4 @@
-package minimal_algorithms.phases;
+package minimal_algorithms.hadoop.phases;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +31,10 @@ import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import minimal_algorithms.ranking.*;
-import minimal_algorithms.utils.*;
-import minimal_algorithms.sending.AvroSender;
-import minimal_algorithms.config.BaseConfig;
+import minimal_algorithms.hadoop.ranking.*;
+import minimal_algorithms.hadoop.utils.*;
+import minimal_algorithms.hadoop.sending.AvroSender;
+import minimal_algorithms.hadoop.config.BaseConfig;
 
 public class PhaseRanking {
 

@@ -1,8 +1,8 @@
-package minimal_algorithms.examples.types;
+package minimal_algorithms.hadoop.examples.types;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import minimal_algorithms.utils.KeyRecord;
+import minimal_algorithms.hadoop.utils.KeyRecord;
 import java.util.Comparator;
 
 public class IntKeyRecord4Float extends KeyRecord<IntKeyRecord4Float> {

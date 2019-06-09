@@ -1,13 +1,13 @@
-package minimal_algorithms.examples.types;
+package minimal_algorithms.hadoop.examples.types;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import minimal_algorithms.utils.KeyRecord;
+import minimal_algorithms.hadoop.utils.KeyRecord;
 import java.util.Comparator;
 
 public class SemiJoinTestKeyRecord extends KeyRecord<SemiJoinTestKeyRecord> {
 
-    public static final Schema SCHEMA$ = new Schema.Parser().parse("{\"type\":\"record\",\"name\":\"SemiJoinTestKeyRecord\",\"namespace\":\"minimal_algorithms.examples.types\",\"fields\":[{\"name\":\"value\",\"type\":\"int\"}]}");
+    public static final Schema SCHEMA$ = new Schema.Parser().parse("{\"type\":\"record\",\"name\":\"SemiJoinTestKeyRecord\",\"namespace\":\"minimal_algorithms.hadoop.examples.types\",\"fields\":[{\"name\":\"value\",\"type\":\"int\"}]}");
     public static Schema getClassSchema() { return SCHEMA$; }
 
     private GenericRecord objectRecord;

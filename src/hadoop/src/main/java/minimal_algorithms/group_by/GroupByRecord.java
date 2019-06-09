@@ -1,17 +1,17 @@
-package minimal_algorithms.group_by;
+package minimal_algorithms.hadoop.group_by;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
-import minimal_algorithms.statistics.StatisticsAggregator;
-import minimal_algorithms.utils.KeyRecord;
+import minimal_algorithms.hadoop.statistics.StatisticsAggregator;
+import minimal_algorithms.hadoop.utils.KeyRecord;
 
 public class GroupByRecord extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
     public static Schema SCHEMA$;
 
     public static void setSchema(Schema statisticsAggregatorSchema, Schema keySchema) {
         SCHEMA$ = SchemaBuilder.record("GroupByRecord")
-                .namespace("minimal_algorithms.group_by")
+                .namespace("minimal_algorithms.hadoop.group_by")
                 .fields()
                 .name("statisticsAggregator").type(statisticsAggregatorSchema).noDefault()
                 .name("key").type(keySchema).noDefault()

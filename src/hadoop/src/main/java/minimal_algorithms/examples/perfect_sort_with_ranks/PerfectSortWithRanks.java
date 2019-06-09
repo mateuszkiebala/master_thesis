@@ -1,4 +1,4 @@
-package minimal_algorithms.examples;
+package minimal_algorithms.hadoop.examples;
 
 import java.io.IOException;
 import org.apache.commons.logging.Log;
@@ -8,10 +8,10 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import minimal_algorithms.examples.types.*;
-import minimal_algorithms.config.BaseConfig;
-import minimal_algorithms.config.Config;
-import minimal_algorithms.MinimalAlgorithm;
+import minimal_algorithms.hadoop.examples.types.*;
+import minimal_algorithms.hadoop.config.BaseConfig;
+import minimal_algorithms.hadoop.config.Config;
+import minimal_algorithms.hadoop.MinimalAlgorithm;
 
 public class PerfectSortWithRanks extends Configured implements Tool {
 

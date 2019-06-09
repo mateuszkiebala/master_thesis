@@ -1,4 +1,4 @@
-package minimal_algorithms.examples.types;
+package minimal_algorithms.hadoop.examples.types;
 
 import java.util.Comparator;
 

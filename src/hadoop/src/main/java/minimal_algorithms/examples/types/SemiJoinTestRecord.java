@@ -1,15 +1,15 @@
-package minimal_algorithms.examples.types;
+package minimal_algorithms.hadoop.examples.types;
 
 import java.util.Comparator;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificData;
-import minimal_algorithms.semi_join.SemiJoinRecord;
+import minimal_algorithms.hadoop.semi_join.SemiJoinRecord;
 
 public class SemiJoinTestRecord extends SemiJoinRecord {
     public static Schema SCHEMA$ = SchemaBuilder.record("SemiJoinTestRecord")
-                .namespace("minimal_algorithms.examples.types")
+                .namespace("minimal_algorithms.hadoop.examples.types")
                 .fields()
                 .name("type").type().enumeration("type").symbols("R", "T").noDefault()
                 .name("record").type(Record4Float.getClassSchema()).noDefault()

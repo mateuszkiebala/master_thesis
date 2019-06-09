@@ -1,4 +1,4 @@
-package minimal_algorithms.sending;
+package minimal_algorithms.hadoop.sending;
 
 import java.io.IOException;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.avro.mapred.AvroKey;
 import org.apache.avro.mapred.AvroValue;
 import org.apache.hadoop.conf.Configuration;
-import minimal_algorithms.utils.Utils;
+import minimal_algorithms.hadoop.utils.Utils;
 
 public class AvroSender extends Sender {
     public AvroSender(Mapper.Context context) {

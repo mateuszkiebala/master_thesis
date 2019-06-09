@@ -4,12 +4,17 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>mateuszkiebala.minimal_algorithms</groupId>
-  <artifactId>hadoop_minimal_algorithms</artifactId>
-  <version>1.0.0</version>
+  <parent>
+    <artifactId>minimal_algorithms-parent</artifactId>
+    <groupId>minimal_algorithms</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../</relativePath>
+  </parent>
 
-  <name>hadoop_minimal_algorithms</name>
-  <url>https://github.com/mateuszkiebala/master_thesis</url>
+  <artifactId>hadoop</artifactId>
+
+  <name>Hadoop Minimal Algorithm API</name>
+  <description>An org.matkie.minimal_algorithms.hadoop compatible API for using Minimal Algorithms in Hadoop</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,9 +1,9 @@
-package minimal_algorithms.config;
+package minimal_algorithms.hadoop.config;
 
 import java.util.Comparator;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
-import minimal_algorithms.utils.Utils;
+import minimal_algorithms.hadoop.utils.Utils;
 
 public class SlidingAggregationConfig extends StatisticsConfig {
     public static final String WINDOW_LENGTH_KEY = "window.length.key";

@@ -1,4 +1,4 @@
-package minimal_algorithms.utils;
+package minimal_algorithms.hadoop.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
-import minimal_algorithms.config.Config;
+import minimal_algorithms.hadoop.config.Config;
 
 public class Utils {
 

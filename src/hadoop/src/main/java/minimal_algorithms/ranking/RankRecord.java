@@ -1,4 +1,4 @@
-package minimal_algorithms.ranking;
+package minimal_algorithms.hadoop.ranking;
 
 import java.util.Comparator;
 import org.apache.avro.Schema;
@@ -10,7 +10,7 @@ public class RankRecord extends org.apache.avro.specific.SpecificRecordBase impl
   public static Schema SCHEMA$;
 
   public static void setSchema(Schema schema) {
-    SCHEMA$ = SchemaBuilder.record("RankRecord").namespace("minimal_algorithms.ranking")
+    SCHEMA$ = SchemaBuilder.record("RankRecord").namespace("minimal_algorithms.hadoop.ranking")
             .fields()
             .name("rank").type().longType().noDefault()
             .name("record").type(schema).noDefault()

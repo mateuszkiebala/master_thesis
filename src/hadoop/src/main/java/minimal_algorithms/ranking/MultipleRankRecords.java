@@ -1,4 +1,4 @@
-package minimal_algorithms.ranking;
+package minimal_algorithms.hadoop.ranking;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public class MultipleRankRecords extends org.apache.avro.specific.SpecificRecord
 
   public static void setSchema(Schema schema) {
     SCHEMA$ = SchemaBuilder
-            .record("MultipleRankRecords").namespace("minimal_algorithms.ranking")
+            .record("MultipleRankRecords").namespace("minimal_algorithms.hadoop.ranking")
             .fields()
             .name("records").type().array().items(schema).noDefault()
             .endRecord();

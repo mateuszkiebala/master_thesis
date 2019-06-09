@@ -1,4 +1,4 @@
-package minimal_algorithms.utils;
+package minimal_algorithms.hadoop.utils;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;

@@ -3,7 +3,7 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package minimal_algorithms.examples.types;
+package minimal_algorithms.hadoop.examples.types;
 
 import org.apache.avro.specific.SpecificData;
 
@@ -11,7 +11,7 @@ import org.apache.avro.specific.SpecificData;
 @org.apache.avro.specific.AvroGenerated
 public class Record4Float extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = -4756935028409065295L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Record4Float\",\"namespace\":\"minimal_algorithms.examples.types\",\"fields\":[{\"name\":\"first\",\"type\":\"float\"},{\"name\":\"second\",\"type\":\"float\"},{\"name\":\"third\",\"type\":\"float\"},{\"name\":\"fourth\",\"type\":\"float\"}]}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Record4Float\",\"namespace\":\"minimal_algorithms.hadoop.examples.types\",\"fields\":[{\"name\":\"first\",\"type\":\"float\"},{\"name\":\"second\",\"type\":\"float\"},{\"name\":\"third\",\"type\":\"float\"},{\"name\":\"fourth\",\"type\":\"float\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public float first;
   @Deprecated public float second;
@@ -131,8 +131,8 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
    * Creates a new Record4Float RecordBuilder.
    * @return A new Record4Float RecordBuilder
    */
-  public static minimal_algorithms.examples.types.Record4Float.Builder newBuilder() {
-    return new minimal_algorithms.examples.types.Record4Float.Builder();
+  public static minimal_algorithms.hadoop.examples.types.Record4Float.Builder newBuilder() {
+    return new minimal_algorithms.hadoop.examples.types.Record4Float.Builder();
   }
 
   /**
@@ -140,8 +140,8 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
    * @param other The existing builder to copy.
    * @return A new Record4Float RecordBuilder
    */
-  public static minimal_algorithms.examples.types.Record4Float.Builder newBuilder(minimal_algorithms.examples.types.Record4Float.Builder other) {
-    return new minimal_algorithms.examples.types.Record4Float.Builder(other);
+  public static minimal_algorithms.hadoop.examples.types.Record4Float.Builder newBuilder(minimal_algorithms.hadoop.examples.types.Record4Float.Builder other) {
+    return new minimal_algorithms.hadoop.examples.types.Record4Float.Builder(other);
   }
 
   /**
@@ -149,8 +149,8 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
    * @param other The existing instance to copy.
    * @return A new Record4Float RecordBuilder
    */
-  public static minimal_algorithms.examples.types.Record4Float.Builder newBuilder(minimal_algorithms.examples.types.Record4Float other) {
-    return new minimal_algorithms.examples.types.Record4Float.Builder(other);
+  public static minimal_algorithms.hadoop.examples.types.Record4Float.Builder newBuilder(minimal_algorithms.hadoop.examples.types.Record4Float other) {
+    return new minimal_algorithms.hadoop.examples.types.Record4Float.Builder(other);
   }
 
   /**
@@ -173,7 +173,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(minimal_algorithms.examples.types.Record4Float.Builder other) {
+    private Builder(minimal_algorithms.hadoop.examples.types.Record4Float.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.first)) {
         this.first = data().deepCopy(fields()[0].schema(), other.first);
@@ -197,7 +197,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
      * Creates a Builder by copying an existing Record4Float instance
      * @param other The existing instance to copy.
      */
-    private Builder(minimal_algorithms.examples.types.Record4Float other) {
+    private Builder(minimal_algorithms.hadoop.examples.types.Record4Float other) {
             super(SCHEMA$);
       if (isValidValue(fields()[0], other.first)) {
         this.first = data().deepCopy(fields()[0].schema(), other.first);
@@ -230,7 +230,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * @param value The value of 'first'.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder setFirst(float value) {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder setFirst(float value) {
       validate(fields()[0], value);
       this.first = value;
       fieldSetFlags()[0] = true;
@@ -250,7 +250,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * Clears the value of the 'first' field.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder clearFirst() {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder clearFirst() {
       fieldSetFlags()[0] = false;
       return this;
     }
@@ -268,7 +268,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * @param value The value of 'second'.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder setSecond(float value) {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder setSecond(float value) {
       validate(fields()[1], value);
       this.second = value;
       fieldSetFlags()[1] = true;
@@ -288,7 +288,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * Clears the value of the 'second' field.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder clearSecond() {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder clearSecond() {
       fieldSetFlags()[1] = false;
       return this;
     }
@@ -306,7 +306,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * @param value The value of 'third'.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder setThird(float value) {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder setThird(float value) {
       validate(fields()[2], value);
       this.third = value;
       fieldSetFlags()[2] = true;
@@ -326,7 +326,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * Clears the value of the 'third' field.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder clearThird() {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder clearThird() {
       fieldSetFlags()[2] = false;
       return this;
     }
@@ -344,7 +344,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * @param value The value of 'fourth'.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder setFourth(float value) {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder setFourth(float value) {
       validate(fields()[3], value);
       this.fourth = value;
       fieldSetFlags()[3] = true;
@@ -364,7 +364,7 @@ public class Record4Float extends org.apache.avro.specific.SpecificRecordBase im
       * Clears the value of the 'fourth' field.
       * @return This builder.
       */
-    public minimal_algorithms.examples.types.Record4Float.Builder clearFourth() {
+    public minimal_algorithms.hadoop.examples.types.Record4Float.Builder clearFourth() {
       fieldSetFlags()[3] = false;
       return this;
     }

@@ -1,4 +1,4 @@
-package minimal_algorithms.sending;
+package minimal_algorithms.hadoop.sending;
 
 import java.util.List;
 import java.util.ArrayList;

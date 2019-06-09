@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics;
+package minimal_algorithms.hadoop.statistics;
 
 import java.util.Iterator;
 import java.util.List;

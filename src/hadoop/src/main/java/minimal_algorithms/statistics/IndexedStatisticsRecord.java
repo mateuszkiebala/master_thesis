@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics;
+package minimal_algorithms.hadoop.statistics;
 
 import java.util.Comparator;
 import org.apache.avro.Schema;
@@ -10,7 +10,7 @@ public class IndexedStatisticsRecord extends org.apache.avro.specific.SpecificRe
     public static Schema SCHEMA$;
 
     public static void setSchema(Schema schema) {
-        SCHEMA$ = SchemaBuilder.record("IndexedStatisticsRecord").namespace("minimal_algorithms.statistics")
+        SCHEMA$ = SchemaBuilder.record("IndexedStatisticsRecord").namespace("minimal_algorithms.hadoop.statistics")
                 .fields()
                 .name("index").type().longType().noDefault()
                 .name("record").type(schema).noDefault()

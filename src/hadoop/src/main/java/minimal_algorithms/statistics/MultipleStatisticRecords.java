@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics;
+package minimal_algorithms.hadoop.statistics;
 
 import java.util.List;
 import org.apache.avro.Schema;
@@ -10,7 +10,7 @@ public class MultipleStatisticRecords extends org.apache.avro.specific.SpecificR
 
     static public void setSchema(Schema schema) {
         SCHEMA$ = SchemaBuilder
-                .record("MultipleStatisticRecord").namespace("minimal_algorithms.statistics")
+                .record("MultipleStatisticRecord").namespace("minimal_algorithms.hadoop.statistics")
                 .fields()
                 .name("records").type().array().items(schema).noDefault()
                 .endRecord();

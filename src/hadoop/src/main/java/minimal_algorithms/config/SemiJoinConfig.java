@@ -1,9 +1,9 @@
-package minimal_algorithms.config;
+package minimal_algorithms.hadoop.config;
 
 import java.util.Comparator;
 import org.apache.avro.Schema;
 import org.apache.hadoop.conf.Configuration;
-import minimal_algorithms.utils.Utils;
+import minimal_algorithms.hadoop.utils.Utils;
 
 public class SemiJoinConfig extends BaseConfig {
     protected Schema keyRecordSchema;

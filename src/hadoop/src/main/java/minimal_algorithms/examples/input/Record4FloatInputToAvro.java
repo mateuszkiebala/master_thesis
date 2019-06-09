@@ -1,4 +1,4 @@
-package minimal_algorithms.examples.input;
+package minimal_algorithms.hadoop.examples.input;
 
 import java.io.IOException;
 import org.apache.avro.Schema;
@@ -24,7 +24,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-import minimal_algorithms.examples.types.*;
+import minimal_algorithms.hadoop.examples.types.*;
 
 /**
  *

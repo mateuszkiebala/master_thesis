@@ -3,22 +3,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <groupId>minimal_algorithms</groupId>
+    <artifactId>minimal_algorithms-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <groupId>mateuszkiebala.minimal_algorithms</groupId>
-    <artifactId>minimal_algorithms</artifactId>
-    <version>1.0.0</version>
 
     <name>minimal_algorithms</name>
     <url>https://github.com/mateuszkiebala/master_thesis</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-    </properties>
+    <description>minimal_algorithms toplevel pom</description>
 
     <modules>
         <module>hadoop</module>
-        <module>spark</module>
+        <module>factory</module>
     </modules>
 </project>

@@ -1,7 +1,7 @@
 import com.holdenkarau.spark.testing.SharedSparkContext
-import minimal_algorithms.MinimalAlgFactory
-import minimal_algorithms.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
-import minimal_algorithms.sliding_aggregation._
+import minimal_algorithms.hadoop.MinimalAlgFactory
+import minimal_algorithms.hadoop.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
+import minimal_algorithms.hadoop.sliding_aggregation._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{FunSuite, Matchers}

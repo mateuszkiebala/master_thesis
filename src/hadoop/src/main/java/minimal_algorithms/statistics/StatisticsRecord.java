@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics;
+package minimal_algorithms.hadoop.statistics;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -10,7 +10,7 @@ public class StatisticsRecord extends org.apache.avro.specific.SpecificRecordBas
 
     public static void setSchema(Schema statisticsAggregatorSchema, Schema baseSchema) {
         SCHEMA$ = SchemaBuilder.record("StatisticsRecord")
-                .namespace("minimal_algorithms.statistics")
+                .namespace("minimal_algorithms.hadoop.statistics")
                 .fields()
                 .name("statisticsAggregator").type(statisticsAggregatorSchema).noDefault()
                 .name("record").type(baseSchema).noDefault()

@@ -1,4 +1,4 @@
-package minimal_algorithms.phases;
+package minimal_algorithms.hadoop.phases;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +27,10 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import minimal_algorithms.utils.*;
-import minimal_algorithms.sending.*;
-import minimal_algorithms.semi_join.*;
-import minimal_algorithms.config.SemiJoinConfig;
+import minimal_algorithms.hadoop.utils.*;
+import minimal_algorithms.hadoop.sending.*;
+import minimal_algorithms.hadoop.semi_join.*;
+import minimal_algorithms.hadoop.config.SemiJoinConfig;
 
 public class PhaseSemiJoin {
 

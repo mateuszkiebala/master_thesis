@@ -1,4 +1,4 @@
-package minimal_algorithms.phases;
+package minimal_algorithms.hadoop.phases;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +27,11 @@ import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import minimal_algorithms.statistics.*;
-import minimal_algorithms.group_by.*;
-import minimal_algorithms.utils.*;
-import minimal_algorithms.sending.AvroSender;
-import minimal_algorithms.config.GroupByConfig;
+import minimal_algorithms.hadoop.statistics.*;
+import minimal_algorithms.hadoop.group_by.*;
+import minimal_algorithms.hadoop.utils.*;
+import minimal_algorithms.hadoop.sending.AvroSender;
+import minimal_algorithms.hadoop.config.GroupByConfig;
 
 public class PhaseGroupBy {
 

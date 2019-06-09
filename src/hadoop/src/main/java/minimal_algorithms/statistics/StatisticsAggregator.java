@@ -1,4 +1,4 @@
-package minimal_algorithms.statistics;
+package minimal_algorithms.hadoop.statistics;
 
 import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificData;

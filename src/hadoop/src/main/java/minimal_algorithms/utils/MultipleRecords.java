@@ -1,4 +1,4 @@
-package minimal_algorithms.utils;
+package minimal_algorithms.hadoop.utils;
 
 import java.util.List;
 import org.apache.avro.Schema;
@@ -11,7 +11,7 @@ public class MultipleRecords extends org.apache.avro.specific.SpecificRecordBase
 
   public static void setSchema(Schema schema) {
     SCHEMA$ = SchemaBuilder
-            .record("MultipleRecords").namespace("minimal_algorithms.utils")
+            .record("MultipleRecords").namespace("minimal_algorithms.hadoop.utils")
             .fields()
             .name("records").type().array().items(schema).noDefault()
             .endRecord();

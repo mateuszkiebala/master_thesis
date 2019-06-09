@@ -29,7 +29,7 @@ do
     hdfs dfs -rm -r "$OUTPUT_HDFS/output_$i"
 done
 
-spark-submit --class minimal_algorithms.examples.group_by.ExampleGroupBy --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
+spark-submit --class minimal_algorithms.hadoop.examples.group_by.ExampleGroupBy --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
 
 run() {
     ALGORITHM=$1

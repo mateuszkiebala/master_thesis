@@ -1,4 +1,4 @@
-package minimal_algorithms.group_by;
+package minimal_algorithms.hadoop.group_by;
 
 import java.util.List;
 import org.apache.avro.Schema;
@@ -10,7 +10,7 @@ public class MultipleGroupByRecords extends org.apache.avro.specific.SpecificRec
 
     public static void setSchema(Schema schema) {
         SCHEMA$ = SchemaBuilder
-                .record("MultipleGroupByRecords").namespace("minimal_algorithms.group_by")
+                .record("MultipleGroupByRecords").namespace("minimal_algorithms.hadoop.group_by")
                 .fields()
                 .name("records").type().array().items(schema).noDefault()
                 .endRecord();

@@ -1,4 +1,4 @@
-package minimal_algorithms.phases;
+package minimal_algorithms.hadoop.phases;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,12 +26,12 @@ import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import minimal_algorithms.statistics.*;
-import minimal_algorithms.utils.*;
-import minimal_algorithms.sending.*;
-import minimal_algorithms.ranking.*;
-import minimal_algorithms.RangeTree;
-import minimal_algorithms.config.SlidingAggregationConfig;
+import minimal_algorithms.hadoop.statistics.*;
+import minimal_algorithms.hadoop.utils.*;
+import minimal_algorithms.hadoop.sending.*;
+import minimal_algorithms.hadoop.ranking.*;
+import minimal_algorithms.hadoop.RangeTree;
+import minimal_algorithms.hadoop.config.SlidingAggregationConfig;
 
 public class PhaseSlidingAggregation {
 
