@@ -39,7 +39,6 @@ public class SendingUtils {
             SendWrapper sw = SendWrapper.deepCopy(record.datum());
             int swType = sw.getType();
             List<GenericRecord> value = new ArrayList<>();
-
             if (result.containsKey(swType)) {
                 value = result.get(swType);
                 value.add(sw.getRecord());

@@ -22,6 +22,9 @@ public class Config {
     public static final String SORTED_DATA_PATTERN = SORTED_DATA_TAG + "-r-*.avro";
 
     protected Configuration conf;
+    private int valuesNo;
+    private int stripsNo;
+    private int reduceTasksNo;
 
     public static boolean validateValuesPerStripNo(int valuesNo, int stripsNo) {
         if (valuesNo <= 0 || stripsNo <= 0) {
@@ -50,6 +53,9 @@ public class Config {
 
     public Config(Configuration conf, int valuesNo, int stripsNo, int reduceTasksNo) {
         this.conf = conf;
+        this.valuesNo = valuesNo;
+        this.stripsNo = stripsNo;
+        this.reduceTasksNo = reduceTasksNo;
 
         conf.setLong(NO_OF_VALUES_KEY, valuesNo);
         conf.setInt(NO_OF_STRIPS_KEY, stripsNo);
@@ -68,5 +74,21 @@ public class Config {
 
     public void setConf(Configuration conf) {
         this.conf = conf;
+    }
+
+    public int getReduceTasksNo() {
+        return reduceTasksNo;
+    }
+
+    public int getStripsNo() {
+        return stripsNo;
+    }
+
+    public int getValuesNo() {
+        return valuesNo;
+    }
+
+    public boolean validateValuesPerStripNo() {
+        return validateValuesPerStripNo(valuesNo, stripsNo);
     }
 }

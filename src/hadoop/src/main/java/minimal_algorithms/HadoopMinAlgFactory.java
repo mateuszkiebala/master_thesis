@@ -17,33 +17,27 @@ import minimal_algorithms.hadoop.config.*;
 import minimal_algorithms.hadoop.utils.*;
 import minimal_algorithms.hadoop.phases.*;
 
-public class MinimalAlgorithm {
+public class HadoopMinAlgFactory {
 
-    static final Log LOG = LogFactory.getLog(MinimalAlgorithm.class);
+    static final Log LOG = LogFactory.getLog(HadoopMinAlgFactory.class);
 
     private Configuration conf;
     private Config config;
-    private int valuesNo;
-    private int stripsNo;
-    private int reduceTasksNo;
 
     private final String SAMPLING_DIR = "/sampling_output";
     private final String SORTING_DIR = "/sorting_output";
     private final String RANKING_DIR = "/ranking_output";
     private final String PERFECT_SORT_WITH_RANKS_DIR = "/perfect_sort_with_ranks_output";
 
-    public MinimalAlgorithm(Configuration conf, int valuesNo, int stripsNo, int reduceTasksNo) {
-        this.valuesNo = valuesNo;
-        this.stripsNo = stripsNo;
-        this.reduceTasksNo = reduceTasksNo;
-        this.conf = conf;
-        config = new Config(this.conf, valuesNo, stripsNo, reduceTasksNo);
+    public HadoopMinAlgFactory(Config config) {
+        this.config = config;
+        this.conf = config.getConf();
         this.conf.setBoolean(MRJobConfig.MAPREDUCE_JOB_USER_CLASSPATH_FIRST, true);
     }
 
-    public int teraSort(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
-        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        return teraSort(homeDir, input, output, baseConfig);
+    public int teraSort(IOConfig ioConfig, Comparator cmp) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, ioConfig.getBaseSchema());
+        return teraSort(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), baseConfig);
     }
 
     public int teraSort(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
@@ -78,9 +72,9 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int ranking(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
-        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        return ranking(homeDir, input, output, baseConfig);
+    public int ranking(IOConfig ioConfig, Comparator cmp) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, ioConfig.getBaseSchema());
+        return ranking(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), baseConfig);
     }
 
     public int ranking(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
@@ -91,9 +85,9 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int perfectSort(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
-        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        return perfectSort(homeDir, input, output, baseConfig);
+    public int perfectSort(IOConfig ioConfig, Comparator cmp) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, ioConfig.getBaseSchema());
+        return perfectSort(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), baseConfig);
     }
 
     public int perfectSort(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
@@ -104,9 +98,9 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int perfectSortWithRanks(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema) throws Exception {
-        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        return perfectSortWithRanks(homeDir, input, output, baseConfig);
+    public int perfectSortWithRanks(IOConfig ioConfig, Comparator cmp) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, ioConfig.getBaseSchema());
+        return perfectSortWithRanks(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), baseConfig);
     }
 
     public int perfectSortWithRanks(Path homeDir, Path input, Path output, BaseConfig baseConfig) throws Exception {
@@ -117,9 +111,9 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int partitionStatistics(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
-        StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, baseSchema, statisticsAggregatorSchema);
-        return partitionStatistics(homeDir, input, output, statisticsConfig);
+    public int partitionStatistics(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema) throws Exception {
+        StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, ioConfig.getBaseSchema(), statisticsAggregatorSchema);
+        return partitionStatistics(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), statisticsConfig);
     }
 
     public int partitionStatistics(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
@@ -130,22 +124,23 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int prefix(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema) throws Exception {
-        StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, baseSchema, statisticsAggregatorSchema);
-        return prefix(homeDir, input, output, statisticsConfig);
+    public int prefix(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema) throws Exception {
+        StatisticsConfig statisticsConfig = new StatisticsConfig(config, cmp, ioConfig.getBaseSchema(), statisticsAggregatorSchema);
+        return prefix(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), statisticsConfig);
     }
 
     public int prefix(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
-        int ret = teraSort(homeDir, input, sortingDir, statisticsConfig);
-        ret = ret == 0 ? PhasePrefix.run(sortingDir, output, statisticsConfig) : ret;
-        Utils.deleteDirFromHDFS(conf, sortingDir, true);
-        return ret;
+        //int ret = teraSort(homeDir, input, sortingDir, statisticsConfig);
+        //ret = ret == 0 ?
+        PhasePrefix.run(sortingDir, output, statisticsConfig);// : ret;
+        //Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return 1;
     }
 
-    public int group(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
-        GroupByConfig groupByConfig = new GroupByConfig(config, cmp, baseSchema, statisticsAggregatorSchema, keyRecordSchema);
-        return group(homeDir, input, output, groupByConfig);
+    public int group(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
+        GroupByConfig groupByConfig = new GroupByConfig(config, cmp, ioConfig.getBaseSchema(), statisticsAggregatorSchema, keyRecordSchema);
+        return group(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), groupByConfig);
     }
 
     public int group(Path homeDir, Path input, Path output, GroupByConfig groupByConfig) throws Exception {
@@ -156,9 +151,9 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int semiJoin(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema, Schema keyRecordSchema) throws Exception {
-        SemiJoinConfig semiJoinConfig = new SemiJoinConfig(config, cmp, baseSchema, keyRecordSchema);
-        return semiJoin(homeDir, input, output, semiJoinConfig);
+    public int semiJoin(IOConfig ioConfig, Comparator cmp, Schema keyRecordSchema) throws Exception {
+        SemiJoinConfig semiJoinConfig = new SemiJoinConfig(config, cmp, ioConfig.getBaseSchema(), keyRecordSchema);
+        return semiJoin(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), semiJoinConfig);
     }
 
     public int semiJoin(Path homeDir, Path input, Path output, SemiJoinConfig semiJoinConfig) throws Exception {
@@ -169,13 +164,13 @@ public class MinimalAlgorithm {
         return ret;
     }
 
-    public int slidingAggregation(Path homeDir, Path input, Path output, Comparator cmp, Schema baseSchema,
-                                  Schema statisticsAggregatorSchema, long windowLength) throws Exception {
-        BaseConfig baseConfig = new BaseConfig(config, cmp, baseSchema);
-        Path perfectSortWithRanksDir = new Path(homeDir + "/tmp" + PERFECT_SORT_WITH_RANKS_DIR);
-        int ret = perfectSortWithRanks(homeDir, input, perfectSortWithRanksDir, baseConfig);
-        SlidingAggregationConfig saConfig = new SlidingAggregationConfig(config, cmp, baseSchema, statisticsAggregatorSchema, windowLength);
-        ret = ret == 0 ? PhaseSlidingAggregation.run(perfectSortWithRanksDir, output, saConfig) : ret;
+    public int slidingAggregation(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema, long windowLength) throws Exception {
+        BaseConfig baseConfig = new BaseConfig(config, cmp, ioConfig.getBaseSchema());
+        Path perfectSortWithRanksDir = new Path(ioConfig.getHomeDir() + "/tmp" + PERFECT_SORT_WITH_RANKS_DIR);
+        int ret = perfectSortWithRanks(ioConfig.getHomeDir(), ioConfig.getInput(), perfectSortWithRanksDir, baseConfig);
+
+        SlidingAggregationConfig saConfig = new SlidingAggregationConfig(config, cmp, ioConfig.getBaseSchema(), statisticsAggregatorSchema, windowLength);
+        ret = ret == 0 ? PhaseSlidingAggregation.run(perfectSortWithRanksDir, ioConfig.getOutput(), saConfig) : ret;
         Utils.deleteDirFromHDFS(conf, perfectSortWithRanksDir, true);
         return ret;
     }
@@ -189,8 +184,8 @@ public class MinimalAlgorithm {
     }
 
     private void validateArgs() {
-        if (!Config.validateValuesPerStripNo(valuesNo, stripsNo)) {
-            System.err.println("Too many values for one strip. Increase number of strips to avoid int overflow.");
+        if (!config.validateValuesPerStripNo()) {
+            System.err.println("Too many values for one partition. Increase number of partitions to avoid int overflow.");
             System.exit(-1);
         }
     }

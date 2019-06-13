@@ -1,6 +1,7 @@
 package minimal_algorithms.hadoop.examples;
 
 import java.io.IOException;
+import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -8,29 +9,28 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.avro.Schema;
 import minimal_algorithms.hadoop.examples.types.*;
-import minimal_algorithms.hadoop.MinimalAlgorithm;
-import minimal_algorithms.hadoop.config.GroupByConfig;
+import minimal_algorithms.hadoop.HadoopMinAlgFactory;
+import minimal_algorithms.hadoop.config.IOConfig;
 import minimal_algorithms.hadoop.config.Config;
 
 public class GroupBy extends Configured implements Tool {
 
     static final Log LOG = LogFactory.getLog(GroupBy.class);
 
-    public static final String GROUP_BY_SUPERDIR = "/group_by_output";
-
     public int run(String[] args) throws Exception {
-        if (args.length != 5) {
-            System.err.println("Usage: Prefix <input> <intermediate_prefix> <elements> <splits> <reduce_tasks>");
+        if (args.length != 6) {
+            System.err.println("Usage: GroupBy <home_dir> <input_path> <output_path> <elements_no> <partitions_no> <reduce_tasks_no>");
             return -1;
         }
 
-        MinimalAlgorithm ma = new MinimalAlgorithm(getConf(), Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
-        Config config = ma.getConfig();
-        GroupByConfig groupByConfig = new GroupByConfig(config, RWC4Cmps.firstCmp, Record4Float.getClassSchema(),
-                                                        SumStatisticsAggregator.getClassSchema(), IntKeyRecord4Float.getClassSchema());
-        int ret = ma.group(new Path(args[1]), new Path(args[0]), new Path(args[1] + GROUP_BY_SUPERDIR), groupByConfig);
-        return ret;
+        IOConfig ioConfig = new IOConfig(new Path(args[0]), new Path(args[1]), new Path(args[2]), Record4Float.getClassSchema());
+        Config config = new Config(getConf(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
+        Comparator cmp = RWC4Cmps.firstCmp;
+        Schema statsSchema = SumStatisticsAggregator.getClassSchema();
+        Schema keySchema = IntKeyRecord4Float.getClassSchema();
+        return new HadoopMinAlgFactory(config).group(ioConfig, cmp, statsSchema, keySchema);
     }
 
     public static void main(String[] args) throws Exception {

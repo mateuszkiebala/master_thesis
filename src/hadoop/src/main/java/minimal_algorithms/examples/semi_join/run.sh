@@ -11,10 +11,10 @@ hdfs dfs -setrep -w 1 /user/mati/input_semi_join.txt
 hdfs balancer
 
 hdfs dfs -rm -r /user/mati/input_semi_join.dir
-yarn jar $app_jar minimal_algorithms.examples.input.SemiJoinInputToAvro -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input_semi_join.txt hdfs://$nn:9000/user/mati/input_semi_join.dir
+yarn jar $app_jar minimal_algorithms.hadoop.examples.input.SemiJoinInputToAvro -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input_semi_join.txt hdfs://$nn:9000/user/mati/input_semi_join.dir
 hdfs dfs -setrep -w 1 /user/mati/input_semi_join.dir
 hdfs fsck /user/mati/input_semi_join.dir
 
 hdfs dfs -rm -r /user/mati/tmp
 hdfs dfs -rm -r /user/mati/semi_join_output
-yarn jar $app_jar minimal_algorithms.examples.SemiJoin -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input_semi_join.dir hdfs://$nn:9000/user/mati/ 20 3 3
+yarn jar $app_jar minimal_algorithms.hadoop.examples.SemiJoin -libjars $yarn_libjars hdfs://$nn:9000/user/mati/ hdfs://$nn:9000/user/mati/input_semi_join.dir hdfs://$nn:9000/user/mati/semi_join_output 20 3 3

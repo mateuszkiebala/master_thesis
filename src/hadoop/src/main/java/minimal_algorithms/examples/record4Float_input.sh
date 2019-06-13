@@ -12,6 +12,6 @@ hdfs dfs -setrep -w 1 /user/mati/input_sample_2.txt
 hdfs balancer
 
 hdfs dfs -rm -r /user/mati/input.dir
-yarn jar $app_jar minimal_algorithms.examples.input.Record4FloatInputToAvro -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input_sample_2.txt hdfs://$nn:9000/user/mati/input.dir
+yarn jar $app_jar minimal_algorithms.hadoop.examples.input.Record4FloatInputToAvro -libjars $yarn_libjars hdfs://$nn:9000/user/mati/input_sample_2.txt hdfs://$nn:9000/user/mati/input.dir
 hdfs dfs -setrep -w 1 /user/mati/input.dir
 hdfs fsck /user/mati/input.dir
