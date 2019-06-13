@@ -131,11 +131,10 @@ public class HadoopMinAlgFactory {
 
     public int prefix(Path homeDir, Path input, Path output, StatisticsConfig statisticsConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
-        //int ret = teraSort(homeDir, input, sortingDir, statisticsConfig);
-        //ret = ret == 0 ?
-        PhasePrefix.run(sortingDir, output, statisticsConfig);// : ret;
-        //Utils.deleteDirFromHDFS(conf, sortingDir, true);
-        return 1;
+        int ret = teraSort(homeDir, input, sortingDir, statisticsConfig);
+        ret = ret == 0 ? PhasePrefix.run(sortingDir, output, statisticsConfig) : ret;
+        Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        return ret;
     }
 
     public int group(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {

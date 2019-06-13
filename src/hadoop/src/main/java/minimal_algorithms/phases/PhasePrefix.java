@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.avro.Schema;
@@ -74,12 +75,14 @@ public class PhasePrefix {
         private AvroSender sender;
         private Configuration conf;
         private StatisticsUtils statsUtiler;
+        private Comparator<GenericRecord> cmp;
 
         @Override
         public void setup(Context ctx) {
             this.conf = ctx.getConfiguration();
             setSchemas(conf);
             sender = new AvroSender(ctx);
+            cmp = Utils.retrieveComparatorFromConf(conf);
             statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
         }
 
@@ -87,8 +90,11 @@ public class PhasePrefix {
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
             Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
-            List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(groupedRecords.get(1), partitionStatistics);
-            List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, groupedRecords.get(1));
+
+            List<GenericRecord> elements = groupedRecords.get(1);
+            java.util.Collections.sort(elements, cmp);
+            List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, partitionStatistics);
+            List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, elements);
             sender.send(key, new MultipleStatisticRecords(statsRecords));
         }
     }
