@@ -76,7 +76,7 @@ public class PhaseSampling {
         @Override
         protected void setup(Context ctx) throws IOException, InterruptedException {
             super.setup(ctx);
-            noOfSplitPoints = Utils.getStripsCount(ctx.getConfiguration()) - 1;
+            noOfSplitPoints = Utils.getPartitionsCount(ctx.getConfiguration()) - 1;
             cmp = Utils.retrieveComparatorFromConf(ctx.getConfiguration());
             baseSchema = Utils.retrieveSchemaFromConf(ctx.getConfiguration(), BaseConfig.BASE_SCHEMA_KEY);
             sender = new Sender(ctx);

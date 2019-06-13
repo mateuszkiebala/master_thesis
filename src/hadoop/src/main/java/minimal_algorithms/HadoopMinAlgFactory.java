@@ -146,7 +146,7 @@ public class HadoopMinAlgFactory {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
         int ret = teraSort(homeDir, input, sortingDir, groupByConfig);
         ret = ret == 0 ? PhaseGroupBy.run(sortingDir, output, groupByConfig) : ret;
-        Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        //Utils.deleteDirFromHDFS(conf, sortingDir, true);
         return ret;
     }
 
@@ -183,8 +183,8 @@ public class HadoopMinAlgFactory {
     }
 
     private void validateArgs() {
-        if (!config.validateValuesPerStripNo()) {
-            System.err.println("Too many values for one partition. Increase number of partitions to avoid int overflow.");
+        if (!config.validateItemsPerPartition()) {
+            System.err.println("Too many items for one partition. Increase number of partitions to avoid int overflow.");
             System.exit(-1);
         }
     }

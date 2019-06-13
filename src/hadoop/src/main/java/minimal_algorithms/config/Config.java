@@ -12,8 +12,8 @@ public class Config {
     public static final String KEY_RECORD_SCHEMA_KEY = "key.record.schema.key";
     public static final String MAIN_COMPARATOR_KEY = "main.comparator.key";
     public static final String NO_OF_REDUCE_TASKS_KEY = "no.of.reduce.tasks.key";
-    public static final String NO_OF_VALUES_KEY = "no.of.values";
-    public static final String NO_OF_STRIPS_KEY = "no.of.splits";
+    public static final String NO_OF_ITEMS_KEY = "no.of.items";
+    public static final String NO_OF_PARTITIONS_KEY = "no.of.partitions";
     public static final String NO_OF_ITEMS_BY_MACHINE = "no.of.items.by.machine";
     public static final String RATIO_FOR_RANDOM_KEY = "ratio.for.random";
 
@@ -22,46 +22,46 @@ public class Config {
     public static final String SORTED_DATA_PATTERN = SORTED_DATA_TAG + "-r-*.avro";
 
     protected Configuration conf;
-    private int valuesNo;
-    private int stripsNo;
+    private int itemsNo;
+    private int partitionsNo;
     private int reduceTasksNo;
 
-    public static boolean validateValuesPerStripNo(int valuesNo, int stripsNo) {
-        if (valuesNo <= 0 || stripsNo <= 0) {
+    public static boolean validateItemsPerPartition(int itemsNo, int partitionsNo) {
+        if (itemsNo <= 0 || partitionsNo <= 0) {
             return false;
         }
-        int valuesPerStripNo = 1 + valuesNo / stripsNo;
-        return valuesPerStripNo / 20 > Integer.MAX_VALUE ? false : true;
+        int itemsPerPartition = 1 + itemsNo / partitionsNo;
+        return itemsPerPartition / 20 > Integer.MAX_VALUE ? false : true;
     }
 
-    public static int computeValuesPerStripNo(int valuesNo, int stripsNo) {
-        return 1 + valuesNo / stripsNo;
+    public static int computeItemsPerPartition(int itemsNo, int partitionsNo) {
+        return 1 + itemsNo / partitionsNo;
     }
 
-    public static double computeRHO(int valuesNo, int stripsNo) {
-        int valuesPerStripNo = computeValuesPerStripNo(valuesNo, stripsNo);
-        return 1. / valuesPerStripNo * Math.log(((double) valuesNo) * stripsNo);
+    public static double computeRHO(int itemsNo, int partitionsNo) {
+        int itemsPerPartition = computeItemsPerPartition(itemsNo, partitionsNo);
+        return 1. / itemsPerPartition * Math.log(((double) itemsNo) * partitionsNo);
     }
 
-    public static int computeReversedRHO(int valuesNo, int stripsNo) {
-        return (int) (1 / computeRHO(valuesNo, stripsNo));
+    public static int computeReversedRHO(int itemsNo, int partitionsNo) {
+        return (int) (1 / computeRHO(itemsNo, partitionsNo));
     }
 
-    public static long computeItemsNoByMachine(int valuesNo, int stripsNo) {
-        return (valuesNo + stripsNo - 1) / stripsNo;
+    public static long computeItemsNoByMachine(int itemsNo, int partitionsNo) {
+        return (itemsNo + partitionsNo - 1) / partitionsNo;
     }
 
-    public Config(Configuration conf, int valuesNo, int stripsNo, int reduceTasksNo) {
+    public Config(Configuration conf, int itemsNo, int partitionsNo, int reduceTasksNo) {
         this.conf = conf;
-        this.valuesNo = valuesNo;
-        this.stripsNo = stripsNo;
+        this.itemsNo = itemsNo;
+        this.partitionsNo = partitionsNo;
         this.reduceTasksNo = reduceTasksNo;
 
-        conf.setLong(NO_OF_VALUES_KEY, valuesNo);
-        conf.setInt(NO_OF_STRIPS_KEY, stripsNo);
-        conf.setInt(RATIO_FOR_RANDOM_KEY, computeReversedRHO(valuesNo, stripsNo));
+        conf.setLong(NO_OF_ITEMS_KEY, itemsNo);
+        conf.setInt(NO_OF_PARTITIONS_KEY, partitionsNo);
+        conf.setInt(RATIO_FOR_RANDOM_KEY, computeReversedRHO(itemsNo, partitionsNo));
         conf.setInt(NO_OF_REDUCE_TASKS_KEY, reduceTasksNo);
-        conf.setLong(NO_OF_ITEMS_BY_MACHINE, computeItemsNoByMachine(valuesNo, stripsNo));
+        conf.setLong(NO_OF_ITEMS_BY_MACHINE, computeItemsNoByMachine(itemsNo, partitionsNo));
     }
 
     public Config(Config config) {
@@ -80,15 +80,15 @@ public class Config {
         return reduceTasksNo;
     }
 
-    public int getStripsNo() {
-        return stripsNo;
+    public int getPartitionsNo() {
+        return partitionsNo;
     }
 
-    public int getValuesNo() {
-        return valuesNo;
+    public int getItemsNo() {
+        return itemsNo;
     }
 
-    public boolean validateValuesPerStripNo() {
-        return validateValuesPerStripNo(valuesNo, stripsNo);
+    public boolean validateItemsPerPartition() {
+        return validateItemsPerPartition(itemsNo, partitionsNo);
     }
 }

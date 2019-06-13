@@ -22,7 +22,7 @@ public class PerfectSortWithRanks extends Configured implements Tool {
 
     public int run(String[] args) throws Exception {
         if (args.length != 6) {
-            System.err.println("Usage: PerfectSortWithRanks <home_dir> <input_path> <output_path> <elements_no> <partitions_no> <reduce_tasks_no>");
+            System.err.println("Usage: PerfectSortWithRanks <home_dir> <input_path> <output_path> <items_no> <partitions_no> <reduce_tasks_no>");
             return -1;
         }
 

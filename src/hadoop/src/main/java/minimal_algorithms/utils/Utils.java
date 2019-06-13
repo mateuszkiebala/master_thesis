@@ -85,15 +85,15 @@ public class Utils {
     }
 
     public static int getMachinesNo(Configuration conf) {
-        return getStripsCount(conf);
+        return getPartitionsCount(conf);
     }
 
-    public static int getStripsCount(Configuration conf) {
-        return getSafeInt(conf, Config.NO_OF_STRIPS_KEY);
+    public static int getPartitionsCount(Configuration conf) {
+        return getSafeInt(conf, Config.NO_OF_PARTITIONS_KEY);
     }
 
-    public static long getTotalValuesCount(Configuration conf) {
-        return getSafeLong(conf, Config.NO_OF_VALUES_KEY);
+    public static long getTotalItemsCount(Configuration conf) {
+        return getSafeLong(conf, Config.NO_OF_ITEMS_KEY);
     }
 
     public static int getReduceTasksCount(Configuration conf) {
@@ -154,8 +154,8 @@ public class Utils {
     }
 
     public static Long[] readAvroSortingCountsFromCache(Configuration conf, String fileNameCache) {
-        int stripsCount = Utils.getStripsCount(conf);
-        Long[] records = new Long[stripsCount];
+        int partitionsCount = Utils.getPartitionsCount(conf);
+        Long[] records = new Long[partitionsCount];
         File f = new File(fileNameCache);
 
         GenericRecord datumKeyValuePair = null;
@@ -172,13 +172,13 @@ public class Utils {
     }
 
     public static GenericRecord[] readRecordsFromHDFSAvro(Configuration conf, URI fileURI, String schemaKey) {
-        int noOfStrips = Utils.getStripsCount(conf);
-        return readRecordsFromHDFSAvro(conf, fileURI, schemaKey, noOfStrips);
+        int noOfPartitions = Utils.getPartitionsCount(conf);
+        return readRecordsFromHDFSAvro(conf, fileURI, schemaKey, noOfPartitions);
     }
 
     public static GenericRecord[] readRecordsFromHDFSAvro(Configuration conf, URI fileURI, Schema schema) {
-        int noOfStrips = Utils.getStripsCount(conf);
-        return readRecordsFromHDFSAvro(conf, fileURI, schema, noOfStrips);
+        int noOfPartitions = Utils.getPartitionsCount(conf);
+        return readRecordsFromHDFSAvro(conf, fileURI, schema, noOfPartitions);
     }
     public static GenericRecord[] readRecordsFromHDFSAvro(Configuration conf, URI fileURI, String schemaKey, int limit) {
         Schema schema = retrieveSchemaFromConf(conf, schemaKey);
@@ -206,13 +206,13 @@ public class Utils {
     }
 
     public static GenericRecord[] readRecordsFromCacheAvro(Configuration conf, String fileName, String schemaKey) {
-        int noOfStrips = getStripsCount(conf);
-        return readRecordsFromCacheAvro(conf, fileName, schemaKey, noOfStrips);
+        int noOfPartitions = getPartitionsCount(conf);
+        return readRecordsFromCacheAvro(conf, fileName, schemaKey, noOfPartitions);
     }
 
     public static GenericRecord[] readRecordsFromCacheAvro(Configuration conf, String fileName, Schema schema) {
-        int noOfStrips = getStripsCount(conf);
-        return readRecordsFromCacheAvro(conf, fileName, schema, noOfStrips);
+        int noOfPartitions = getPartitionsCount(conf);
+        return readRecordsFromCacheAvro(conf, fileName, schema, noOfPartitions);
     }
 
     public static GenericRecord[] readRecordsFromCacheAvro(Configuration conf, String fileName, String schemaKey, int limit) {
