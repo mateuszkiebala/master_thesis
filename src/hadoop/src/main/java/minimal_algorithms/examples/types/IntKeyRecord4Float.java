@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 public class IntKeyRecord4Float extends KeyRecord<IntKeyRecord4Float> {
 
-  public static final Schema SCHEMA$ = new Schema.Parser().parse("{\"type\":\"record\",\"name\":\"IntKeyRecord4Float\",\"namespace\":\"minimal_algorithms.examples.types\",\"fields\":[{\"name\":\"value\",\"type\":\"int\"}]}");
+  public static final Schema SCHEMA$ = new Schema.Parser().parse("{\"type\":\"record\",\"name\":\"IntKeyRecord4Float\",\"namespace\":\"minimal_algorithms.hadoop.examples.types\",\"fields\":[{\"name\":\"value\",\"type\":\"int\"}]}");
   public static Schema getClassSchema() { return SCHEMA$; }
 
   private GenericRecord objectRecord;

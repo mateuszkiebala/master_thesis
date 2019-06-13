@@ -146,7 +146,7 @@ public class HadoopMinAlgFactory {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
         int ret = teraSort(homeDir, input, sortingDir, groupByConfig);
         ret = ret == 0 ? PhaseGroupBy.run(sortingDir, output, groupByConfig) : ret;
-        //Utils.deleteDirFromHDFS(conf, sortingDir, true);
+        Utils.deleteDirFromHDFS(conf, sortingDir, true);
         return ret;
     }
 
