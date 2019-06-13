@@ -1,4 +1,4 @@
-package minimal_algorithms.hadoop.examples;
+package minimal_algorithms.factory.examples.hadoop;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -10,18 +10,18 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.avro.Schema;
+import minimal_algorithms.factory.MinimalAlgFactory;
 import minimal_algorithms.hadoop.examples.types.*;
-import minimal_algorithms.hadoop.HadoopMinAlgFactory;
 import minimal_algorithms.hadoop.config.IOConfig;
 import minimal_algorithms.hadoop.config.Config;
 
-public class GroupBy extends Configured implements Tool {
+public class ExamplePrefix extends Configured implements Tool {
 
-    static final Log LOG = LogFactory.getLog(GroupBy.class);
+    static final Log LOG = LogFactory.getLog(ExamplePrefix.class);
 
     public int run(String[] args) throws Exception {
         if (args.length != 6) {
-            System.err.println("Usage: GroupBy <home_dir> <input_path> <output_path> <items_no> <partitions_no> <reduce_tasks_no>");
+            System.err.println("Usage: ExamplePrefix <home_dir> <input_path> <output_path> <items_no> <partitions_no> <reduce_tasks_no>");
             return -1;
         }
 
@@ -29,13 +29,11 @@ public class GroupBy extends Configured implements Tool {
         Config config = new Config(getConf(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
         Comparator cmp = RWC4Cmps.firstCmp;
         Schema statsSchema = SumStatisticsAggregator.getClassSchema();
-        Schema keySchema = IntKeyRecord4Float.getClassSchema();
-        return new HadoopMinAlgFactory(config).groupBy(ioConfig, cmp, statsSchema, keySchema);
+        return MinimalAlgFactory.hadoop(config).prefix(ioConfig, cmp, statsSchema);
     }
 
     public static void main(String[] args) throws Exception {
-        // configuration is necessary to add -libjars (http://stackoverflow.com/questions/28520821/how-to-add-external-jar-to-hadoop-job)
-        int res = ToolRunner.run(new Configuration(), new GroupBy(), args);
+        int res = ToolRunner.run(new Configuration(), new ExamplePrefix(), args);
         System.exit(res);
     }
 }

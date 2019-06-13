@@ -137,12 +137,12 @@ public class HadoopMinAlgFactory {
         return ret;
     }
 
-    public int group(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
+    public int groupBy(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
         GroupByConfig groupByConfig = new GroupByConfig(config, cmp, ioConfig.getBaseSchema(), statisticsAggregatorSchema, keyRecordSchema);
-        return group(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), groupByConfig);
+        return groupBy(ioConfig.getHomeDir(), ioConfig.getInput(), ioConfig.getOutput(), groupByConfig);
     }
 
-    public int group(Path homeDir, Path input, Path output, GroupByConfig groupByConfig) throws Exception {
+    public int groupBy(Path homeDir, Path input, Path output, GroupByConfig groupByConfig) throws Exception {
         Path sortingDir = new Path(homeDir + "/tmp" + SORTING_DIR);
         int ret = teraSort(homeDir, input, sortingDir, groupByConfig);
         ret = ret == 0 ? PhaseGroupBy.run(sortingDir, output, groupByConfig) : ret;
