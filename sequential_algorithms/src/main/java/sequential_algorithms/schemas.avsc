@@ -5,7 +5,16 @@
     [
       { "name": "null_prim", "type": ["null", "int"] },
       { "name": "boolean_prim", "type": "boolean" },
-      { "name": "int_prim", "type": "int" },
+      { "name": "int_prim", "type": {
+          "type": "int",
+          "arg.properties": {
+            "range": {
+              "min": -100,
+              "max": 100
+            }
+          }
+        }
+      },
       { "name": "long_prim", "type": "long" },
       { "name": "float_prim", "type": "float" },
       { "name": "double_prim", "type": "double" },
@@ -47,4 +56,12 @@
     { "name": "rank", "type": "int" },
     { "name": "complex", "type": "Complex" }
   ]
+}, {
+   "type": "record",
+   "name": "StatsComplex",
+   "namespace": "sequential_algorithms.types",
+   "fields": [
+     { "name": "sum", "type": "long" },
+     { "name": "complex", "type": "Complex" }
+   ]
 }]
