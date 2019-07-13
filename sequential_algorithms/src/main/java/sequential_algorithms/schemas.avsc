@@ -1,0 +1,50 @@
+[{ "type": "record",
+  "name": "Complex",
+  "namespace": "sequential_algorithms.types",
+  "fields":
+    [
+      { "name": "null_prim", "type": ["null", "int"] },
+      { "name": "boolean_prim", "type": "boolean" },
+      { "name": "int_prim", "type": "int" },
+      { "name": "long_prim", "type": "long" },
+      { "name": "float_prim", "type": "float" },
+      { "name": "double_prim", "type": "double" },
+      { "name": "string_prim", "type": "string" },
+      { "name": "bytes_prim", "type": "bytes" },
+      { "name": "middle", "type":
+        { "type": "record",
+          "name": "MiddleNested",
+          "fields": [
+            { "name": "middle_array",
+              "type": {
+                "type": "array",
+                "items": "float"
+              }
+            },
+            { "name": "inner",
+              "type": {
+                "type": "record",
+                "name": "InnerNested",
+                "fields": [
+                  { "name": "inner_int",
+                    "type": "int"
+                  },
+                  { "name": "inner_string",
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+}, {
+  "type": "record",
+  "name": "RankComplex",
+  "namespace": "sequential_algorithms.types",
+  "fields": [
+    { "name": "rank", "type": "int" },
+    { "name": "complex", "type": "Complex" }
+  ]
+}]

@@ -3,25 +3,83 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package sequential_algorithms.schema_types;
+package sequential_algorithms.types;
 
+import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
+import org.apache.avro.util.Utf8;
+import org.apache.avro.message.BinaryMessageEncoder;
+import org.apache.avro.message.BinaryMessageDecoder;
+import org.apache.avro.message.SchemaStore;
 
-@SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class Complex extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -4435005321282147297L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Complex\",\"namespace\":\"sequential_algorithms.schema_types\",\"fields\":[{\"name\":\"null_prim\",\"type\":[\"null\",\"int\"]},{\"name\":\"boolean_prim\",\"type\":\"boolean\"},{\"name\":\"int_prim\",\"type\":\"int\"},{\"name\":\"long_prim\",\"type\":\"long\"},{\"name\":\"float_prim\",\"type\":\"float\"},{\"name\":\"double_prim\",\"type\":\"double\"},{\"name\":\"string_prim\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}},{\"name\":\"bytes_prim\",\"type\":\"bytes\"},{\"name\":\"middle\",\"type\":{\"type\":\"record\",\"name\":\"MiddleNested\",\"fields\":[{\"name\":\"middle_array\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"inner\",\"type\":{\"type\":\"record\",\"name\":\"InnerNested\",\"fields\":[{\"name\":\"inner_int\",\"type\":\"int\"},{\"name\":\"inner_string\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"}}]}}]}}]}");
+  private static final long serialVersionUID = 7626035616501863241L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Complex\",\"namespace\":\"sequential_algorithms.types\",\"fields\":[{\"name\":\"null_prim\",\"type\":[\"null\",\"int\"]},{\"name\":\"boolean_prim\",\"type\":\"boolean\"},{\"name\":\"int_prim\",\"type\":\"int\"},{\"name\":\"long_prim\",\"type\":\"long\"},{\"name\":\"float_prim\",\"type\":\"float\"},{\"name\":\"double_prim\",\"type\":\"double\"},{\"name\":\"string_prim\",\"type\":\"string\"},{\"name\":\"bytes_prim\",\"type\":\"bytes\"},{\"name\":\"middle\",\"type\":{\"type\":\"record\",\"name\":\"MiddleNested\",\"fields\":[{\"name\":\"middle_array\",\"type\":{\"type\":\"array\",\"items\":\"float\"}},{\"name\":\"inner\",\"type\":{\"type\":\"record\",\"name\":\"InnerNested\",\"fields\":[{\"name\":\"inner_int\",\"type\":\"int\"},{\"name\":\"inner_string\",\"type\":\"string\"}]}}]}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
+
+  private static SpecificData MODEL$ = new SpecificData();
+
+  private static final BinaryMessageEncoder<Complex> ENCODER =
+      new BinaryMessageEncoder<Complex>(MODEL$, SCHEMA$);
+
+  private static final BinaryMessageDecoder<Complex> DECODER =
+      new BinaryMessageDecoder<Complex>(MODEL$, SCHEMA$);
+
+  /**
+   * Return the BinaryMessageEncoder instance used by this class.
+   * @return the message encoder used by this class
+   */
+  public static BinaryMessageEncoder<Complex> getEncoder() {
+    return ENCODER;
+  }
+
+  /**
+   * Return the BinaryMessageDecoder instance used by this class.
+   * @return the message decoder used by this class
+   */
+  public static BinaryMessageDecoder<Complex> getDecoder() {
+    return DECODER;
+  }
+
+  /**
+   * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
+   * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
+   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
+   */
+  public static BinaryMessageDecoder<Complex> createDecoder(SchemaStore resolver) {
+    return new BinaryMessageDecoder<Complex>(MODEL$, SCHEMA$, resolver);
+  }
+
+  /**
+   * Serializes this Complex to a ByteBuffer.
+   * @return a buffer holding the serialized data for this instance
+   * @throws java.io.IOException if this instance could not be serialized
+   */
+  public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
+    return ENCODER.encode(this);
+  }
+
+  /**
+   * Deserializes a Complex from a ByteBuffer.
+   * @param b a byte buffer holding serialized data for an instance of this class
+   * @return a Complex instance decoded from the given buffer
+   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
+   */
+  public static Complex fromByteBuffer(
+      java.nio.ByteBuffer b) throws java.io.IOException {
+    return DECODER.decode(b);
+  }
+
   @Deprecated public java.lang.Integer null_prim;
   @Deprecated public boolean boolean_prim;
   @Deprecated public int int_prim;
   @Deprecated public long long_prim;
   @Deprecated public float float_prim;
   @Deprecated public double double_prim;
-  @Deprecated public java.lang.String string_prim;
+  @Deprecated public java.lang.CharSequence string_prim;
   @Deprecated public java.nio.ByteBuffer bytes_prim;
-  @Deprecated public sequential_algorithms.schema_types.MiddleNested middle;
+  @Deprecated public sequential_algorithms.types.MiddleNested middle;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -42,7 +100,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param bytes_prim The new value for bytes_prim
    * @param middle The new value for middle
    */
-  public Complex(java.lang.Integer null_prim, java.lang.Boolean boolean_prim, java.lang.Integer int_prim, java.lang.Long long_prim, java.lang.Float float_prim, java.lang.Double double_prim, java.lang.String string_prim, java.nio.ByteBuffer bytes_prim, sequential_algorithms.schema_types.MiddleNested middle) {
+  public Complex(java.lang.Integer null_prim, java.lang.Boolean boolean_prim, java.lang.Integer int_prim, java.lang.Long long_prim, java.lang.Float float_prim, java.lang.Double double_prim, java.lang.CharSequence string_prim, java.nio.ByteBuffer bytes_prim, sequential_algorithms.types.MiddleNested middle) {
     this.null_prim = null_prim;
     this.boolean_prim = boolean_prim;
     this.int_prim = int_prim;
@@ -54,6 +112,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
     this.middle = middle;
   }
 
+  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
@@ -81,9 +140,9 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
     case 3: long_prim = (java.lang.Long)value$; break;
     case 4: float_prim = (java.lang.Float)value$; break;
     case 5: double_prim = (java.lang.Double)value$; break;
-    case 6: string_prim = (java.lang.String)value$; break;
+    case 6: string_prim = (java.lang.CharSequence)value$; break;
     case 7: bytes_prim = (java.nio.ByteBuffer)value$; break;
-    case 8: middle = (sequential_algorithms.schema_types.MiddleNested)value$; break;
+    case 8: middle = (sequential_algorithms.types.MiddleNested)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -95,6 +154,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
   public java.lang.Integer getNullPrim() {
     return null_prim;
   }
+
 
   /**
    * Sets the value of the 'null_prim' field.
@@ -108,15 +168,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'boolean_prim' field.
    * @return The value of the 'boolean_prim' field.
    */
-  public java.lang.Boolean getBooleanPrim() {
+  public boolean getBooleanPrim() {
     return boolean_prim;
   }
+
 
   /**
    * Sets the value of the 'boolean_prim' field.
    * @param value the value to set.
    */
-  public void setBooleanPrim(java.lang.Boolean value) {
+  public void setBooleanPrim(boolean value) {
     this.boolean_prim = value;
   }
 
@@ -124,15 +185,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'int_prim' field.
    * @return The value of the 'int_prim' field.
    */
-  public java.lang.Integer getIntPrim() {
+  public int getIntPrim() {
     return int_prim;
   }
+
 
   /**
    * Sets the value of the 'int_prim' field.
    * @param value the value to set.
    */
-  public void setIntPrim(java.lang.Integer value) {
+  public void setIntPrim(int value) {
     this.int_prim = value;
   }
 
@@ -140,15 +202,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'long_prim' field.
    * @return The value of the 'long_prim' field.
    */
-  public java.lang.Long getLongPrim() {
+  public long getLongPrim() {
     return long_prim;
   }
+
 
   /**
    * Sets the value of the 'long_prim' field.
    * @param value the value to set.
    */
-  public void setLongPrim(java.lang.Long value) {
+  public void setLongPrim(long value) {
     this.long_prim = value;
   }
 
@@ -156,15 +219,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'float_prim' field.
    * @return The value of the 'float_prim' field.
    */
-  public java.lang.Float getFloatPrim() {
+  public float getFloatPrim() {
     return float_prim;
   }
+
 
   /**
    * Sets the value of the 'float_prim' field.
    * @param value the value to set.
    */
-  public void setFloatPrim(java.lang.Float value) {
+  public void setFloatPrim(float value) {
     this.float_prim = value;
   }
 
@@ -172,15 +236,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'double_prim' field.
    * @return The value of the 'double_prim' field.
    */
-  public java.lang.Double getDoublePrim() {
+  public double getDoublePrim() {
     return double_prim;
   }
+
 
   /**
    * Sets the value of the 'double_prim' field.
    * @param value the value to set.
    */
-  public void setDoublePrim(java.lang.Double value) {
+  public void setDoublePrim(double value) {
     this.double_prim = value;
   }
 
@@ -188,15 +253,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'string_prim' field.
    * @return The value of the 'string_prim' field.
    */
-  public java.lang.String getStringPrim() {
+  public java.lang.CharSequence getStringPrim() {
     return string_prim;
   }
+
 
   /**
    * Sets the value of the 'string_prim' field.
    * @param value the value to set.
    */
-  public void setStringPrim(java.lang.String value) {
+  public void setStringPrim(java.lang.CharSequence value) {
     this.string_prim = value;
   }
 
@@ -207,6 +273,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
   public java.nio.ByteBuffer getBytesPrim() {
     return bytes_prim;
   }
+
 
   /**
    * Sets the value of the 'bytes_prim' field.
@@ -220,15 +287,16 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Gets the value of the 'middle' field.
    * @return The value of the 'middle' field.
    */
-  public sequential_algorithms.schema_types.MiddleNested getMiddle() {
+  public sequential_algorithms.types.MiddleNested getMiddle() {
     return middle;
   }
+
 
   /**
    * Sets the value of the 'middle' field.
    * @param value the value to set.
    */
-  public void setMiddle(sequential_algorithms.schema_types.MiddleNested value) {
+  public void setMiddle(sequential_algorithms.types.MiddleNested value) {
     this.middle = value;
   }
 
@@ -236,8 +304,8 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * Creates a new Complex RecordBuilder.
    * @return A new Complex RecordBuilder
    */
-  public static sequential_algorithms.schema_types.Complex.Builder newBuilder() {
-    return new sequential_algorithms.schema_types.Complex.Builder();
+  public static sequential_algorithms.types.Complex.Builder newBuilder() {
+    return new sequential_algorithms.types.Complex.Builder();
   }
 
   /**
@@ -245,8 +313,12 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param other The existing builder to copy.
    * @return A new Complex RecordBuilder
    */
-  public static sequential_algorithms.schema_types.Complex.Builder newBuilder(sequential_algorithms.schema_types.Complex.Builder other) {
-    return new sequential_algorithms.schema_types.Complex.Builder(other);
+  public static sequential_algorithms.types.Complex.Builder newBuilder(sequential_algorithms.types.Complex.Builder other) {
+    if (other == null) {
+      return new sequential_algorithms.types.Complex.Builder();
+    } else {
+      return new sequential_algorithms.types.Complex.Builder(other);
+    }
   }
 
   /**
@@ -254,8 +326,12 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param other The existing instance to copy.
    * @return A new Complex RecordBuilder
    */
-  public static sequential_algorithms.schema_types.Complex.Builder newBuilder(sequential_algorithms.schema_types.Complex other) {
-    return new sequential_algorithms.schema_types.Complex.Builder(other);
+  public static sequential_algorithms.types.Complex.Builder newBuilder(sequential_algorithms.types.Complex other) {
+    if (other == null) {
+      return new sequential_algorithms.types.Complex.Builder();
+    } else {
+      return new sequential_algorithms.types.Complex.Builder(other);
+    }
   }
 
   /**
@@ -270,10 +346,10 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
     private long long_prim;
     private float float_prim;
     private double double_prim;
-    private java.lang.String string_prim;
+    private java.lang.CharSequence string_prim;
     private java.nio.ByteBuffer bytes_prim;
-    private sequential_algorithms.schema_types.MiddleNested middle;
-    private sequential_algorithms.schema_types.MiddleNested.Builder middleBuilder;
+    private sequential_algorithms.types.MiddleNested middle;
+    private sequential_algorithms.types.MiddleNested.Builder middleBuilder;
 
     /** Creates a new Builder */
     private Builder() {
@@ -284,46 +360,46 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(sequential_algorithms.schema_types.Complex.Builder other) {
+    private Builder(sequential_algorithms.types.Complex.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.null_prim)) {
         this.null_prim = data().deepCopy(fields()[0].schema(), other.null_prim);
-        fieldSetFlags()[0] = true;
+        fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
       if (isValidValue(fields()[1], other.boolean_prim)) {
         this.boolean_prim = data().deepCopy(fields()[1].schema(), other.boolean_prim);
-        fieldSetFlags()[1] = true;
+        fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
       if (isValidValue(fields()[2], other.int_prim)) {
         this.int_prim = data().deepCopy(fields()[2].schema(), other.int_prim);
-        fieldSetFlags()[2] = true;
+        fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
       if (isValidValue(fields()[3], other.long_prim)) {
         this.long_prim = data().deepCopy(fields()[3].schema(), other.long_prim);
-        fieldSetFlags()[3] = true;
+        fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
       if (isValidValue(fields()[4], other.float_prim)) {
         this.float_prim = data().deepCopy(fields()[4].schema(), other.float_prim);
-        fieldSetFlags()[4] = true;
+        fieldSetFlags()[4] = other.fieldSetFlags()[4];
       }
       if (isValidValue(fields()[5], other.double_prim)) {
         this.double_prim = data().deepCopy(fields()[5].schema(), other.double_prim);
-        fieldSetFlags()[5] = true;
+        fieldSetFlags()[5] = other.fieldSetFlags()[5];
       }
       if (isValidValue(fields()[6], other.string_prim)) {
         this.string_prim = data().deepCopy(fields()[6].schema(), other.string_prim);
-        fieldSetFlags()[6] = true;
+        fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
       if (isValidValue(fields()[7], other.bytes_prim)) {
         this.bytes_prim = data().deepCopy(fields()[7].schema(), other.bytes_prim);
-        fieldSetFlags()[7] = true;
+        fieldSetFlags()[7] = other.fieldSetFlags()[7];
       }
       if (isValidValue(fields()[8], other.middle)) {
         this.middle = data().deepCopy(fields()[8].schema(), other.middle);
-        fieldSetFlags()[8] = true;
+        fieldSetFlags()[8] = other.fieldSetFlags()[8];
       }
       if (other.hasMiddleBuilder()) {
-        this.middleBuilder = sequential_algorithms.schema_types.MiddleNested.newBuilder(other.getMiddleBuilder());
+        this.middleBuilder = sequential_algorithms.types.MiddleNested.newBuilder(other.getMiddleBuilder());
       }
     }
 
@@ -331,8 +407,8 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
      * Creates a Builder by copying an existing Complex instance
      * @param other The existing instance to copy.
      */
-    private Builder(sequential_algorithms.schema_types.Complex other) {
-            super(SCHEMA$);
+    private Builder(sequential_algorithms.types.Complex other) {
+      super(SCHEMA$);
       if (isValidValue(fields()[0], other.null_prim)) {
         this.null_prim = data().deepCopy(fields()[0].schema(), other.null_prim);
         fieldSetFlags()[0] = true;
@@ -380,12 +456,13 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       return null_prim;
     }
 
+
     /**
       * Sets the value of the 'null_prim' field.
       * @param value The value of 'null_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setNullPrim(java.lang.Integer value) {
+    public sequential_algorithms.types.Complex.Builder setNullPrim(java.lang.Integer value) {
       validate(fields()[0], value);
       this.null_prim = value;
       fieldSetFlags()[0] = true;
@@ -405,7 +482,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'null_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearNullPrim() {
+    public sequential_algorithms.types.Complex.Builder clearNullPrim() {
       null_prim = null;
       fieldSetFlags()[0] = false;
       return this;
@@ -415,16 +492,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'boolean_prim' field.
       * @return The value.
       */
-    public java.lang.Boolean getBooleanPrim() {
+    public boolean getBooleanPrim() {
       return boolean_prim;
     }
+
 
     /**
       * Sets the value of the 'boolean_prim' field.
       * @param value The value of 'boolean_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setBooleanPrim(boolean value) {
+    public sequential_algorithms.types.Complex.Builder setBooleanPrim(boolean value) {
       validate(fields()[1], value);
       this.boolean_prim = value;
       fieldSetFlags()[1] = true;
@@ -444,7 +522,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'boolean_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearBooleanPrim() {
+    public sequential_algorithms.types.Complex.Builder clearBooleanPrim() {
       fieldSetFlags()[1] = false;
       return this;
     }
@@ -453,16 +531,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'int_prim' field.
       * @return The value.
       */
-    public java.lang.Integer getIntPrim() {
+    public int getIntPrim() {
       return int_prim;
     }
+
 
     /**
       * Sets the value of the 'int_prim' field.
       * @param value The value of 'int_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setIntPrim(int value) {
+    public sequential_algorithms.types.Complex.Builder setIntPrim(int value) {
       validate(fields()[2], value);
       this.int_prim = value;
       fieldSetFlags()[2] = true;
@@ -482,7 +561,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'int_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearIntPrim() {
+    public sequential_algorithms.types.Complex.Builder clearIntPrim() {
       fieldSetFlags()[2] = false;
       return this;
     }
@@ -491,16 +570,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'long_prim' field.
       * @return The value.
       */
-    public java.lang.Long getLongPrim() {
+    public long getLongPrim() {
       return long_prim;
     }
+
 
     /**
       * Sets the value of the 'long_prim' field.
       * @param value The value of 'long_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setLongPrim(long value) {
+    public sequential_algorithms.types.Complex.Builder setLongPrim(long value) {
       validate(fields()[3], value);
       this.long_prim = value;
       fieldSetFlags()[3] = true;
@@ -520,7 +600,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'long_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearLongPrim() {
+    public sequential_algorithms.types.Complex.Builder clearLongPrim() {
       fieldSetFlags()[3] = false;
       return this;
     }
@@ -529,16 +609,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'float_prim' field.
       * @return The value.
       */
-    public java.lang.Float getFloatPrim() {
+    public float getFloatPrim() {
       return float_prim;
     }
+
 
     /**
       * Sets the value of the 'float_prim' field.
       * @param value The value of 'float_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setFloatPrim(float value) {
+    public sequential_algorithms.types.Complex.Builder setFloatPrim(float value) {
       validate(fields()[4], value);
       this.float_prim = value;
       fieldSetFlags()[4] = true;
@@ -558,7 +639,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'float_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearFloatPrim() {
+    public sequential_algorithms.types.Complex.Builder clearFloatPrim() {
       fieldSetFlags()[4] = false;
       return this;
     }
@@ -567,16 +648,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'double_prim' field.
       * @return The value.
       */
-    public java.lang.Double getDoublePrim() {
+    public double getDoublePrim() {
       return double_prim;
     }
+
 
     /**
       * Sets the value of the 'double_prim' field.
       * @param value The value of 'double_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setDoublePrim(double value) {
+    public sequential_algorithms.types.Complex.Builder setDoublePrim(double value) {
       validate(fields()[5], value);
       this.double_prim = value;
       fieldSetFlags()[5] = true;
@@ -596,7 +678,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'double_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearDoublePrim() {
+    public sequential_algorithms.types.Complex.Builder clearDoublePrim() {
       fieldSetFlags()[5] = false;
       return this;
     }
@@ -605,16 +687,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'string_prim' field.
       * @return The value.
       */
-    public java.lang.String getStringPrim() {
+    public java.lang.CharSequence getStringPrim() {
       return string_prim;
     }
+
 
     /**
       * Sets the value of the 'string_prim' field.
       * @param value The value of 'string_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setStringPrim(java.lang.String value) {
+    public sequential_algorithms.types.Complex.Builder setStringPrim(java.lang.CharSequence value) {
       validate(fields()[6], value);
       this.string_prim = value;
       fieldSetFlags()[6] = true;
@@ -634,7 +717,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'string_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearStringPrim() {
+    public sequential_algorithms.types.Complex.Builder clearStringPrim() {
       string_prim = null;
       fieldSetFlags()[6] = false;
       return this;
@@ -648,12 +731,13 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       return bytes_prim;
     }
 
+
     /**
       * Sets the value of the 'bytes_prim' field.
       * @param value The value of 'bytes_prim'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setBytesPrim(java.nio.ByteBuffer value) {
+    public sequential_algorithms.types.Complex.Builder setBytesPrim(java.nio.ByteBuffer value) {
       validate(fields()[7], value);
       this.bytes_prim = value;
       fieldSetFlags()[7] = true;
@@ -673,7 +757,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'bytes_prim' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearBytesPrim() {
+    public sequential_algorithms.types.Complex.Builder clearBytesPrim() {
       bytes_prim = null;
       fieldSetFlags()[7] = false;
       return this;
@@ -683,16 +767,17 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Gets the value of the 'middle' field.
       * @return The value.
       */
-    public sequential_algorithms.schema_types.MiddleNested getMiddle() {
+    public sequential_algorithms.types.MiddleNested getMiddle() {
       return middle;
     }
+
 
     /**
       * Sets the value of the 'middle' field.
       * @param value The value of 'middle'.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder setMiddle(sequential_algorithms.schema_types.MiddleNested value) {
+    public sequential_algorithms.types.Complex.Builder setMiddle(sequential_algorithms.types.MiddleNested value) {
       validate(fields()[8], value);
       this.middleBuilder = null;
       this.middle = value;
@@ -712,12 +797,12 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
      * Gets the Builder instance for the 'middle' field and creates one if it doesn't exist yet.
      * @return This builder.
      */
-    public sequential_algorithms.schema_types.MiddleNested.Builder getMiddleBuilder() {
+    public sequential_algorithms.types.MiddleNested.Builder getMiddleBuilder() {
       if (middleBuilder == null) {
         if (hasMiddle()) {
-          setMiddleBuilder(sequential_algorithms.schema_types.MiddleNested.newBuilder(middle));
+          setMiddleBuilder(sequential_algorithms.types.MiddleNested.newBuilder(middle));
         } else {
-          setMiddleBuilder(sequential_algorithms.schema_types.MiddleNested.newBuilder());
+          setMiddleBuilder(sequential_algorithms.types.MiddleNested.newBuilder());
         }
       }
       return middleBuilder;
@@ -728,7 +813,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
      * @param value The builder instance that must be set.
      * @return This builder.
      */
-    public sequential_algorithms.schema_types.Complex.Builder setMiddleBuilder(sequential_algorithms.schema_types.MiddleNested.Builder value) {
+    public sequential_algorithms.types.Complex.Builder setMiddleBuilder(sequential_algorithms.types.MiddleNested.Builder value) {
       clearMiddle();
       middleBuilder = value;
       return this;
@@ -746,7 +831,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
       * Clears the value of the 'middle' field.
       * @return This builder.
       */
-    public sequential_algorithms.schema_types.Complex.Builder clearMiddle() {
+    public sequential_algorithms.types.Complex.Builder clearMiddle() {
       middle = null;
       middleBuilder = null;
       fieldSetFlags()[8] = false;
@@ -754,6 +839,7 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Complex build() {
       try {
         Complex record = new Complex();
@@ -763,34 +849,168 @@ public class Complex extends org.apache.avro.specific.SpecificRecordBase impleme
         record.long_prim = fieldSetFlags()[3] ? this.long_prim : (java.lang.Long) defaultValue(fields()[3]);
         record.float_prim = fieldSetFlags()[4] ? this.float_prim : (java.lang.Float) defaultValue(fields()[4]);
         record.double_prim = fieldSetFlags()[5] ? this.double_prim : (java.lang.Double) defaultValue(fields()[5]);
-        record.string_prim = fieldSetFlags()[6] ? this.string_prim : (java.lang.String) defaultValue(fields()[6]);
+        record.string_prim = fieldSetFlags()[6] ? this.string_prim : (java.lang.CharSequence) defaultValue(fields()[6]);
         record.bytes_prim = fieldSetFlags()[7] ? this.bytes_prim : (java.nio.ByteBuffer) defaultValue(fields()[7]);
         if (middleBuilder != null) {
-          record.middle = this.middleBuilder.build();
+          try {
+            record.middle = this.middleBuilder.build();
+          } catch (org.apache.avro.AvroMissingFieldException e) {
+            e.addParentField(record.getSchema().getField("middle"));
+            throw e;
+          }
         } else {
-          record.middle = fieldSetFlags()[8] ? this.middle : (sequential_algorithms.schema_types.MiddleNested) defaultValue(fields()[8]);
+          record.middle = fieldSetFlags()[8] ? this.middle : (sequential_algorithms.types.MiddleNested) defaultValue(fields()[8]);
         }
         return record;
-      } catch (Exception e) {
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
+      } catch (java.lang.Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
     }
   }
 
-  private static final org.apache.avro.io.DatumWriter
-    WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);
+  @SuppressWarnings("unchecked")
+  private static final org.apache.avro.io.DatumWriter<Complex>
+    WRITER$ = (org.apache.avro.io.DatumWriter<Complex>)MODEL$.createDatumWriter(SCHEMA$);
 
   @Override public void writeExternal(java.io.ObjectOutput out)
     throws java.io.IOException {
     WRITER$.write(this, SpecificData.getEncoder(out));
   }
 
-  private static final org.apache.avro.io.DatumReader
-    READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);
+  @SuppressWarnings("unchecked")
+  private static final org.apache.avro.io.DatumReader<Complex>
+    READER$ = (org.apache.avro.io.DatumReader<Complex>)MODEL$.createDatumReader(SCHEMA$);
 
   @Override public void readExternal(java.io.ObjectInput in)
     throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
+  @Override protected boolean hasCustomCoders() { return true; }
+
+  @Override public void customEncode(org.apache.avro.io.Encoder out)
+    throws java.io.IOException
+  {
+    if (this.null_prim == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      out.writeInt(this.null_prim);
+    }
+
+    out.writeBoolean(this.boolean_prim);
+
+    out.writeInt(this.int_prim);
+
+    out.writeLong(this.long_prim);
+
+    out.writeFloat(this.float_prim);
+
+    out.writeDouble(this.double_prim);
+
+    out.writeString(this.string_prim);
+
+    out.writeBytes(this.bytes_prim);
+
+    this.middle.customEncode(out);
+
+  }
+
+  @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
+    throws java.io.IOException
+  {
+    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
+    if (fieldOrder == null) {
+      if (in.readIndex() != 1) {
+        in.readNull();
+        this.null_prim = null;
+      } else {
+        this.null_prim = in.readInt();
+      }
+
+      this.boolean_prim = in.readBoolean();
+
+      this.int_prim = in.readInt();
+
+      this.long_prim = in.readLong();
+
+      this.float_prim = in.readFloat();
+
+      this.double_prim = in.readDouble();
+
+      this.string_prim = in.readString(this.string_prim instanceof Utf8 ? (Utf8)this.string_prim : null);
+
+      this.bytes_prim = in.readBytes(this.bytes_prim);
+
+      if (this.middle == null) {
+        this.middle = new sequential_algorithms.types.MiddleNested();
+      }
+      this.middle.customDecode(in);
+
+    } else {
+      for (int i = 0; i < 9; i++) {
+        switch (fieldOrder[i].pos()) {
+        case 0:
+          if (in.readIndex() != 1) {
+            in.readNull();
+            this.null_prim = null;
+          } else {
+            this.null_prim = in.readInt();
+          }
+          break;
+
+        case 1:
+          this.boolean_prim = in.readBoolean();
+          break;
+
+        case 2:
+          this.int_prim = in.readInt();
+          break;
+
+        case 3:
+          this.long_prim = in.readLong();
+          break;
+
+        case 4:
+          this.float_prim = in.readFloat();
+          break;
+
+        case 5:
+          this.double_prim = in.readDouble();
+          break;
+
+        case 6:
+          this.string_prim = in.readString(this.string_prim instanceof Utf8 ? (Utf8)this.string_prim : null);
+          break;
+
+        case 7:
+          this.bytes_prim = in.readBytes(this.bytes_prim);
+          break;
+
+        case 8:
+          if (this.middle == null) {
+            this.middle = new sequential_algorithms.types.MiddleNested();
+          }
+          this.middle.customDecode(in);
+          break;
+
+        default:
+          throw new java.io.IOException("Corrupt ResolvingDecoder.");
+        }
+      }
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 { "type": "record",
   "name": "Complex",
-  "namespace": "sequential_algorithms.schema_types",
+  "namespace": "sequential_algorithms.types",
   "fields":
     [
       { "name": "null_prim", "type": ["null", "int"] },

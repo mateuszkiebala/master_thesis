@@ -4,22 +4,24 @@ import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
-import sequential_algorithms.schema_types.Complex;
+import sequential_algorithms.types.Complex;
 import org.apache.avro.Schema;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.file.FileReader;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.avro.specific.SpecificRecordBase;
 
 public class AvroUtils {
+    public static String INPUT_DIR = "src/main/java/sequential_algorithms/";
+    public static String OUTPUT_DIR = "src/main/java/sequential_algorithms/outputs/";
+
     public static List<Complex> read(String filename) {
         List result = new ArrayList<>();
-        File input = new File(filename);
+        File input = new File(INPUT_DIR + filename);
 
         try {
             DatumReader<Complex> complexDatumReader = new SpecificDatumReader<Complex>(Complex.class);
@@ -34,17 +36,20 @@ public class AvroUtils {
         return result;
     }
 
-    public static void write(List<Complex> data, String filename) {
-        File output = new File(filename);
+    public static void write(List<SpecificRecordBase> data, String filename, Schema schema) {
+        File dir = new File(OUTPUT_DIR);
+        if (!dir.exists()) {
+            if (!dir.mkdir())
+                throw new IllegalArgumentException("Can't create output directory");
+        }
 
-        try {
-            DatumWriter<Complex> complexDatumWriter = new SpecificDatumWriter<Complex>(Complex.class);
-            DataFileWriter<Complex> dataFileWriter = new DataFileWriter<Complex>(complexDatumWriter);
-            dataFileWriter.create(Complex.getClassSchema(), output);
-            for (Complex c : data) {
+        File output = new File(OUTPUT_DIR + filename);
+
+        try (DataFileWriter<SpecificRecordBase> dataFileWriter = new DataFileWriter<SpecificRecordBase>(new SpecificDatumWriter<SpecificRecordBase>(schema));) {
+            dataFileWriter.create(schema, output);
+            for (SpecificRecordBase c : data) {
                 dataFileWriter.append(c);
             }
-            dataFileWriter.close();
         } catch (IOException ie) {
             throw new IllegalArgumentException("Can't write to avro file");
         }

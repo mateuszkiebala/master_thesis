@@ -1,4 +1,4 @@
-package sequential_algorithms.schema_types;
+package sequential_algorithms.types;
 
 import java.util.Comparator;
 
