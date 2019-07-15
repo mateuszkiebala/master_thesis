@@ -1,0 +1,6 @@
+[submodule "sequential_algorithms/avro-random-generator"]
+	path = sequential_algorithms/avro-random-generator
+	url = https://github.com/confluentinc/avro-random-generator.git
+[submodule "avro-random-generator"]
+	path = avro-random-generator
+	url = https://github.com/confluentinc/avro-random-generator.git
