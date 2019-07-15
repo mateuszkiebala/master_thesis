@@ -9,8 +9,8 @@
           "type": "int",
           "arg.properties": {
             "range": {
-              "min": -100,
-              "max": 100
+              "min": -10,
+              "max": 10
             }
           }
         }
@@ -57,11 +57,19 @@
     { "name": "complex", "type": "Complex" }
   ]
 }, {
-   "type": "record",
-   "name": "StatsComplex",
-   "namespace": "sequential_algorithms.types",
-   "fields": [
-     { "name": "sum", "type": "long" },
-     { "name": "complex", "type": "Complex" }
-   ]
+  "type": "record",
+  "name": "StatsComplex",
+  "namespace": "sequential_algorithms.types",
+  "fields": [
+   { "name": "sum", "type": "long" },
+   { "name": "complex", "type": "Complex" }
+  ]
+}, {
+  "type": "record",
+  "name": "GroupByComplex",
+  "namespace": "sequential_algorithms.types",
+  "fields": [
+    { "name": "key", "type": "int" },
+    { "name": "sum", "type": "long" }
+  ]
 }]
