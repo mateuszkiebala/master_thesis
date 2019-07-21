@@ -11,10 +11,10 @@ Mateusz Kiebala
 3. Run `source install.sh`
 
 #### Creating package
-Run `sbt package` in main directory. Place created jar in `target/scala-2.11/`.
+Run `mvn package` in main directory. Place created jar in `target/scala-2.11/`.
 
 #### Tests:
-* Unit tests: `sbt test`
+* Unit tests: `mvn test`
 * Distributed tests:
     1. Go to `src/test/distributed`
     2. Check if app package is under `target/scala-2.11/library_2.11-0.1.jar`
