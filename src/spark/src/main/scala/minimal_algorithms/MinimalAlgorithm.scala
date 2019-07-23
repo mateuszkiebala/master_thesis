@@ -20,7 +20,7 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
 
   def teraSort[T, K](rdd: RDD[T], cmpKey: T => K)
                     (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
-    rdd.repartition(numPartitions).sortBy(cmpKey)
+    rdd.sortBy(cmpKey)
   }
 
   def rank[T, K](rdd: RDD[T], cmpKey: T => K)
