@@ -2,13 +2,13 @@ package test;
 
 import java.util.List;
 import java.util.ArrayList;
-import javafx.util.Pair;
 import org.junit.Assert;
 import org.junit.rules.ExpectedException;
 import org.apache.avro.AvroRuntimeException;
 import minimal_algorithms.hadoop.examples.types.SumStatisticsAggregator;
 import minimal_algorithms.hadoop.statistics.StatisticsAggregator;
 import minimal_algorithms.hadoop.RangeTree;
+import minimal_algorithms.hadoop.utils.Pair;
 
 public class TestRangeTree {
 
@@ -70,10 +70,10 @@ public class TestRangeTree {
         expectedEx.expectMessage("Start (3) greater than end (2)");
 
         List<Pair<StatisticsAggregator, Integer>> elements = new ArrayList<>();
-        elements.add(new Pair(new SumStatisticsAggregator(10), 0));
-        elements.add(new Pair(new SumStatisticsAggregator(30), 1));
-        elements.add(new Pair(new SumStatisticsAggregator(20), 2));
-        elements.add(new Pair(new SumStatisticsAggregator(60), 3));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(10), 0));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(30), 1));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(20), 2));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(60), 3));
         RangeTree tree = new RangeTree(elements);
 
         tree.query(3, 2);
@@ -85,20 +85,20 @@ public class TestRangeTree {
         expectedEx.expectMessage("Position out of range: 4");
 
         List<Pair<StatisticsAggregator, Integer>> elements = new ArrayList<>();
-        elements.add(new Pair(new SumStatisticsAggregator(10), 0));
-        elements.add(new Pair(new SumStatisticsAggregator(30), 4));
-        elements.add(new Pair(new SumStatisticsAggregator(20), 2));
-        elements.add(new Pair(new SumStatisticsAggregator(60), 3));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(10), 0));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(30), 4));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(20), 2));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(60), 3));
         RangeTree tree = new RangeTree(elements);
     }
 
     @org.junit.Test
     public void testSum() {
         List<Pair<StatisticsAggregator, Integer>> elements = new ArrayList<>();
-        elements.add(new Pair(new SumStatisticsAggregator(3), 2));
-        elements.add(new Pair(new SumStatisticsAggregator(2), 1));
-        elements.add(new Pair(new SumStatisticsAggregator(1), 0));
-        elements.add(new Pair(new SumStatisticsAggregator(4), 3));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(3), 2));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(2), 1));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(1), 0));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(4), 3));
 
         RangeTree tree = new RangeTree(elements);
         Integer[] expected = {null, 10, 3, 7, 1, 2, 3, 4};
@@ -108,11 +108,11 @@ public class TestRangeTree {
     @org.junit.Test
     public void testSumBaseNotPowerOfTwo() {
         List<Pair<StatisticsAggregator, Integer>> elements = new ArrayList<>();
-        elements.add(new Pair(new SumStatisticsAggregator(4), 2));
-        elements.add(new Pair(new SumStatisticsAggregator(1), 1));
-        elements.add(new Pair(new SumStatisticsAggregator(3), 0));
-        elements.add(new Pair(new SumStatisticsAggregator(10), 3));
-        elements.add(new Pair(new SumStatisticsAggregator(2), 4));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(4), 2));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(1), 1));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(3), 0));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(10), 3));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(2), 4));
 
         RangeTree tree = new RangeTree(elements);
         Integer[] expected = {null, 20, 18, 2, 4, 14, 2, null, 3, 1, 4, 10, 2, null, null, null};
@@ -123,11 +123,11 @@ public class TestRangeTree {
     @org.junit.Test
     public void testQuerySum() {
         List<Pair<StatisticsAggregator, Integer>> elements = new ArrayList<>();
-        elements.add(new Pair(new SumStatisticsAggregator(4), 2));
-        elements.add(new Pair(new SumStatisticsAggregator(1), 1));
-        elements.add(new Pair(new SumStatisticsAggregator(3), 0));
-        elements.add(new Pair(new SumStatisticsAggregator(10), 3));
-        elements.add(new Pair(new SumStatisticsAggregator(2), 4));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(4), 2));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(1), 1));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(3), 0));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(10), 3));
+        elements.add(new Pair<StatisticsAggregator, Integer>(new SumStatisticsAggregator(2), 4));
 
         RangeTree tree = new RangeTree(elements);
         Assert.assertEquals(new Integer(3), unpackSumSA(tree.query(0, 0)));

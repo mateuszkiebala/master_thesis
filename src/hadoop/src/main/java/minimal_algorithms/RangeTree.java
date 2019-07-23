@@ -1,12 +1,12 @@
 package minimal_algorithms.hadoop;
 
 import java.util.List;
-import javafx.util.Pair;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.generic.GenericRecord;
 import minimal_algorithms.hadoop.statistics.StatisticsAggregator;
+import minimal_algorithms.hadoop.utils.Pair;
 
 public class RangeTree extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
     public static Schema SCHEMA$;

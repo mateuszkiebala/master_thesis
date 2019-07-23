@@ -25,11 +25,10 @@ public class Prefix extends Configured implements Tool {
             return -1;
         }
 
-        IOConfig ioConfig = new IOConfig(new Path(args[0]), new Path(args[1]), new Path(args[2]), Record4Float.getClassSchema());
+        IOConfig ioConfig = new IOConfig(new Path(args[0]), new Path(args[1]), new Path(args[2]), Complex.getClassSchema());
         Config config = new Config(getConf(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
-        Comparator cmp = RWC4Cmps.firstCmp;
         Schema statsSchema = SumStatisticsAggregator.getClassSchema();
-        return new HadoopMinAlgFactory(config).prefix(ioConfig, cmp, statsSchema);
+        return new HadoopMinAlgFactory(config).prefix(ioConfig, new ComplexCmp(), statsSchema);
     }
 
     public static void main(String[] args) throws Exception {
