@@ -92,10 +92,12 @@ public class PhasePrefix {
             StatisticsAggregator partitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
 
             List<GenericRecord> elements = groupedRecords.get(1);
-            java.util.Collections.sort(elements, cmp);
-            List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, partitionStatistics);
-            List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, elements);
-            sender.send(key, new MultipleStatisticRecords(statsRecords));
+            if (elements != null) {
+                java.util.Collections.sort(elements, cmp);
+                List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, partitionStatistics);
+                List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, elements);
+                sender.send(key, new MultipleStatisticRecords(statsRecords));
+            }
         }
     }
 

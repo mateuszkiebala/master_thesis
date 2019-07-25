@@ -135,6 +135,7 @@ public class HadoopMinAlgFactory {
         ret = ret == 0 ? PhasePrefix.run(sortingDir, output, statisticsConfig) : ret;
         Utils.deleteDirFromHDFS(conf, sortingDir, true);
         return ret;
+        //return PhasePrefix.run(sortingDir, output, statisticsConfig);
     }
 
     public int groupBy(IOConfig ioConfig, Comparator cmp, Schema statisticsAggregatorSchema, Schema keyRecordSchema) throws Exception {
