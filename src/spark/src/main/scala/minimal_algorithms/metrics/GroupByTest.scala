@@ -16,7 +16,6 @@ object GroupByTest {
     val cmpKey = (o: Row) => o.getAs[Int]("int_prim")
     val sumAgg = (o: Row) => new SumAggregator(o.getAs[Int]("int_prim") % 10000)
     val result = new SparkMinAlgFactory(spark, numOfPartitions).groupBy(df.rdd, cmpKey, sumAgg, numOfItems)
-    result.collect().foreach(println)
     spark.stop()
   }
 }
