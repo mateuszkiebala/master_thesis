@@ -2,7 +2,7 @@
 
 nn=ip-172-31-36-205.eu-west-2.compute.internal
 port=8020
-src=/home/hadoop/master_thesis/src/hadoop/
+src=/home/hadoop/master_thesis/src/spark/
 user_path=/user/hadoop/
 items_no=10000000
 partitions_no=100
