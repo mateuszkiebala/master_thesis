@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession
   * @param numPartitions  Number of partitionIts
   */
-class MinimalSemiJoin(spark: SparkSession, numPartitions: Int) extends MinimalAlgorithm(spark, numPartitions) {
+class MinimalSemiJoin(spark: SparkSession, numPartitions: Int = -1) extends MinimalAlgorithm(spark, numPartitions) {
   /**
     * Runs semi join algorithm on imported data.
     * @return RDD of objects that belong to set R and have a match in set T.

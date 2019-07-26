@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession
   * @param numPartitions  Number of partitions
   */
-class MinimalSlidingAggregation(spark: SparkSession, numPartitions: Int) extends MinimalAlgorithm(spark, numPartitions) {
+class MinimalSlidingAggregation(spark: SparkSession, numPartitions: Int = -1) extends MinimalAlgorithm(spark, numPartitions) {
 
   def aggregate[T, K, S <: StatisticsAggregator[S]]
   (rdd: RDD[T], windowLength: Int, cmpKey: T => K, statsAgg: T => S, itemsCnt: Int = -1)

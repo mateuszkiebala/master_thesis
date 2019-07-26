@@ -13,7 +13,7 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession
   * @param numPartitions  Number of partitions
   */
-class MinimalGroupBy(spark: SparkSession, numPartitions: Int) extends MinimalAlgorithm(spark, numPartitions) {
+class MinimalGroupBy(spark: SparkSession, numPartitions: Int = -1) extends MinimalAlgorithm(spark, numPartitions) {
 
   def groupBy[T, K, S <: StatisticsAggregator[S]]
   (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S, elementsCnt: Int = -1)
