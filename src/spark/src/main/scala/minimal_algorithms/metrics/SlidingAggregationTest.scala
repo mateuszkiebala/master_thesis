@@ -12,7 +12,7 @@ object SlidingAggregationTest {
     val windowLen = args(2).toInt
     val numOfItems = args(3).toInt
 
-    val spark = SparkSession.builder().appName("SlidingAggregationTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("SlidingAggregationTest").getOrCreate()
     val df = spark.read.format("com.databricks.spark.avro").option("header", "true").load(inputPath)
     val cmpKey = (o: Row) => o.getAs[Long]("long_prim")
     val sumAgg = (o: Row) => new SumAggregator(o.getAs[Int]("int_prim") % 10000)

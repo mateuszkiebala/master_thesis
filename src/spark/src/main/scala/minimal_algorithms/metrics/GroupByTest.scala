@@ -11,7 +11,7 @@ object GroupByTest {
     val inputPath = args(1)
     val numOfItems = args(2).toInt
 
-    val spark = SparkSession.builder().appName("GroupByTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("GroupByTest").getOrCreate()
     val df = spark.read.format("com.databricks.spark.avro").option("header", "true").load(inputPath)
     val cmpKey = (o: Row) => o.getAs[Int]("int_prim")
     val sumAgg = (o: Row) => new SumAggregator(o.getAs[Int]("int_prim") % 10000)
