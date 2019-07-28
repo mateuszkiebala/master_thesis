@@ -8,8 +8,9 @@ import org.apache.spark.sql.SparkSession
 
 import scala.reflect.ClassTag
 
-class MinimalAlgorithm(spark: SparkSession, numPartitions: Int = -1) {
+class MinimalAlgorithm(spark: SparkSession, numberOfPartitions: Int = -1) {
   protected val sc: SparkContext = spark.sparkContext
+  protected var numPartitions: Int = numberOfPartitions;
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
@@ -20,12 +21,13 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int = -1) {
 
   def teraSort[T, K](rdd: RDD[T], cmpKey: T => K)
                     (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
-    if (numPartitions == -1) {
+    var newRdd = rdd;
+    if (numberOfPartitions == -1) {
       numPartitions = rdd.getNumPartitions
     } else {
-      rdd.repartition(numPartitions)
+      newRdd = rdd.repartition(numPartitions)
     }
-    rdd.sortBy(cmpKey)
+    newRdd.sortBy(cmpKey)
   }
 
   def rank[T, K](rdd: RDD[T], cmpKey: T => K)
