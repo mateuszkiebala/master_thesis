@@ -11,10 +11,18 @@ import scala.reflect.ClassTag
 /**
   * Class implementing group by algorithm.
   * @param spark  SparkSession
-  * @param numPartitions  Number of partitions
+  * @param numPartitions  Number of partitions. If you do not provide this value then algorithms will use default RDD partitioning.
   */
 class MinimalGroupBy(spark: SparkSession, numPartitions: Int = -1) extends MinimalAlgorithm(spark, numPartitions) {
 
+  /**
+    * Runs group by algorithm on imported data.
+    * @param rdd RDD of objects
+    * @param cmpKey function to compare objects of rdd
+    * @param statsAgg  function to compute statistics on the object of rdd
+    * @param itemsCount number of items in rdd. If you do not provide this value then it will be computed.
+    * @return groupped statistics for rdd.
+    */
   def groupBy[T, K, S <: StatisticsAggregator[S]]
   (rdd: RDD[T], cmpKey: T => K, statsAgg: T => S, elementsCnt: Int = -1)
   (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[(K, S)] = {

@@ -8,6 +8,11 @@ import org.apache.spark.sql.SparkSession
 
 import scala.reflect.ClassTag
 
+/**
+  * Class implementing basic minimal algorithms.
+  * @param spark  SparkSession
+  * @param numPartitions  Number of partitions. If you do not provide this value then algorithms will use default RDD partitioning.
+  */
 class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
   protected val sc: SparkContext = spark.sparkContext
   object PerfectPartitioner {}

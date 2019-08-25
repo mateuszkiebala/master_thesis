@@ -29,7 +29,7 @@ run() {
     LOGS="result_$WINDOW_LENGTH"
 
     hdfs dfs -rm -r $OUTPUT_HDFS
-    spark-submit --class minimal_algorithms.spark.examples.sliding_aggregation.ExampleSlidingAggregation --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar "$NUM_OF_PARTITIONS" "$WINDOW_LENGTH" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
+    spark-submit --class minimal_algorithms.spark.examples.sliding_aggregation.ExampleSlidingAggregation --master yarn ../../../../target/spark-1.0.0-SNAPSHOT.jar "$NUM_OF_PARTITIONS" "$WINDOW_LENGTH" "$HDFS/$INPUT_HDFS" "$HDFS/$OUTPUT_HDFS"
 
     mkdir -p tmp
     rm -rf "tmp/$CORRECT_OUT_DIR"
