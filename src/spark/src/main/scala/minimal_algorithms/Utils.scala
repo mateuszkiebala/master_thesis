@@ -102,6 +102,18 @@ object Utils {
   }
 
   /**
+    * Shuffles rdd objects by sending every object to all machines [0, numPartitions)
+    * Method does NOT preserve order.
+    * @param rdd  RDD[object]
+    */
+  def sendToAllMachines[T](rdd: RDD[T])(implicit rtag: ClassTag[T]): RDD[T] = {
+    val numPartitions = rdd.getNumPartitions
+    partitionByKey[T](rdd.mapPartitions(partition => {
+      partition.flatMap{o => List.range(0, numPartitions).map{i => (i, o)}}
+    }))
+  }
+
+  /**
     * Broadcasts object to all partitions.
     */
   def sendToAllMachines[T](sc: SparkContext, o: T)(implicit rtag: ClassTag[T]): T = {

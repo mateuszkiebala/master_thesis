@@ -1,6 +1,6 @@
 package minimal_algorithms.spark.examples.ranking
 
-import minimal_algorithms.spark.MinimalAlgorithm
+import minimal_algorithms.spark.SparkMinAlgFactory
 import org.apache.spark.sql.SparkSession
 
 object ExampleRanking {
@@ -14,7 +14,7 @@ object ExampleRanking {
       val p = line.split(' ')
       new RankingObject(p(0).toInt, p(1).toDouble)})
 
-    new MinimalAlgorithm(spark, numOfPartitions).rank(inputMapped, RankingObject.cmpKey).saveAsTextFile(outputPath)
+    new SparkMinAlgFactory(spark, numOfPartitions).rank(inputMapped, RankingObject.cmpKey).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

@@ -1,6 +1,6 @@
 package minimal_algorithms.spark.examples.ranking
 
-import minimal_algorithms.spark.MinimalAlgorithm
+import minimal_algorithms.spark.SparkMinAlgFactory
 import minimal_algorithms.spark.examples.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
 
@@ -17,7 +17,7 @@ object ExampleRankingUsingPrefixSum {
 
     val cmpKey = (o: RankingObject) => new RankingComparator(o)
     val sumAgg = (o: RankingObject) => new SumAggregator(o.getWeight)
-    new MinimalAlgorithm(spark, 5).prefix(inputMapped, cmpKey, sumAgg).collect().foreach(println)
+    new SparkMinAlgFactory(spark, 5).prefix(inputMapped, cmpKey, sumAgg).collect().foreach(println)
     spark.stop()
   }
 }

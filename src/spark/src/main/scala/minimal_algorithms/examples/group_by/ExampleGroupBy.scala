@@ -1,7 +1,7 @@
 package minimal_algorithms.spark.examples.group_by
 
 import minimal_algorithms.spark.examples.statistics_aggregators.{AvgAggregator, MaxAggregator, MinAggregator, SumAggregator}
-import minimal_algorithms.spark.group_by.MinimalGroupBy
+import minimal_algorithms.spark.SparkMinAlgFactory
 import org.apache.spark.sql.SparkSession
 
 class InputObject(key: Int, weight: Double) extends Serializable {
@@ -25,7 +25,7 @@ object ExampleGroupBy {
     })
     val cmpKey = (o: InputObject) => o.getKey
     val resultCmpKey = (o: (Int, _)) => o._1
-    val minimalAlgorithm = new MinimalGroupBy(spark, numOfPartitions)
+    val minimalAlgorithm = new SparkMinAlgFactory(spark, numOfPartitions)
 
     val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
     val groupedSum = minimalAlgorithm.groupBy(inputMapped, cmpKey, sumAgg)
