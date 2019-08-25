@@ -17,11 +17,11 @@ class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit 
   var nodes: Array[S] = new Array[S](2 * BASE)
   elements.foreach{ case(element, pos) => insert(element, pos) }
 
-  def insert(element: S, start: Int): Unit = {
-    if (start < 0 || start >= BASE)
-      throw new IndexOutOfBoundsException("Position out of range: " + start)
+  def insert(element: S, position: Int): Unit = {
+    if (position < 0 || position >= BASE)
+      throw new IndexOutOfBoundsException("Position out of range: " + position)
 
-    var pos = BASE + start
+    var pos = BASE + position
     nodes(pos) = safeMerge(nodes(pos), element)
     while(pos != 1) {
       pos = pos / 2
