@@ -17,6 +17,12 @@ class RangeTree[S <: StatisticsAggregator[S]](elements: Seq[(S, Int)])(implicit 
   var nodes: Array[S] = new Array[S](2 * BASE)
   elements.foreach{ case(element, pos) => insert(element, pos) }
 
+  /**
+    * Insert value at given leaf position.
+    * @param element  object S
+    * @param position [0 ... BASE - 1]
+    * @return  Unit
+    */
   def insert(element: S, position: Int): Unit = {
     if (position < 0 || position >= BASE)
       throw new IndexOutOfBoundsException("Position out of range: " + position)
