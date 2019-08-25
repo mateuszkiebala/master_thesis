@@ -179,8 +179,8 @@
 	\def\klasyfikacja#1{\gdef\@klasyfikacja{#1}}
 	\def\@klasyfikacja{???\ClassError{pracamgr}{Brak klasyfikacji tematycznej}\@ehc}
 	%-------------------nowe------------
-	%\def\tytulang#1{\gdef\@tytulang{#1}}
-	%\def\@tytulang{???\ClassError{pracamgr}{Brak tytulu po angielsku}\@ehc}
+	\def\tytulang#1{\gdef\@tytulang{#1}}
+	\def\@tytulang{???\ClassError{pracamgr}{Brak tytulu po angielsku}\@ehc}
 	\def\titlepl#1{\gdef\@titlepl{#1}}
 	\def\@titlepl{???\ClassError{pracamgr}{Brak tytulu po polski}\@ehc}
 
