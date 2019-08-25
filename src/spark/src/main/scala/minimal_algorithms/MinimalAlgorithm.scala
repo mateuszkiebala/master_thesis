@@ -13,8 +13,9 @@ import scala.reflect.ClassTag
   * @param spark  SparkSession
   * @param numPartitions  Number of partitions. If you do not provide this value then algorithms will use default RDD partitioning.
   */
-class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
+class MinimalAlgorithm(spark: SparkSession, numberOfPartitions: Int = -1) {
   protected val sc: SparkContext = spark.sparkContext
+  protected var numPartitions: Int = numberOfPartitions;
   object PerfectPartitioner {}
   object KeyPartitioner {}
 
@@ -25,7 +26,13 @@ class MinimalAlgorithm(spark: SparkSession, numPartitions: Int) {
 
   def teraSort[T, K](rdd: RDD[T], cmpKey: T => K)
                     (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
-    rdd.repartition(numPartitions).sortBy(cmpKey)
+    var newRdd = rdd;
+    if (numberOfPartitions == -1) {
+      numPartitions = rdd.getNumPartitions
+    } else {
+      newRdd = rdd.repartition(numPartitions)
+    }
+    newRdd.sortBy(cmpKey)
   }
 
   def rank[T, K](rdd: RDD[T], cmpKey: T => K)

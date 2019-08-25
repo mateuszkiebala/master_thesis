@@ -31,7 +31,7 @@ public class TeraSort extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
         // configuration is necessary to add -libjars (http://stackoverflow.com/questions/28520821/how-to-add-external-jar-to-hadoop-job)
-        int res = ToolRunner.run(new Configuration(), new Ranking(), args);
+        int res = ToolRunner.run(new Configuration(), new TeraSort(), args);
         System.exit(res);
     }
 }

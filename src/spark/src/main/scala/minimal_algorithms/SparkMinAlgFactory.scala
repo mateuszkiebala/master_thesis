@@ -7,7 +7,7 @@ import minimal_algorithms.spark.statistics.StatisticsAggregator
 import minimal_algorithms.spark.group_by.MinimalGroupBy
 import minimal_algorithms.spark.sliding_aggregation.MinimalSlidingAggregation
 
-class SparkMinAlgFactory(spark: SparkSession, numPartitions: Int) {
+class SparkMinAlgFactory(spark: SparkSession, numPartitions: Int = -1) {
 
   def teraSort[T, K](rdd: RDD[T], cmpKey: T => K, itemsCnt: Int = -1)
       (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K]): RDD[T] = {
