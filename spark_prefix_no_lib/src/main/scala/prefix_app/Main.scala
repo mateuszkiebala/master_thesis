@@ -29,7 +29,7 @@ object PrefixApp {
     rdd.mapPartitions(partitionIt => {
       if (partitionIt.isEmpty) {
         Iterator()
-      } else {s
+      } else {
         Iterator(partitionIt.foldLeft(0){(acc, o) => acc + o.getValue()})
       }
     })
