@@ -37,7 +37,7 @@ public class PartitionStatistics {
     @Override
     protected void map(Text key, Text value, Context context) throws IOException, InterruptedException {
       long result = 0;
-      for (FourInts fourInts : new MultipleFourInts(value.toString()).getValues()) {
+      for (FourInts fourInts : new MultipleFourInts(value).getValues()) {
         result += fourInts.getValue();
       }
       context.write(NullWritable.get(), new IndexedStatistics(key.toString(), result).toText());

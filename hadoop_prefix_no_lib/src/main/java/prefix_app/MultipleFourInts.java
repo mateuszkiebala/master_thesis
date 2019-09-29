@@ -2,10 +2,15 @@ package prefix_app;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.hadoop.io.Text;
 
 public class MultipleFourInts {
   public static final String DELIMITER = "#";
   private List<FourInts> fourIntsSeq;
+
+  public MultipleFourInts(Text encodedValues){
+    this(encodedValues.toString());
+  }
 
   public MultipleFourInts(String encodedValues) {
     this.fourIntsSeq = new ArrayList<>();
@@ -29,5 +34,9 @@ public class MultipleFourInts {
       result.add(fourInts.toString());
     }
     return String.join(DELIMITER, result);
+  }
+
+  public Text toText() {
+    return new Text(this.toString());
   }
 }

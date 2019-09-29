@@ -20,6 +20,10 @@ public class FourInts {
         this.fourth = Integer.parseInt(values[3]);
     }
 
+    public FourInts(Text encodedValues) {
+      this(encodedValues.toString());
+    }
+
     public long getValue() {
       return this.second + this.third + this.fourth;
     }
@@ -30,7 +34,7 @@ public class FourInts {
     }
 
     public Text toText() {
-        return new Text(this.encodedValues);
+        return new Text(this.toString());
     }
 
     public static class FourIntsComparator implements Comparator<FourInts> {

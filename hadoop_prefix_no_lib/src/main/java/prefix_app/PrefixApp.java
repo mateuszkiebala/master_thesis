@@ -34,9 +34,9 @@ public class PrefixApp extends Configured implements Tool {
         conf.setInt(Utils.SPLIT_POINTS_KEY, partitionsNo);
         conf.setInt(Utils.REDUCERS_NO_KEY, reducersNo);
         Path input = new Path(args[1]);
-        //Sampling.run(input, new Path("sampling"), conf);
-        //Sorting.run(input, new Path(args[0] + "/sampling"), new Path("sorting"), conf);
-        //PartitionStatistics.run(new Path(args[0] + "/sorting"), new Path("part_stats"), conf);
+        Sampling.run(input, new Path("sampling"), conf);
+        Sorting.run(input, new Path(args[0] + "/sampling"), new Path("sorting"), conf);
+        PartitionStatistics.run(new Path(args[0] + "/sorting"), new Path("part_stats"), conf);
         return Prefix.run(new Path(args[0] + "/sorting"), new Path(args[0] + "/part_stats"), new Path("prefix"), conf);
     }
 

@@ -56,13 +56,13 @@ public class Sampling {
         protected void reduce(NullWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
             ArrayList<FourInts> result = new ArrayList<>();
             for (Text value : values) {
-                result.add(new FourInts(value.toString()));
+                result.add(new FourInts(value));
             }
 
             java.util.Collections.sort(result, FourInts.cmp);
             int step = result.size() / (noOfSplitPoints+1);
             for (int i = 1; i <= noOfSplitPoints; i++) {
-                context.write(new Text(result.get(i * step).toString()), NullWritable.get());
+                context.write(result.get(i * step).toText(), NullWritable.get());
             }
         }
     }

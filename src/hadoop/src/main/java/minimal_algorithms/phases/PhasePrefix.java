@@ -89,12 +89,12 @@ public class PhasePrefix {
         @Override
         protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
             Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
-            StatisticsAggregator partitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
+            StatisticsAggregator priorPartitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
 
             List<GenericRecord> elements = groupedRecords.get(1);
             if (elements != null) {
                 java.util.Collections.sort(elements, cmp);
-                List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, partitionStatistics);
+                List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, priorPartitionStatistics);
                 List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, elements);
                 sender.send(key, new MultipleStatisticRecords(statsRecords));
             }

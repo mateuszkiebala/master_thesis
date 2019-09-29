@@ -51,7 +51,7 @@ public class Sorting {
 
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            int dummy = java.util.Arrays.binarySearch(splitPoints, new FourInts(value.toString()), FourInts.cmp);
+            int dummy = java.util.Arrays.binarySearch(splitPoints, new FourInts(value), FourInts.cmp);
             context.write(new IntWritable(dummy >= 0 ? dummy : -dummy - 1), value);
         }
     }
@@ -76,11 +76,11 @@ public class Sorting {
         protected void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
             List<FourInts> result = new ArrayList<>();
             for (Text record : values) {
-                result.add(new FourInts(record.toString()));
+                result.add(new FourInts(record));
             }
             java.util.Collections.sort(result, FourInts.cmp);
             mos.write(SORTED_COUNTS, key, new LongWritable(result.size()));
-            mos.write(SORTED_DATA, key, new Text(new MultipleFourInts(result).toString()));
+            mos.write(SORTED_DATA, key, new MultipleFourInts(result).toText());
         }
     }
 

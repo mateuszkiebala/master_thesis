@@ -48,7 +48,7 @@ public class Prefix {
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       List<FourInts> fourIntsList = new ArrayList<>();
       for (Text value : values) {
-        for (FourInts fourInts : new MultipleFourInts(value.toString()).getValues()) {
+        for (FourInts fourInts : new MultipleFourInts(value).getValues()) {
           fourIntsList.add(fourInts);
         }
       }
@@ -71,7 +71,7 @@ public class Prefix {
     LOG.info("starting phase Prefix");
     Job job = Job.getInstance(conf, "JOB: Phase Prefix");
     job.setJarByClass(Prefix.class);
-    job.setNumReduceTasks(1);
+    job.setNumReduceTasks(conf.getInt(Utils.REDUCERS_NO_KEY, 1));
     job.setMapperClass(PrefixMapper.class);
     job.setInputFormatClass(KeyValueTextInputFormat.class);
     job.setMapOutputKeyClass(Text.class);
