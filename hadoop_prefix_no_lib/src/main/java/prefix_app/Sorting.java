@@ -30,85 +30,85 @@ import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 public class Sorting {
 
-    static final Log LOG = LogFactory.getLog(Sorting.class);
+  static final Log LOG = LogFactory.getLog(Sorting.class);
 
-    public static final String SAMPLING_SPLIT_POINTS_CACHE = "sampling_split_points.cache";
-    public static final String SORTED_COUNTS = "sortedCounts";
-    public static final String SORTED_DATA = "sortedData";
-    public static final String SORTED_DATA_PATTERN = SORTED_DATA + "-r-*";
+  public static final String SAMPLING_SPLIT_POINTS_CACHE = "sampling_split_points.cache";
+  public static final String SORTED_COUNTS = "sortedCounts";
+  public static final String SORTED_DATA = "sortedData";
+  public static final String SORTED_DATA_PATTERN = SORTED_DATA + "-r-*";
 
-    public static class PartitioningMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
-        private FourInts[] splitPoints;
+  public static class PartitioningMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
+    private FourInts[] splitPoints;
 
-        @Override
-        public void setup(Context ctx) {
-            ArrayList<String> words = Utils.readFromCache(new Path(SAMPLING_SPLIT_POINTS_CACHE));
-            splitPoints = new FourInts[words.size()];
-            for (int i = 0; i < words.size(); i++) {
-              splitPoints[i] = new FourInts(words.get(i));
-            }
-        }
-
-        @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            int dummy = java.util.Arrays.binarySearch(splitPoints, new FourInts(value), FourInts.cmp);
-            context.write(new IntWritable(dummy >= 0 ? dummy : -dummy - 1), value);
-        }
+    @Override
+    public void setup(Context ctx) {
+      ArrayList<String> words = Utils.readFromCache(new Path(SAMPLING_SPLIT_POINTS_CACHE));
+      splitPoints = new FourInts[words.size()];
+      for (int i = 0; i < words.size(); i++) {
+        splitPoints[i] = new FourInts(words.get(i));
+      }
     }
 
-    public static class SortingReducer extends Reducer<IntWritable, Text, WritableComparable, Writable> {
-        private MultipleOutputs mos;
+    @Override
+    protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+      int dummy = java.util.Arrays.binarySearch(splitPoints, new FourInts(value), FourInts.cmp);
+      context.write(new IntWritable(dummy >= 0 ? dummy : -dummy - 1), value);
+    }
+  }
 
-        @Override
-        public void setup(Context ctx) {
-          mos = new MultipleOutputs(ctx);
-        }
+  public static class SortingReducer extends Reducer<IntWritable, Text, WritableComparable, Writable> {
+    private MultipleOutputs mos;
 
-        public void cleanup(Context ctx) throws IOException {
-          try {
-            mos.close();
-          } catch (InterruptedException ex) {
-            Logger.getLogger(Sorting.class.getName()).log(Level.SEVERE, null, ex);
-          }
-        }
-
-        @Override
-        protected void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-            List<FourInts> result = new ArrayList<>();
-            for (Text record : values) {
-                result.add(new FourInts(record));
-            }
-            java.util.Collections.sort(result, FourInts.cmp);
-            mos.write(SORTED_COUNTS, key, new LongWritable(result.size()));
-            mos.write(SORTED_DATA, key, new MultipleFourInts(result).toText());
-        }
+    @Override
+    public void setup(Context ctx) {
+      mos = new MultipleOutputs(ctx);
     }
 
-    public static int run(Path input, Path samplingSuperdir, Path output, Configuration conf) throws Exception {
-        LOG.info("Starting Phase Sorting Reducer");
-
-        Job job = Job.getInstance(conf, "JOB: Phase Sorting Reducer");
-        job.setJarByClass(Sorting.class);
-        job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000" + "#" + Sorting.SAMPLING_SPLIT_POINTS_CACHE));
-        job.setNumReduceTasks(conf.getInt(Utils.REDUCERS_NO_KEY, 1));
-        job.setMapperClass(PartitioningMapper.class);
-        job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(Text.class);
-
-        FileInputFormat.setInputPaths(job, input);
-        FileOutputFormat.setOutputPath(job, output);
-
-        job.setReducerClass(SortingReducer.class);
-        MultipleOutputs.addNamedOutput(job, SORTED_COUNTS, TextOutputFormat.class, IntWritable.class, LongWritable.class);
-        MultipleOutputs.addNamedOutput(job, SORTED_DATA, TextOutputFormat.class, IntWritable.class, Text.class);
-
-        LOG.info("Waiting for sorting reducer");
-        int ret = job.waitForCompletion(true) ? 0 : 1;
-
-        Counters counters = job.getCounters();
-        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-        LOG.info("Finished phase sorting reducer, processed " + total + " key/value pairs");
-
-        return ret;
+    public void cleanup(Context ctx) throws IOException {
+      try {
+        mos.close();
+      } catch (InterruptedException ex) {
+        Logger.getLogger(Sorting.class.getName()).log(Level.SEVERE, null, ex);
+      }
     }
+
+    @Override
+    protected void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+      List<FourInts> result = new ArrayList<>();
+      for (Text record : values) {
+        result.add(new FourInts(record));
+      }
+      java.util.Collections.sort(result, FourInts.cmp);
+      mos.write(SORTED_COUNTS, key, new LongWritable(result.size()));
+      mos.write(SORTED_DATA, key, new MultipleFourInts(result).toText());
+    }
+  }
+
+  public static int run(Path input, Path samplingSuperdir, Path output, Configuration conf) throws Exception {
+    LOG.info("Starting Phase Sorting Reducer");
+
+    Job job = Job.getInstance(conf, "JOB: Phase Sorting Reducer");
+    job.setJarByClass(Sorting.class);
+    job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000" + "#" + Sorting.SAMPLING_SPLIT_POINTS_CACHE));
+    job.setNumReduceTasks(conf.getInt(Utils.REDUCERS_NO_KEY, 1));
+    job.setMapperClass(PartitioningMapper.class);
+    job.setMapOutputKeyClass(IntWritable.class);
+    job.setMapOutputValueClass(Text.class);
+
+    FileInputFormat.setInputPaths(job, input);
+    FileOutputFormat.setOutputPath(job, output);
+
+    job.setReducerClass(SortingReducer.class);
+    MultipleOutputs.addNamedOutput(job, SORTED_COUNTS, TextOutputFormat.class, IntWritable.class, LongWritable.class);
+    MultipleOutputs.addNamedOutput(job, SORTED_DATA, TextOutputFormat.class, IntWritable.class, Text.class);
+
+    LOG.info("Waiting for sorting reducer");
+    int ret = job.waitForCompletion(true) ? 0 : 1;
+
+    Counters counters = job.getCounters();
+    long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+    LOG.info("Finished phase sorting reducer, processed " + total + " key/value pairs");
+
+    return ret;
+  }
 }

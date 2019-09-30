@@ -34,7 +34,7 @@ import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
 public class Prefix {
 
   static final Log LOG = LogFactory.getLog(Prefix.class);
-  static final String PREFIX_PARTITION_STATISTICS_CACHE = "prefix_part_stats.cache";
+  static final String PREFIX_PART_STATS_CACHE = "prefix_part_stats.cache";
 
   public static class PrefixMapper extends Mapper<Text, Text, Text, Text> {
     @Override
@@ -55,7 +55,7 @@ public class Prefix {
       java.util.Collections.sort(fourIntsList, FourInts.cmp);
 
       int partIndex = Integer.parseInt(key.toString());
-      ArrayList<String> words = Utils.readFromCache(new Path(PREFIX_PARTITION_STATISTICS_CACHE));
+      ArrayList<String> words = Utils.readFromCache(new Path(PREFIX_PART_STATS_CACHE));
       long prevPartStats = words.stream().map(w -> Long.parseLong(w)).collect(Collectors.toList()).get(partIndex);
 
       Long[] result = new Long[fourIntsList.size()];
@@ -77,7 +77,7 @@ public class Prefix {
     job.setMapOutputKeyClass(Text.class);
     job.setMapOutputValueClass(Text.class);
 
-    job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000" + "#" + PREFIX_PARTITION_STATISTICS_CACHE));
+    job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000" + "#" + PREFIX_PART_STATS_CACHE));
     FileInputFormat.setInputPaths(job, input + "/" + Sorting.SORTED_DATA_PATTERN);
     FileOutputFormat.setOutputPath(job, output);
 

@@ -29,11 +29,11 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 import org.apache.hadoop.mapreduce.lib.input.KeyValueTextInputFormat;
 
-public class PartitionStatistics {
+public class PartStats {
 
-  static final Log LOG = LogFactory.getLog(PartitionStatistics.class);
+  static final Log LOG = LogFactory.getLog(PartStats.class);
 
-  public static class PartitionPrefixMapper extends Mapper<Text, Text, NullWritable, Text> {
+  public static class PartPrefixMapper extends Mapper<Text, Text, NullWritable, Text> {
     @Override
     protected void map(Text key, Text value, Context context) throws IOException, InterruptedException {
       long result = 0;
@@ -44,7 +44,7 @@ public class PartitionStatistics {
     }
   }
 
-  public static class PartitionStatisticsReducer extends Reducer<NullWritable, Text, NullWritable, LongWritable> {
+  public static class PartStatsReducer extends Reducer<NullWritable, Text, NullWritable, LongWritable> {
     @Override
     protected void reduce(NullWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       List<IndexedStatistics> result = new ArrayList<>();
@@ -53,21 +53,21 @@ public class PartitionStatistics {
       }
       java.util.Collections.sort(result, IndexedStatistics.cmp);
 
-      Long[] prefixPartitionStatistics = new Long[result.size()];
+      Long[] prefixPartStats = new Long[result.size()];
       for (int i = 0; i < result.size(); i++) {
-        long stat = i == 0 ? 0 : result.get(i-1).statistics + prefixPartitionStatistics[i-1];
-        prefixPartitionStatistics[i] = stat;
+        long stat = i == 0 ? 0 : result.get(i-1).statistics + prefixPartStats[i-1];
+        prefixPartStats[i] = stat;
         context.write(NullWritable.get(), new LongWritable(stat));
       }
     }
   }
 
   public static int run(Path input, Path output, Configuration conf) throws Exception {
-    LOG.info("starting phase PartitionStatistics");
-    Job job = Job.getInstance(conf, "JOB: Phase PartitionStatistics");
-    job.setJarByClass(PartitionStatistics.class);
+    LOG.info("starting phase PartStats");
+    Job job = Job.getInstance(conf, "JOB: Phase PartStats");
+    job.setJarByClass(PartStats.class);
     job.setNumReduceTasks(1);
-    job.setMapperClass(PartitionPrefixMapper.class);
+    job.setMapperClass(PartPrefixMapper.class);
     job.setInputFormatClass(KeyValueTextInputFormat.class);
     job.setMapOutputKeyClass(NullWritable.class);
     job.setMapOutputValueClass(Text.class);
@@ -75,16 +75,16 @@ public class PartitionStatistics {
     FileInputFormat.setInputPaths(job, input + "/" + Sorting.SORTED_DATA_PATTERN);
     FileOutputFormat.setOutputPath(job, output);
 
-    job.setReducerClass(PartitionStatisticsReducer.class);
+    job.setReducerClass(PartStatsReducer.class);
     job.setOutputKeyClass(NullWritable.class);
     job.setOutputValueClass(LongWritable.class);
 
-    LOG.info("Waiting for phase PartitionStatistics");
+    LOG.info("Waiting for phase PartStats");
     int ret = job.waitForCompletion(true) ? 0 : 1;
 
     Counters counters = job.getCounters();
     long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-    LOG.info("Finished phase PartitionStatistics, processed " + total + " key/value pairs");
+    LOG.info("Finished phase PartStats, processed " + total + " key/value pairs");
 
     return ret;
   }
