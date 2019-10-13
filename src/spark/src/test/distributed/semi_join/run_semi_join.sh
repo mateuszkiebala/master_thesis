@@ -28,7 +28,7 @@ HDFS="hdfs://192.168.0.199:9000"
 OUTPUT_HDFS="$USER_PATH/output"
 
 hdfs dfs -rm -r $OUTPUT_HDFS
-spark-submit --class minimal_algorithms.hadoop.examples.semi_join.ExampleSemiJoin --master yarn ../../../../target/scala-2.11/library_2.11-0.1.jar 10 "$HDFS/$INPUT_R_HDFS" "$HDFS/$INPUT_T_HDFS" "$HDFS/$OUTPUT_HDFS"
+spark-submit --class minimal_algorithms.spark.examples.semi_join.ExampleSemiJoin --master yarn ../../../../target/spark-1.0.0-SNAPSHOT.jar 10 "$HDFS/$INPUT_R_HDFS" "$HDFS/$INPUT_T_HDFS" "$HDFS/$OUTPUT_HDFS"
 
 run() {
     LOGS="result"

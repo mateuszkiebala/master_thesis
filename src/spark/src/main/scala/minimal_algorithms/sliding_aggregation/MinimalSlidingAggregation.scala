@@ -11,10 +11,19 @@ import scala.reflect.ClassTag
 /**
   * Class implementing sliding aggregation algorithm.
   * @param spark  SparkSession
-  * @param numPartitions  Number of partitions
+  * @param numPartitions  Number of partitions. If you do not provide this value then algorithms will use default RDD partitioning.
   */
-class MinimalSlidingAggregation(spark: SparkSession, numPartitions: Int) extends MinimalAlgorithm(spark, numPartitions) {
+class MinimalSlidingAggregation(spark: SparkSession, numPartitions: Int = -1) extends MinimalAlgorithm(spark, numPartitions) {
 
+  /**
+    * Runs sliding aggregation algorithm on imported data.
+    * @param rdd RDD of objects
+    * @param windowLength length of the window defined in algorithm
+    * @param cmpKey function to compare objects of rdd
+    * @param statsAgg  function to compute statistics on the object of rdd
+    * @param itemsCount number of items in rdd. If you do not provide this value then it will be computed.
+    * @return sliding aggregation's statistics for rdd.
+    */
   def aggregate[T, K, S <: StatisticsAggregator[S]]
   (rdd: RDD[T], windowLength: Int, cmpKey: T => K, statsAgg: T => S, itemsCnt: Int = -1)
   (implicit ord: Ordering[K], ttag: ClassTag[T], ktag: ClassTag[K], stag: ClassTag[S]): RDD[(T, S)] = {

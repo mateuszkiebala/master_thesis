@@ -1,7 +1,7 @@
 package minimal_algorithms.spark.examples.sliding_aggregation
 
 import minimal_algorithms.spark.examples.statistics_aggregators.SumAggregator
-import minimal_algorithms.spark.sliding_aggregation.MinimalSlidingAggregation
+import minimal_algorithms.spark.SparkMinAlgFactory
 import org.apache.spark.sql.SparkSession
 
 class InputObject(key: Int, weight: Int) extends Serializable {
@@ -25,10 +25,8 @@ object ExampleSlidingAggregation {
       new InputObject(p(0).toInt, p(1).toInt)})
 
     val cmpKey = (o: InputObject) => o.getKey
-    val minimalAlgorithm = new MinimalSlidingAggregation(spark, numOfPartitions)
-
     val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
-    minimalAlgorithm.aggregate(inputMapped, windowLen, cmpKey, sumAgg).
+    new SparkMinAlgFactory(spark, numOfPartitions).slidingAggregation(inputMapped, windowLen, cmpKey, sumAgg).
       map(res => res._1.toString + " " + res._2.getValue.toInt.toString).saveAsTextFile(outputPath)
     spark.stop()
   }

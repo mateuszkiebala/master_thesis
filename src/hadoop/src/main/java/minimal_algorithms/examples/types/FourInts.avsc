@@ -1,0 +1,12 @@
+[
+{"namespace": "minimal_algorithms.examples.types",
+ "type": "record",
+ "name": "FourInts",
+ "fields": [
+    {"name": "first", "type": "int"},
+    {"name": "second", "type": "int"},
+    {"name": "third", "type": "int"},
+    {"name": "fourth", "type": "int"}
+  ]
+}
+]

@@ -27,7 +27,7 @@ public class Prefix extends Configured implements Tool {
 
         IOConfig ioConfig = new IOConfig(new Path(args[0]), new Path(args[1]), new Path(args[2]), Complex.getClassSchema());
         Config config = new Config(getConf(), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
-        Schema statsSchema = SumStatisticsAggregator.getClassSchema();
+        Schema statsSchema = SumSAComplex.getClassSchema();
         return new HadoopMinAlgFactory(config).prefix(ioConfig, new ComplexCmp(), statsSchema);
     }
 

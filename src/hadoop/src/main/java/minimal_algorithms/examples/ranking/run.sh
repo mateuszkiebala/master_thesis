@@ -2,7 +2,6 @@
 
 MYDIR="${0%/*}"
 source "$MYDIR"/../settings.sh
-source "$MYDIR"/../record4Float_input.sh
 
-hdfs dfs -rm -r /user/mati/ranking_output
-yarn jar $app_jar minimal_algorithms.hadoop.examples.Ranking -libjars $yarn_libjars hdfs://$nn:9000/user/mati/ hdfs://$nn:9000/user/mati/input.dir hdfs://$nn:9000/user/mati/ranking_output 20 3 3
+hdfs dfs -rm -r /user/hadoop/ranking_output
+yarn jar $app_jar minimal_algorithms.hadoop.examples.Ranking -libjars $yarn_libjars hdfs://$nn:$port/user/hadoop/ hdfs://$nn:$port/user/hadoop/data_hadoop.avro hdfs://$nn:$port/user/hadoop/ranking_output $items_no $partitions_no $reducers_no

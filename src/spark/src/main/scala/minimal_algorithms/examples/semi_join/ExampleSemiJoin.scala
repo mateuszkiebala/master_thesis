@@ -1,6 +1,6 @@
 package minimal_algorithms.spark.examples.semi_join
 
-import minimal_algorithms.spark.MinimalSemiJoin
+import minimal_algorithms.spark.SparkMinAlgFactory
 import org.apache.spark.sql.SparkSession
 
 object ExampleSemiJoin {
@@ -22,7 +22,7 @@ object ExampleSemiJoin {
       new SemiJoinType(p(0).toInt, p(1).toDouble, false)})
 
     val isRType = ((o: SemiJoinType) => o.getSetType)
-    val minimalAlgorithm = new MinimalSemiJoin(spark, numOfPartitions)
+    val minimalAlgorithm = new SparkMinAlgFactory(spark, numOfPartitions)
     val result = minimalAlgorithm.semiJoin(inputMappedR, inputMappedT, SemiJoinType.cmpKey, isRType)
     minimalAlgorithm.perfectSort(result, SemiJoinType.cmpKey).map(res => res.toString).saveAsTextFile(outputPath)
     spark.stop()

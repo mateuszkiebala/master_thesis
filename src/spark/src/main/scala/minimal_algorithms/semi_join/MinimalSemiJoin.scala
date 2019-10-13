@@ -8,11 +8,16 @@ import scala.reflect.ClassTag
 /**
   * Class implementing semi join algorithm.
   * @param spark  SparkSession
-  * @param numPartitions  Number of partitionIts
+  * @param numPartitions  Number of partitions. If you do not provide this value then algorithms will use default RDD partitioning.
   */
-class MinimalSemiJoin(spark: SparkSession, numPartitions: Int) extends MinimalAlgorithm(spark, numPartitions) {
+class MinimalSemiJoin(spark: SparkSession, numPartitions: Int = -1) extends MinimalAlgorithm(spark, numPartitions) {
   /**
     * Runs semi join algorithm on imported data.
+    * @param rddR RDD of objects from set R
+    * @param rddT RDD of objects from set T
+    * @param cmpKey function to compare objects of RDD
+    * @param isRType  function to check if object belongs to set R
+    * @param itemsCount number of items in rddR + rddT. If you do not provide this value then it will be computed.
     * @return RDD of objects that belong to set R and have a match in set T.
     */
   def semiJoin[T, K]

@@ -71,11 +71,11 @@ public class RangeTree extends org.apache.avro.specific.SpecificRecordBase imple
         }
     }
 
-    public void insert(StatisticsAggregator element, int start) {
-        if (start < 0 || start >= BASE)
-            throw new org.apache.avro.AvroRuntimeException("Position out of range: " + start);
+    public void insert(StatisticsAggregator element, int position) {
+        if (position < 0 || position >= BASE)
+            throw new org.apache.avro.AvroRuntimeException("Position out of range: " + position);
 
-        int pos = BASE + start;
+        int pos = BASE + position;
         nodes[pos] = StatisticsAggregator.safeMerge(nodes[pos], element);
         while (pos != 1) {
             pos = pos / 2;

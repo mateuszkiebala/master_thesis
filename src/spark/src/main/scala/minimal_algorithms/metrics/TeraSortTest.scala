@@ -10,7 +10,7 @@ object TeraSortTest {
     val numOfPartitions = args(0).toInt
     val inputPath = args(1)
 
-    val spark = SparkSession.builder().appName("TeraSortTest").master("local").getOrCreate()
+    val spark = SparkSession.builder().appName("TeraSortTest").getOrCreate()
     val df = spark.read.format("com.databricks.spark.avro").option("header", "true").load(inputPath)
     val cmpKey = (o: Row) => o.getAs[Long]("long_prim")
     val result = new SparkMinAlgFactory(spark, numOfPartitions).teraSort(df.rdd, cmpKey)

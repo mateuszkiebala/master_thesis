@@ -2,7 +2,6 @@
 
 MYDIR="${0%/*}"
 source "$MYDIR"/../settings.sh
-source "$MYDIR"/../record4Float_input.sh
 
-hdfs dfs -rm -r /user/mati/group_by_output
-yarn jar $app_jar minimal_algorithms.hadoop.examples.GroupBy -libjars $yarn_libjars hdfs://$nn:9000/user/mati/ hdfs://$nn:9000/user/mati/input.dir hdfs://$nn:9000/user/mati/group_by_output 20 3 3
+hdfs dfs -rm -r $user_path/group_by_output
+yarn jar $app_jar minimal_algorithms.hadoop.examples.GroupBy -libjars $yarn_libjars hdfs://$nn:$port$user_path/ hdfs://$nn:$port$user_path/data_hadoop.avro hdfs://$nn:$port$user_path/group_by_output $items_no $partitions_no $reducers_no

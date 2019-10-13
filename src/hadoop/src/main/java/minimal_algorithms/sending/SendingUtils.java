@@ -13,7 +13,7 @@ import org.apache.avro.specific.SpecificData;
 
 public class SendingUtils {
 
-    public static List<GenericRecord> select1Records(List<SendWrapper> records) {
+    public static List<GenericRecord> selectFirst(List<SendWrapper> records) {
         List<GenericRecord> result = new ArrayList<>();
         for (SendWrapper sw : records) {
             if (sw.isType1()) {
@@ -23,7 +23,7 @@ public class SendingUtils {
         return result;
     }
 
-    public static List<GenericRecord> select2Records(List<SendWrapper> records) {
+    public static List<GenericRecord> selectSecond(List<SendWrapper> records) {
         List<GenericRecord> result = new ArrayList<>();
         for (SendWrapper sw : records) {
             if (sw.isType2()) {

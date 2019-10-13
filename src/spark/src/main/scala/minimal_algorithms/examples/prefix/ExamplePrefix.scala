@@ -1,6 +1,6 @@
 package minimal_algorithms.spark.examples.prefix
 
-import minimal_algorithms.spark.MinimalAlgorithm
+import minimal_algorithms.spark.SparkMinAlgFactory
 import minimal_algorithms.spark.examples.statistics_aggregators.SumAggregator
 import org.apache.spark.sql.SparkSession
 
@@ -23,7 +23,7 @@ object ExamplePrefix {
 
     val cmpKey = (o: InputObject) => o.getWeight
     val sumAgg = (o: InputObject) => new SumAggregator(o.getWeight)
-    new MinimalAlgorithm(spark, numOfPartitions).prefix(inputMapped, cmpKey, sumAgg).saveAsTextFile(outputPath)
+    new SparkMinAlgFactory(spark, numOfPartitions).prefix(inputMapped, cmpKey, sumAgg).saveAsTextFile(outputPath)
     spark.stop()
   }
 }

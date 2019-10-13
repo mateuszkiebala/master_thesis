@@ -20,7 +20,7 @@ object StatisticsUtils {
     * @param rdd  RDD of objects
     * @return Array of prefix statistics for partitions
     */
-  def prefixedPartitionStatistics[A, S <: StatisticsAggregator[S]]
+  def scanLeftPertitions[A, S <: StatisticsAggregator[S]]
   (rdd: RDD[A], statsAgg: A => S)(implicit atag: ClassTag[A], stag: ClassTag[S]): Seq[S] = {
     val elements = partitionStatistics(rdd, statsAgg).collect()
     if (elements.isEmpty) Seq[S]() else scanLeft(elements)
