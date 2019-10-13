@@ -44,6 +44,14 @@ public class Prefix {
   }
 
   public static class PrefixReducer extends Reducer<Text, Text, LongWritable, Text> {
+    List<Long> machinePrefixStats;
+
+    @Override
+    public void setup(Context ctx) {
+      ArrayList<String> words = Utils.readFromCache(new Path(PREFIX_PART_STATS_CACHE));
+      machinePrefixStats = words.stream().map(w -> Long.parseLong(w)).collect(Collectors.toList());
+    }
+
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       List<FourInts> fourIntsList = new ArrayList<>();
@@ -55,8 +63,7 @@ public class Prefix {
       java.util.Collections.sort(fourIntsList, FourInts.cmp);
 
       int partIndex = Integer.parseInt(key.toString());
-      ArrayList<String> words = Utils.readFromCache(new Path(PREFIX_PART_STATS_CACHE));
-      long prevPartStats = words.stream().map(w -> Long.parseLong(w)).collect(Collectors.toList()).get(partIndex);
+      long prevPartStats = machinePrefixStats.get(partIndex);
 
       Long[] result = new Long[fourIntsList.size()];
       for (int i = 0; i < fourIntsList.size(); i++) {
@@ -78,7 +85,7 @@ public class Prefix {
     job.setMapOutputValueClass(Text.class);
 
     job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000" + "#" + PREFIX_PART_STATS_CACHE));
-    FileInputFormat.setInputPaths(job, input + "/" + Sorting.SORTED_DATA_PATTERN);
+    FileInputFormat.setInputPaths(job, input);
     FileOutputFormat.setOutputPath(job, output);
 
     job.setReducerClass(PrefixReducer.class);

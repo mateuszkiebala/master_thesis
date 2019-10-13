@@ -72,7 +72,7 @@ public class PartStats {
     job.setMapOutputKeyClass(NullWritable.class);
     job.setMapOutputValueClass(Text.class);
 
-    FileInputFormat.setInputPaths(job, input + "/" + Sorting.SORTED_DATA_PATTERN);
+    FileInputFormat.setInputPaths(job, input);
     FileOutputFormat.setOutputPath(job, output);
 
     job.setReducerClass(PartStatsReducer.class);

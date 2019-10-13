@@ -31,11 +31,7 @@ import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 public class Sorting {
 
   static final Log LOG = LogFactory.getLog(Sorting.class);
-
   public static final String SAMPLING_SPLIT_POINTS_CACHE = "sampling_split_points.cache";
-  public static final String SORTED_COUNTS = "sortedCounts";
-  public static final String SORTED_DATA = "sortedData";
-  public static final String SORTED_DATA_PATTERN = SORTED_DATA + "-r-*";
 
   public static class PartitioningMapper extends Mapper<LongWritable, Text, IntWritable, Text> {
     private FourInts[] splitPoints;
@@ -56,22 +52,7 @@ public class Sorting {
     }
   }
 
-  public static class SortingReducer extends Reducer<IntWritable, Text, WritableComparable, Writable> {
-    private MultipleOutputs mos;
-
-    @Override
-    public void setup(Context ctx) {
-      mos = new MultipleOutputs(ctx);
-    }
-
-    public void cleanup(Context ctx) throws IOException {
-      try {
-        mos.close();
-      } catch (InterruptedException ex) {
-        Logger.getLogger(Sorting.class.getName()).log(Level.SEVERE, null, ex);
-      }
-    }
-
+  public static class SortingReducer extends Reducer<IntWritable, Text, IntWritable, Text> {
     @Override
     protected void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
       List<FourInts> result = new ArrayList<>();
@@ -79,8 +60,7 @@ public class Sorting {
         result.add(new FourInts(record));
       }
       java.util.Collections.sort(result, FourInts.cmp);
-      mos.write(SORTED_COUNTS, key, new LongWritable(result.size()));
-      mos.write(SORTED_DATA, key, new MultipleFourInts(result).toText());
+      context.write(key, new MultipleFourInts(result).toText());
     }
   }
 
@@ -91,6 +71,7 @@ public class Sorting {
     job.setJarByClass(Sorting.class);
     job.addCacheFile(new URI(samplingSuperdir + "/part-r-00000" + "#" + Sorting.SAMPLING_SPLIT_POINTS_CACHE));
     job.setNumReduceTasks(conf.getInt(Utils.REDUCERS_NO_KEY, 1));
+
     job.setMapperClass(PartitioningMapper.class);
     job.setMapOutputKeyClass(IntWritable.class);
     job.setMapOutputValueClass(Text.class);
@@ -99,8 +80,8 @@ public class Sorting {
     FileOutputFormat.setOutputPath(job, output);
 
     job.setReducerClass(SortingReducer.class);
-    MultipleOutputs.addNamedOutput(job, SORTED_COUNTS, TextOutputFormat.class, IntWritable.class, LongWritable.class);
-    MultipleOutputs.addNamedOutput(job, SORTED_DATA, TextOutputFormat.class, IntWritable.class, Text.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(Text.class);
 
     LOG.info("Waiting for sorting reducer");
     int ret = job.waitForCompletion(true) ? 0 : 1;

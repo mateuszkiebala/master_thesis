@@ -35,108 +35,108 @@ import minimal_algorithms.hadoop.config.StatisticsConfig;
 
 public class PhasePrefix {
 
-    static final Log LOG = LogFactory.getLog(PhasePrefix.class);
+  static final Log LOG = LogFactory.getLog(PhasePrefix.class);
 
-    private static void setSchemas(Configuration conf) {
-        Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);
-        Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
-        StatisticsRecord.setSchema(statisticsAggregatorSchema, baseSchema);
-        MultipleRecords.setSchema(baseSchema);
-        MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
-        SendWrapper.setSchema(baseSchema, statisticsAggregatorSchema);
+  private static void setSchemas(Configuration conf) {
+    Schema baseSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.BASE_SCHEMA_KEY);
+    Schema statisticsAggregatorSchema = Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY);
+    StatisticsRecord.setSchema(statisticsAggregatorSchema, baseSchema);
+    MultipleRecords.setSchema(baseSchema);
+    MultipleStatisticRecords.setSchema(StatisticsRecord.getClassSchema());
+    SendWrapper.setSchema(baseSchema, statisticsAggregatorSchema);
+  }
+
+  public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
+
+    private Configuration conf;
+    private AvroSender sender;
+    private StatisticsUtils statsUtiler;
+
+    @Override
+    public void setup(Context ctx) {
+      conf = ctx.getConfiguration();
+      setSchemas(conf);
+      sender = new AvroSender(ctx);
+      statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
     }
 
-    public static class PrefixMapper extends Mapper<AvroKey<Integer>, AvroValue<MultipleRecords>, AvroKey<Integer>, AvroValue<SendWrapper>> {
+    @Override
+    protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
+      StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
+      sender.sendToAllHigherMachines(new SendWrapper(null, partitionStatistics), key.datum());
+      for (GenericRecord record : value.datum().getRecords()) {
+        sender.send(key, new SendWrapper(record, null));
+      }
+    }
+  }
 
-        private Configuration conf;
-        private AvroSender sender;
-        private StatisticsUtils statsUtiler;
+  public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
 
-        @Override
-        public void setup(Context ctx) {
-            conf = ctx.getConfiguration();
-            setSchemas(conf);
-            sender = new AvroSender(ctx);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
-        }
+    private AvroSender sender;
+    private Configuration conf;
+    private StatisticsUtils statsUtiler;
+    private Comparator<GenericRecord> cmp;
 
-        @Override
-        protected void map(AvroKey<Integer> key, AvroValue<MultipleRecords> value, Context context) throws IOException, InterruptedException {
-            StatisticsAggregator partitionStatistics = statsUtiler.foldLeftRecords(value.datum().getRecords(), null);
-            sender.sendToAllHigherMachines(new SendWrapper(null, partitionStatistics), key.datum());
-            for (GenericRecord record : value.datum().getRecords()) {
-                sender.send(key, new SendWrapper(record, null));
-            }
-        }
+    @Override
+    public void setup(Context ctx) {
+      this.conf = ctx.getConfiguration();
+      setSchemas(conf);
+      sender = new AvroSender(ctx);
+      cmp = Utils.retrieveComparatorFromConf(conf);
+      statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
     }
 
-    public static class PrefixReducer extends Reducer<AvroKey<Integer>, AvroValue<SendWrapper>, AvroKey<Integer>, AvroValue<MultipleStatisticRecords>> {
+    @Override
+    protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
+      Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
+      StatisticsAggregator priorPartitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
 
-        private AvroSender sender;
-        private Configuration conf;
-        private StatisticsUtils statsUtiler;
-        private Comparator<GenericRecord> cmp;
-
-        @Override
-        public void setup(Context ctx) {
-            this.conf = ctx.getConfiguration();
-            setSchemas(conf);
-            sender = new AvroSender(ctx);
-            cmp = Utils.retrieveComparatorFromConf(conf);
-            statsUtiler = new StatisticsUtils(Utils.retrieveSchemaFromConf(conf, StatisticsConfig.STATISTICS_AGGREGATOR_SCHEMA_KEY));
-        }
-
-        @Override
-        protected void reduce(AvroKey<Integer> key, Iterable<AvroValue<SendWrapper>> values, Context context) throws IOException, InterruptedException {
-            Map<Integer, List<GenericRecord>> groupedRecords = SendingUtils.partitionRecords(values);
-            StatisticsAggregator priorPartitionStatistics = statsUtiler.foldLeftAggregators(groupedRecords.get(2));
-
-            List<GenericRecord> elements = groupedRecords.get(1);
-            if (elements != null) {
-                java.util.Collections.sort(elements, cmp);
-                List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, priorPartitionStatistics);
-                List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, elements);
-                sender.send(key, new MultipleStatisticRecords(statsRecords));
-            }
-        }
+      List<GenericRecord> elements = groupedRecords.get(1);
+      if (elements != null) {
+        java.util.Collections.sort(elements, cmp);
+        List<StatisticsAggregator> statistics = statsUtiler.scanLeftRecords(elements, priorPartitionStatistics);
+        List<StatisticsRecord> statsRecords = statsUtiler.zip(statistics, elements);
+        sender.send(key, new MultipleStatisticRecords(statsRecords));
+      }
     }
+  }
 
-    public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
-        LOG.info("Starting Phase Prefix");
-        Configuration conf = statsConfig.getConf();
-        setSchemas(conf);
+  public static int run(Path input, Path output, StatisticsConfig statsConfig) throws Exception {
+    LOG.info("Starting Phase Prefix");
+    Configuration conf = statsConfig.getConf();
+    setSchemas(conf);
 
-        Job job = Job.getInstance(conf, "JOB: Phase Prefix");
-        job.setJarByClass(PhasePrefix.class);
-        job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
-        job.setMapperClass(PrefixMapper.class);
+    Job job = Job.getInstance(conf, "JOB: Phase Prefix");
+    job.setJarByClass(PhasePrefix.class);
+    job.setNumReduceTasks(Utils.getReduceTasksCount(conf));
+    job.setMapperClass(PrefixMapper.class);
 
-        FileInputFormat.setInputPaths(job, input + "/" + StatisticsConfig.SORTED_DATA_PATTERN);
-        FileOutputFormat.setOutputPath(job, output);
+    FileInputFormat.setInputPaths(job, input + "/" + StatisticsConfig.SORTED_DATA_PATTERN);
+    FileOutputFormat.setOutputPath(job, output);
 
-        job.setInputFormatClass(AvroKeyValueInputFormat.class);
-        AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
+    job.setInputFormatClass(AvroKeyValueInputFormat.class);
+    AvroJob.setInputKeySchema(job, Schema.create(Schema.Type.INT));
+    AvroJob.setInputValueSchema(job, MultipleRecords.getClassSchema());
 
-        job.setMapOutputKeyClass(AvroKey.class);
-        job.setMapOutputValueClass(AvroValue.class);
-        AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setMapOutputValueSchema(job, SendWrapper.getClassSchema());
+    job.setMapOutputKeyClass(AvroKey.class);
+    job.setMapOutputValueClass(AvroValue.class);
+    AvroJob.setMapOutputKeySchema(job, Schema.create(Schema.Type.INT));
+    AvroJob.setMapOutputValueSchema(job, SendWrapper.getClassSchema());
 
-        job.setReducerClass(PrefixReducer.class);
-        job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
-        job.setOutputKeyClass(AvroKey.class);
-        job.setOutputValueClass(AvroValue.class);
-        AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
-        AvroJob.setOutputValueSchema(job, MultipleStatisticRecords.getClassSchema());
+    job.setReducerClass(PrefixReducer.class);
+    job.setOutputFormatClass(AvroKeyValueOutputFormat.class);
+    job.setOutputKeyClass(AvroKey.class);
+    job.setOutputValueClass(AvroValue.class);
+    AvroJob.setOutputKeySchema(job, Schema.create(Schema.Type.INT));
+    AvroJob.setOutputValueSchema(job, MultipleStatisticRecords.getClassSchema());
 
-        LOG.info("Waiting for Phase Prefix");
-        int ret = job.waitForCompletion(true) ? 0 : 1;
+    LOG.info("Waiting for Phase Prefix");
+    int ret = job.waitForCompletion(true) ? 0 : 1;
 
-        Counters counters = job.getCounters();
-        long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
-        LOG.info("Finished Phase Prefix, processed " + total + " key/value pairs");
+    Counters counters = job.getCounters();
+    long total = counters.findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();
+    LOG.info("Finished Phase Prefix, processed " + total + " key/value pairs");
 
-        return ret;
-    }
+    return ret;
+  }
 }
